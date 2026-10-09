@@ -1,0 +1,35 @@
+# ViewSense AI® Fabric Module Catalog
+
+`fabric/` is machine-readable installable product metadata, not a second copy of application source. Runtime packages live under `src/viewsense_*`; module descriptors connect them to their contracts, Helm controls, provider choices, data ownership, and maturity.
+
+| Directory | Capability | Current maturity |
+|---|---|---|
+| `core/` | edge API and request orchestration | implemented reference |
+| `governance/` | provider passports, admission, and safe execution evidence | implemented reference |
+| `identity/` | workload issuer, modular OIDC and browser SSO | implemented reference |
+| `certificates/` | public certificate inventory, expiry and bounded renewal API | implemented reference |
+| `llm/` | model gateway and inference providers | implemented reference |
+| `memory/` | memory gateway and vector providers | implemented reference |
+| `mcp-registry/` | MCP catalog and invocation boundary | implemented reference |
+| `ingestion/` | governed document chunking and indexing entry point | implemented reference |
+| `agents/` | durable bounded agent runs | implemented reference |
+| `workflows/` | n8n/Temporal/Argo provider boundary | contract only |
+| `networking/` | replaceable CNI/mesh, allowed topology and acceptance APIs | implemented reference |
+| `observability/` | JSON/OTel/SIEM integration boundary | partial reference |
+
+Each capability directory in the implementation repository must contain:
+
+- `module.json` conforming to `module.schema.json`;
+- valid implementation-relative paths to code and machine-readable contracts;
+- canonical public documentation-source URLs for Markdown design contracts;
+- honest provider status: `bundled`, `external`, or `planned`.
+
+Each operator/developer README is maintained separately under the corresponding
+`aiops-fabric-docs/docs/fabric/<module>/` directory. New narrative documentation,
+including module guides, must be authored in the documentation repository.
+
+The authoritative product and integration-mode list is [PRODUCTS.md](PRODUCTS.md), backed by
+`product-catalog.json`. The umbrella chart is `fabric/charts/viewsense`. Each runtime module can be
+independently enabled and provider products are selected through `products.*`. External Secrets,
+cluster workload identity, and production provider charts remain enterprise overlays. Run
+`make catalog-check` and `make profile-check` to reject catalog drift and invalid product profiles.

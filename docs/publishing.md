@@ -1,54 +1,100 @@
 # Publishing the ViewSense AI® Documentation
 
-This repository uses the Zensical toolchain and ViewSense AI® presentation layer
-from `aiops-fabric`.
+All maintained documentation lives in `aiops-fabric-docs/docs/`. Zensical builds that
+source directory directly; the implementation repository no longer stages or publishes
+documentation. The site homepage is `docs/index.md`, while the root README describes
+how to work on this documentation repository.
+
+## Documentation ownership
+
+- Maintain business/technical guides, architecture/design, implementation conformance,
+  module guides, integration/operations/test instructions, governance prompts, diagrams,
+  and documentation screenshots here.
+- Keep implementation code, manifests, Helm runtime templates, catalogs, and
+  machine-readable schemas in `aiops-fabric`.
+- Coordinate design-impacting changes across both repositories and record paired commits
+  or PRs. Follow the [repository instructions](engineering/repository-instructions.md).
+- Do not add narrative documentation back to `aiops-fabric`. Its root README and agent
+  guidance are pointers to the canonical documentation.
+- Implementation commands shown in the guides run from the `aiops-fabric` checkout;
+  documentation build and preview commands run from this checkout.
 
 ## Presentation layer
 
-- `assets/stylesheets/viewsense.css` provides the original navy-and-teal colours,
-  typography, homepage cards, tables, navigation, and light/dark styling.
-- `assets/images/viewsense-mark.svg` is the original logo and favicon.
-- `zensical.toml` connects the assets, theme, Markdown extensions, and navigation.
+The sources remain ordinary GitHub-readable Markdown. The ViewSense AI® presentation layer uses:
 
-The homepage cards originate as an ordinary ordered Markdown list under
-**Explore ViewSense AI®**. The stylesheet turns that list into a responsive card grid.
+- `docs/assets/stylesheets/viewsense.css` for colours, typography, homepage cards,
+  tables, navigation, and light/dark styling;
+- `docs/assets/images/viewsense-mark.svg` for the logo and favicon;
+- `zensical.toml` for site configuration, navigation, and Markdown extensions; and
+- `scripts/build-docs.sh` for a clean, strict Zensical build.
+
+Homepage cards originate as a normal ordered Markdown list under **Explore ViewSense AI®**.
+Edit that content in `docs/index.md`; never duplicate it in generated output.
+
+```mermaid
+flowchart LR
+    Sources["aiops-fabric-docs/docs<br/>Markdown, diagrams and screenshots"] --> Build["strict Zensical build"]
+    Navigation["zensical.toml navigation"] --> Build
+    Build --> Artifact["static site artifact"]
+    Artifact --> Pages["GitHub Pages"]
+    Code["aiops-fabric implementation"] -. "paired design-sync changes" .-> Sources
+```
 
 ## Local build and preview
 
-From the repository root:
+From the documentation repository root:
 
 ```sh
 python3 -m venv .venv-docs
 .venv-docs/bin/python -m pip install --requirement requirements-docs.txt
-PATH="$(pwd)/.venv-docs/bin:${PATH}" make docs-build
-PATH="$(pwd)/.venv-docs/bin:${PATH}" make docs-preview
+make docs-build
+make docs-preview
 ```
 
-Open <http://127.0.0.1:8765/>. Press `Ctrl-C` to stop the preview server.
-The strict build writes the generated site into `site/`. Generated output, caches,
-and the local virtual environment are ignored by Git.
+The build helper uses the local `.venv-docs` toolchain when available, or `zensical`
+from `PATH`. Open <http://127.0.0.1:8765/> and press `Ctrl-C` to stop the preview server.
+Generated `site/`, caches, and virtual environments are ignored and must not be committed.
 
-## Source and navigation
+The implementation repo's `make docs-build` and `make docs-preview` delegate here.
+Keep sibling checkouts or set `DOCS_REPO=/absolute/path/to/aiops-fabric-docs`.
+Its Docker unit/catalog targets mount `docs/` read-only for design checks rather than
+copying documentation into an image. For direct implementation pytest runs, use the
+sibling checkout or set `VS_DOCS_DIR=/absolute/path/to/aiops-fabric-docs/docs`.
 
-Edit Markdown in `docs/`; never edit generated files in `site/`. When adding a page,
-add its path relative to `docs/` to the navigation in `zensical.toml`, then run
-`make docs-build` to verify the site.
+## Navigation and links
 
-This dedicated repository builds `docs/` directly, so it does not need the original
-application repository's curated staging directory or document-copy allow-list.
-The product documentation will be migrated in a separate step.
+1. Edit original Markdown under `docs/`, never generated `site/` content.
+2. When adding or moving a page, update its path in `zensical.toml` and all internal links.
+3. Use relative links between Markdown pages and documentation assets. Paths in navigation
+   are relative to `docs/`.
+4. Run `make docs-build`; strict mode rejects missing navigation pages and broken links.
+5. Keep implementation claims synchronized with the
+   [conformance map](design/high-level/00-implementation-conformance.md).
+6. Public documentation must not direct readers to the closed-source application repository.
 
-## GitHub Pages setup
+## GitHub Pages deployment
 
-1. Commit and push the repository changes.
-2. Open the repository's **Settings → Pages**.
-3. Under **Build and deployment → Source**, select **GitHub Actions**.
-4. Run the **Documentation** workflow from the Actions tab, or push a change to `main`.
-5. Check that the build and deployment jobs succeed.
+The `.github/workflows/docs.yml` workflow validates documentation changes on pull requests
+and publishes the `site/` artifact after relevant changes reach `main`. In **Settings → Pages**,
+select **GitHub Actions** as the source. No Jekyll or Static HTML starter workflow is needed.
+The expected project URL is <https://diaryfolio.github.io/aiops-fabric-docs/>.
 
-The expected URL is <https://diaryfolio.github.io/aiops-fabric-docs/>.
+Manual runs are available under **Actions → Documentation → Run workflow** on `main`.
+The build job needs repository read permission. The deploy job has `contents: read`,
+`pages: write`, and `id-token: write` and uses the `github-pages` environment.
+The implementation repo no longer contains a Pages workflow or a documentation toolchain.
 
-The workflow validates documentation on pull requests and publishes the `site/`
-artifact on pushes to `main`. It also supports manual runs. Deployment uses the
-`github-pages` environment with Pages write and OIDC token permissions; the build
-job only needs repository read permission. No personal access token is required.
+## Migration record — 9 October 2026
+
+The migration moved all 52 existing Markdown sources and 11 supporting assets from the
+implementation checkout, including the latest uncommitted design edits. The documentation
+layout flattens the former `docs/` prefix: architecture lives in `docs/design/`, governance
+prompts in `docs/prompts/`, and the former root product overview in `docs/index.md`.
+Module, contract, integration, and test guides retain their relative groupings under `docs/`.
+The full implementation instructions are now `docs/engineering/repository-instructions.md`.
+Management-console and synthetic status screenshots are in `docs/artifacts/` with gallery pages.
+Internal links and navigation were updated for the new layout.
+
+The generated status-preview HTML harness contains executable console implementation and
+remains in the closed-source checkout; only its screenshots and written evidence are documentation.
