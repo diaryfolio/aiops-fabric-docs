@@ -27,7 +27,8 @@ The sources remain ordinary GitHub-readable Markdown. The ViewSense AI® present
   tables, navigation, and light/dark styling;
 - `docs/assets/images/viewsense-mark.svg` for the logo and favicon;
 - `zensical.toml` for site configuration, navigation, and Markdown extensions; and
-- `scripts/build-docs.sh` and `scripts/build-docs.py` for a clean, strict Zensical build.
+- `scripts/build-docs.sh`, `scripts/build-docs.py`, and `scripts/build-release-docs.py`
+  for strict builds of the latest documentation and release snapshots.
 
 Homepage cards originate as a normal ordered Markdown list under **Explore ViewSense AI®**.
 Edit that content in `docs/index.md`; never duplicate it in generated output.
@@ -59,8 +60,8 @@ Generated `site/`, caches, and virtual environments are ignored and must not be 
 ### Build-time hosting base
 
 The tracked `zensical.toml` contains `{{DOCS_SITE_URL}}`, `{{DOCS_REPO_URL}}`, and
-`{{DOCS_REPO_NAME}}` placeholders. The build fills them in the ignored `.zensical-build.toml`
-at the repository root, preserving the tracked template. Zensical uses `site_url` as the
+`{{DOCS_REPO_NAME}}` placeholders. The build fills them in an ignored `.zensical-build.toml`
+inside each temporary snapshot under `.cache/`, preserving the tracked template. Zensical uses `site_url` as the
 hosting base for canonical URLs and the sitemap; page and asset links remain relative.
 No HTML `<base>` tag is needed.
 
@@ -82,6 +83,53 @@ Its Docker unit/catalog targets mount `docs/` read-only for design checks rather
 copying documentation into an image. For direct implementation pytest runs, use the
 sibling checkout or set `VS_DOCS_DIR=/absolute/path/to/aiops-fabric-docs/docs`.
 
+## Documentation per application release
+
+The header's release dropdown lists **Latest (main)** and published application versions.
+Latest documentation is served under `latest/`; each release has its own path, such as
+`v1.2.3/`. Switching versions keeps the equivalent page and heading when that page exists
+in the selected release, and falls back to its homepage otherwise. Search stays within the
+selected version. Existing documentation URLs redirect to latest and preserve query strings
+and heading bookmarks.
+
+Create a documentation tag matching each `aiops-fabric` release, for example `v1.2.3`,
+after the corresponding docs are reviewed and committed. The docs tag points to the docs
+commit for that application release; it need not share the application's commit hash.
+Record the paired application/docs commits in the release notes. The public build reads
+only this repository and does not require access to the private application repository.
+
+From the documentation repository:
+
+```sh
+git tag -a v1.2.3 -m "Documentation for aiops-fabric v1.2.3"
+git push origin v1.2.3
+```
+
+These commands illustrate a release; use the actual reviewed application version.
+Tags follow `vMAJOR.MINOR.PATCH`, optionally with a prerelease suffix such as `-rc.1`.
+Other tag names are excluded from the dropdown. Without release tags, only Latest appears.
+Fetch all tags before previewing the full release catalog locally:
+
+```sh
+git fetch origin --tags
+make docs-preview
+```
+
+Every publication builds current main plus every release tag into a single `site/` artifact.
+Later main changes cannot replace a release's Markdown or assets. A tag-triggered build checks
+out current main for the publishing tools and latest documentation, then reads each release's
+`docs/` and `zensical.toml` from its tag. Deployment runs are serialized to keep the complete
+catalog together. Preserve published tags; apply corrections as a new application/docs patch
+release rather than moving an existing tag.
+
+Each snapshot is rebuilt with the current pinned documentation toolchain and configured
+hosting base; tagged content, navigation, and assets remain its own. Release tags must contain
+the documentation layout and Zensical configuration. Keep the current toolchain compatible
+with retained snapshots. Temporary snapshot builds live under `.cache/` and are never committed.
+Run `.venv-docs/bin/python -m unittest discover -s tests` to check release-content preservation,
+repeated publishing, version ordering, portable URLs, generated navigation metadata, and
+retention of the previous artifact when a new build fails.
+
 ## Navigation and links
 
 1. Edit original Markdown under `docs/`, never generated `site/` content.
@@ -92,11 +140,15 @@ sibling checkout or set `VS_DOCS_DIR=/absolute/path/to/aiops-fabric-docs/docs`.
 5. Keep implementation claims synchronized with the
    [conformance map](design/high-level/00-implementation-conformance.md).
 6. Public documentation must not direct readers to the closed-source application repository.
+7. Use descriptive headings without calendar dates. Identify releases or evidence baselines
+   by explicit versions or commit references; use format placeholders or generated values
+   for runtime timestamp examples.
 
 ## GitHub Pages deployment
 
 The `.github/workflows/docs.yml` workflow validates documentation changes on pull requests
-and publishes the `site/` artifact after relevant changes reach `main`. In **Settings → Pages**,
+and publishes the `site/` artifact after relevant changes reach `main` or a release tag is pushed.
+In **Settings → Pages**,
 select **GitHub Actions** as the source. No Jekyll or Static HTML starter workflow is needed.
 Find the deployed URL in **Settings → Pages** or the workflow's `github-pages` environment.
 
@@ -106,7 +158,7 @@ The deploy job has `contents: read`,
 `pages: write`, and `id-token: write` and uses the `github-pages` environment.
 The implementation repo no longer contains a Pages workflow or a documentation toolchain.
 
-## Migration record — 9 October 2026
+## Migration record
 
 The migration moved all 52 existing Markdown sources and 11 supporting assets from the
 implementation checkout, including the latest uncommitted design edits. The documentation

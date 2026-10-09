@@ -1,6 +1,6 @@
 # ViewSense AI® Project Status and Local AI Integration Plan
 
-Reviewed on **9 October 2026**, including the local AI console changes after baseline `0001b14`.
+Includes the local AI console changes after baseline `0001b14`.
 The [implementation conformance map](00-implementation-conformance.md) is the canonical route and
 runtime inventory. Live evidence below applies to the isolated development stack, not production.
 
@@ -130,7 +130,7 @@ applies to all modules, including roles, policy and observability. Those managem
 surfaces are explicit backend gaps, not GUI-owned substitutes. The optional console and the
 Kubernetes API suite are independently replaceable clients/runtimes.
 
-Headless acceptance on 9 October 2026: decisions, real 768-d embeddings and persistent
+Recorded headless acceptance: decisions, real 768-d embeddings and persistent
 store/search/owner isolation passed through component mTLS APIs with port 8787 absent.
 Attaching then stopping the optional GUI left all five API health checks and direct smoke
 operational. Component OpenAPI documents and unauthorized/wrong-scope denial checks passed.
@@ -158,7 +158,7 @@ workload hot reload, HA sessions/IdP/database and Okta live acceptance remain ga
 cluster requires an explicitly selected compatible EOL cert-manager release and still fails its
 CNI negative-denial gate. See the [operating guide](../../deploy/integrations/keycloak.md).
 
-## Networking status — 2026-10-09
+## Networking status
 
 The [modular networking design](20-deployment/02-modular-networking-mesh.md) and
 [operator guide](../../deploy/integrations/networking.md) now define replaceable CNI and mesh

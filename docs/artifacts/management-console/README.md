@@ -1,6 +1,6 @@
 # ViewSense AI® management console POC
 
-Live screenshots captured on 2026-10-09 after browser SSO with the dedicated POC operator account.
+Live screenshots captured after browser SSO with the dedicated POC operator account.
 They show Overview/suites, AI/models, Identity/access, Certificates, Observability and the responsive
 mobile overview. These are runtime screenshots of the detachable client, not static mockups.
 

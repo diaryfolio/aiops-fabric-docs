@@ -6,6 +6,10 @@ It can run in an enterprise data centre, a private cloud, a public cloud, or acr
 
 > **Portable · Governed · Replaceable · Enterprise-controlled**
 
+For management readers, start with the [Business overview](BUSINESS_README.md),
+[compatibility guide](business/compatibility.md), and
+[adoption plan](business/adoption-and-governance.md).
+
 ```mermaid
 flowchart LR
     Apps["Business applications"] --> VS["ViewSense AI® stable APIs"]
@@ -44,10 +48,10 @@ GUI with `make gui`, or use combined `make console`; see the
     See component boundaries, trust flows, APIs, state ownership, and replaceability rules.
     [Explore the architecture →](design/high-level/README.md)
 
-4. **Choose products and integrations**
+4. **Assess business fit and compatibility**
 
-    Compare bundled, adapter, managed-dependency, and external product options.
-    [Review the product matrix →](fabric/PRODUCTS.md)
+    See where ViewSense AI® fits, which integrations are available, and what needs acceptance.
+    [Explore the Business section →](BUSINESS_README.md)
 
 5. **Build governed agentic workflows**
 
@@ -118,7 +122,7 @@ ViewSense AI® is not another foundation model, vector database, low-code workfl
 
 For the current embedded/integratable product list, see the [product catalog](fabric/PRODUCTS.md).
 For the navigable web documentation, see the
-[ViewSense AI® documentation portal](index.md).
+[ViewSense AI® documentation portal](#viewsense-ai-enterprise-ai-without-losing-control).
 For installation, daily startup, OpenAI configuration, testing, and shutdown, see the
 [quick start](QUICKSTART.md).
 For architecture, installation, and engineering details, see the [technical guide](TECHNICAL_README.md).

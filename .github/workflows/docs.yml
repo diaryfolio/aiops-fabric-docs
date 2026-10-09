@@ -3,13 +3,14 @@ name: Documentation
 on:
   push:
     branches: [main]
+    tags: ["v*"]
     paths:
       - ".github/workflows/docs.yml"
       - "docs/**"
       - "Makefile"
       - "requirements-docs.txt"
-      - "scripts/build-docs.sh"
-      - "scripts/build-docs.py"
+      - "scripts/**"
+      - "tests/**"
       - "zensical.toml"
   pull_request:
     paths:
@@ -17,8 +18,8 @@ on:
       - "docs/**"
       - "Makefile"
       - "requirements-docs.txt"
-      - "scripts/build-docs.sh"
-      - "scripts/build-docs.py"
+      - "scripts/**"
+      - "tests/**"
       - "zensical.toml"
   workflow_dispatch:
 
@@ -26,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: github-pages-${{ github.event_name }}-${{ github.ref }}
+  group: github-pages
   cancel-in-progress: false
 
 jobs:
@@ -38,14 +39,20 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          # Release pushes publish snapshots alongside the current main documentation.
+          ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.sha }}
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install documentation toolchain
         run: python -m pip install --requirement requirements-docs.txt
+      - name: Test documentation publishing
+        run: python -m unittest discover -s tests
       - name: Read GitHub Pages configuration
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && github.event_name != 'pull_request'
         id: pages
         uses: actions/configure-pages@v6
       - name: Build documentation
@@ -53,13 +60,13 @@ jobs:
           DOCS_SITE_URL: ${{ steps.pages.outputs.base_url }}
         run: bash scripts/build-docs.sh
       - name: Upload GitHub Pages artifact
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) && github.event_name != 'pull_request'
     permissions:
       contents: read
       pages: write

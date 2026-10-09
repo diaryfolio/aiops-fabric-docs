@@ -70,7 +70,7 @@ Expected: all Deployments and all four StatefulSets (memory, registry, governanc
 ready, `viewsense-smoke` completes successfully, required gateway/orchestrator paths connect, and
 the unused gateway-to-ingestion and orchestrator-to-MCP paths are blocked by the cluster CNI.
 
-On 9 October 2026 the local `k3d-cks` run passed application smoke but failed the
+The recorded local `k3d-cks` run passed application smoke but failed the
 gateway-to-ingestion denial probe. Do not treat that cluster as a passed security environment.
 
 ### Headless local API validation
@@ -480,6 +480,7 @@ Keep the forwards from section 4 running; governance is already available on por
 
 Request an administrator token and register a draft provider passport. A provider cannot submit
 `"status":"admitted"`; only the evaluated admission endpoint can make that transition.
+The example generates an expiry thirty days from execution time.
 
 ```bash
 GOVERNANCE_TOKEN="$(
@@ -503,7 +504,7 @@ curl --silent --show-error --fail-with-body \
   --header "Authorization: Bearer ${GOVERNANCE_TOKEN}" \
   --header "Content-Type: application/json" \
   --request PUT \
-  --data '{
+  --data "$(jq -n --arg expires_at "$(python3 -c 'from datetime import datetime, timedelta, timezone; print((datetime.now(timezone.utc) + timedelta(days=30)).isoformat())')" '{
     "name":"manual-llm",
     "kind":"llm",
     "endpoint":"https://llm.enterprise.example/v1",
@@ -513,8 +514,8 @@ curl --silent --show-error --fail-with-body \
     "data_classifications":["internal"],
     "owner":"enterprise-ai-platform",
     "status":"draft",
-    "expires_at":"2099-01-01T00:00:00Z"
-  }' \
+    "expires_at":$expires_at
+  }')" \
   https://localhost:9446/v1/provider-passports/manual-llm |
 jq
 ```
