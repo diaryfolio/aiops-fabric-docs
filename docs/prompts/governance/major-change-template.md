@@ -1,0 +1,60 @@
+# Major Change Record Template
+
+Use this template in PR descriptions for major changes.
+
+## 1. Change Summary
+
+- Title:
+- Owner:
+- Date:
+- Classification: `major`
+
+## 2. Problem and Objective
+
+- What is changing?
+- Why is this needed now?
+
+## 3. Architecture Delta
+
+- Components added/changed/removed:
+- Request flow changes:
+- Trust boundary changes:
+- State/store/cache/queue changes:
+
+## 4. Design Documents Updated
+
+- Documentation repository: `aiops-fabric-docs`
+- Paired implementation commit/PR:
+- Paired documentation commit/PR:
+- `docs/design/high-level/00-implementation-conformance.md`:
+- `docs/design/high-level/design_01.md`:
+- `docs/design/high-level/10-overall/`:
+- `docs/design/high-level/20-deployment/`:
+- `docs/design/high-level/30-security/`:
+- `docs/design/high-level/40-ops/`:
+- `docs/design/high-level/50-roadmap/`:
+
+## 5. Operational Impact
+
+- Security impact:
+- Observability impact:
+- HA/DR impact:
+- Rollout and rollback plan:
+
+## 6. Validation
+
+- Tests performed:
+- Evidence links/artifacts:
+- Known production gaps:
+- Risks and mitigations:
+- Reviewer notes:
+
+## 7. Design Sync Report
+
+- Change Classification: major
+- Design Docs Updated:
+- Code Areas Updated:
+- Architecture Delta:
+- Tests/Evidence:
+- Known Production Gaps:
+- Sync Status: PASS

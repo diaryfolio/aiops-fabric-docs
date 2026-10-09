@@ -2,11 +2,16 @@
 
 The dedicated documentation repository for ViewSense AI® and AIOps Fabric.
 
-Expected site URL: <https://diaryfolio.github.io/aiops-fabric-docs/>
+Documentation site: <https://diaryfolio.github.io/aiops-fabric-docs/>
 
-This repository reuses the Zensical theme, stylesheet, logo, Markdown extensions,
-and GitHub Pages workflow from `aiops-fabric`. It currently contains a starter
-homepage; product documentation will be migrated separately.
+All maintained product documentation lives under `docs/`: business and technical guides,
+architecture/design, implementation conformance, module and integration guides, operations
+and test instructions, governance prompts, diagrams, and documentation screenshots.
+The Zensical site retains the ViewSense AI® stylesheet, logo, and light/dark theme.
+
+Implementation code, runtime catalogs, schemas, and deployment resources remain in the
+separate `aiops-fabric` repository. Coordinate related changes across both repositories;
+see the [repository instructions](docs/engineering/repository-instructions.md).
 
 ## Build and preview
 
