@@ -118,7 +118,7 @@ ViewSense AI® is not another foundation model, vector database, low-code workfl
 
 For the current embedded/integratable product list, see the [product catalog](fabric/PRODUCTS.md).
 For the navigable web documentation, see the
-[ViewSense AI® documentation portal](https://diaryfolio.github.io/aiops-fabric-docs/).
+[ViewSense AI® documentation portal](index.md).
 For installation, daily startup, OpenAI configuration, testing, and shutdown, see the
 [quick start](QUICKSTART.md).
 For architecture, installation, and engineering details, see the [technical guide](TECHNICAL_README.md).

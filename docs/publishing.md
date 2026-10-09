@@ -27,7 +27,7 @@ The sources remain ordinary GitHub-readable Markdown. The ViewSense AI® present
   tables, navigation, and light/dark styling;
 - `docs/assets/images/viewsense-mark.svg` for the logo and favicon;
 - `zensical.toml` for site configuration, navigation, and Markdown extensions; and
-- `scripts/build-docs.sh` for a clean, strict Zensical build.
+- `scripts/build-docs.sh` and `scripts/build-docs.py` for a clean, strict Zensical build.
 
 Homepage cards originate as a normal ordered Markdown list under **Explore ViewSense AI®**.
 Edit that content in `docs/index.md`; never duplicate it in generated output.
@@ -56,6 +56,26 @@ The build helper uses the local `.venv-docs` toolchain when available, or `zensi
 from `PATH`. Open <http://127.0.0.1:8765/> and press `Ctrl-C` to stop the preview server.
 Generated `site/`, caches, and virtual environments are ignored and must not be committed.
 
+### Build-time hosting base
+
+The tracked `zensical.toml` contains `{{DOCS_SITE_URL}}`, `{{DOCS_REPO_URL}}`, and
+`{{DOCS_REPO_NAME}}` placeholders. The build fills them in the ignored `.zensical-build.toml`
+at the repository root, preserving the tracked template. Zensical uses `site_url` as the
+hosting base for canonical URLs and the sitemap; page and asset links remain relative.
+No HTML `<base>` tag is needed.
+
+Local builds default to `http://127.0.0.1:8765/`. To build for another domain or path:
+
+```sh
+DOCS_SITE_URL=https://docs.example.org/platform/ make docs-build
+```
+
+GitHub Actions reads the configured Pages `base_url` before building, so account,
+repository, and custom-domain changes are picked up automatically on the next deployment.
+Pull-request builds use the local preview base. The documentation repository link and name
+come from `GITHUB_SERVER_URL` / `GITHUB_REPOSITORY` in Actions or the local Git `origin`.
+Set `DOCS_REPO_URL` and `DOCS_REPO_NAME` to override that identity when needed.
+
 The implementation repo's `make docs-build` and `make docs-preview` delegate here.
 Keep sibling checkouts or set `DOCS_REPO=/absolute/path/to/aiops-fabric-docs`.
 Its Docker unit/catalog targets mount `docs/` read-only for design checks rather than
@@ -78,10 +98,11 @@ sibling checkout or set `VS_DOCS_DIR=/absolute/path/to/aiops-fabric-docs/docs`.
 The `.github/workflows/docs.yml` workflow validates documentation changes on pull requests
 and publishes the `site/` artifact after relevant changes reach `main`. In **Settings → Pages**,
 select **GitHub Actions** as the source. No Jekyll or Static HTML starter workflow is needed.
-The expected project URL is <https://diaryfolio.github.io/aiops-fabric-docs/>.
+Find the deployed URL in **Settings → Pages** or the workflow's `github-pages` environment.
 
 Manual runs are available under **Actions → Documentation → Run workflow** on `main`.
-The build job needs repository read permission. The deploy job has `contents: read`,
+The build job needs `contents: read` and `pages: read` to obtain the configured hosting base.
+The deploy job has `contents: read`,
 `pages: write`, and `id-token: write` and uses the `github-pages` environment.
 The implementation repo no longer contains a Pages workflow or a documentation toolchain.
 

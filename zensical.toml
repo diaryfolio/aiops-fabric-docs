@@ -1,13 +1,13 @@
 [project]
 site_name = "ViewSense AI® Documentation"
-site_url = "https://diaryfolio.github.io/aiops-fabric-docs/"
+site_url = "{{DOCS_SITE_URL}}"
 site_description = "Business, architecture, security, operations, and integration documentation for the ViewSense AI® enterprise AI backbone."
 site_author = "ViewSense AI® contributors"
 copyright = "ViewSense AI® documentation"
 docs_dir = "docs"
 site_dir = "site"
-repo_url = "https://github.com/diaryfolio/aiops-fabric-docs"
-repo_name = "diaryfolio/aiops-fabric-docs"
+repo_url = "{{DOCS_REPO_URL}}"
+repo_name = "{{DOCS_REPO_NAME}}"
 use_directory_urls = true
 extra_css = ["assets/stylesheets/viewsense.css"]
 

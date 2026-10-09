@@ -48,7 +48,8 @@ In the same coordinated change across the two repositories:
    and fix internal links. The build reads `docs/` directly; never edit generated `site/`.
 9. Put each module's operator/developer guide under `aiops-fabric-docs/docs/fabric/`.
    Module `contractPaths` retain implementation-relative machine-readable schema paths
-   and use canonical public documentation-source URLs for Markdown design contracts.
+   and use `../aiops-fabric-docs/docs/...` sibling paths for Markdown design contracts.
+   Validation resolves those paths through `VS_DOCS_DIR` when the checkout is elsewhere.
 
 ## Architecture rules
 

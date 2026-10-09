@@ -150,5 +150,6 @@ vite.config.ts.timestamp-*
 
 # Documentation build and local Python environment
 /site/
+/.zensical-build.toml
 /.venv-docs/
 __pycache__/
