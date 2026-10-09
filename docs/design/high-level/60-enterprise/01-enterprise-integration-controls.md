@@ -43,11 +43,13 @@ implemented by the reference.
 
 ## Target JSON log schema
 
-Application containers write one JSON object per line and never write multiline human-formatted access logs. The reference middleware emits:
+Application containers write one JSON object per line and never write multiline human-formatted
+access logs. The reference middleware emits the shape below; the timestamp placeholder represents
+the event's RFC3339 timestamp generated at runtime.
 
 ```json
 {
-  "timestamp": "2026-08-15T12:00:00.000000+00:00",
+  "timestamp": "<RFC3339 timestamp>",
   "level": "info",
   "service": "gateway",
   "environment": "production",

@@ -6,7 +6,7 @@ This is the truth map between architecture intent and the repository as shipped.
 - **configuration-ready:** the ViewSense AI® boundary exists, but an enterprise product or credential is required;
 - **planned:** design or selection intent exists, but no executable adapter is shipped.
 
-For a dated source assessment and the next delivery slice toward an enterprise harness for local AI,
+For a source assessment and the next delivery slice toward an enterprise harness for local AI,
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
@@ -128,7 +128,7 @@ shipped.
 | policy | built-in admission and optional OPA sidecar | implemented/configuration-ready |
 | observability | JSON stdout, request ID propagation, inbound `traceparent` logging | native metrics, trace propagation, and OTLP export planned |
 | audit/evidence | payload-minimized append-only API semantics in PostgreSQL | implemented reference; immutable export planned |
-| Kubernetes isolation | ServiceAccounts, restricted contexts, default-deny NetworkPolicy manifests | manifests implemented; 9 October 2026 local runtime probe failed: gateway could reach ingestion; cluster enforcement gate remains failed |
+| Kubernetes isolation | ServiceAccounts, restricted contexts, default-deny NetworkPolicy manifests | manifests implemented; recorded local runtime probe failed: gateway could reach ingestion; cluster enforcement gate remains failed |
 
 ### Local AI and embedding profiles
 
@@ -219,7 +219,7 @@ status-only renewal. New APIs: `/v1/auth/providers`, `/v1/auth/me`, `/v1/auth/ro
 facades, `/v1/certificates`, certificate detail/renewal and authenticated certificate metrics.
 OpenAPI remains served by each backend; GUI `/api` routes are client conveniences.
 
-Implementation and live acceptance evidence (2026-10-09) are recorded below.
+Implementation and live acceptance evidence are recorded below.
 Keycloak and cert-manager are separately packaged POC integrations. Existing development PKI,
 provider configuration promotion, session HA/backchannel logout, Okta acceptance, workload TLS
 hot reload, trust distribution and durable security audit export are production gaps.
@@ -246,7 +246,7 @@ through the signed workload envelope. Each inventory item identifies its environ
 cert-manager resources with both the configured renewable name and renewal approval label support
 the renewal action.
 
-### Management POC evidence — 2026-10-09
+### Management POC evidence
 
 - `make unit`: 80 passed; `make lint`, `make profile-check`, base Kustomize render and
   `make docs-build`: passed. The certificate controller Helm path rejects missing explicit egress.
@@ -283,7 +283,7 @@ planning requires `platform.plan`. Console client routes: `/api/networking/{oper
 (only providers/topology/status) and `/api/networking/plans`. Evidence reports its cluster,
 topology/provider-profile hashes and timestamp; stale, failed or mismatched evidence cannot imply current health.
 
-### Networking evidence — 2026-10-09
+### Networking evidence
 
 - Independent two-node `k3d-viewsense-network` created with Kubernetes `v1.35.8+k3s1`,
   Flannel and the competing k3s policy controller disabled. Cilium 1.20.2 and Istio ambient 1.31.1
@@ -311,7 +311,7 @@ isolation regression. This reference is not production-ready: persistent-data cu
 overlays beyond the base flow graph, HA/load tests, approved mesh trust/rotation, ingress/egress
 gateways and durable protected telemetry remain deployment work.
 
-## Health badges and certificate explanations — minor presentation change (2026-10-09)
+## Health badges and certificate explanations — minor presentation change
 
 The capability inventory, selected component and Observability reachability rows share
 non-interactive status badges: green reachable/ready, amber checking/degraded/unknown, red
@@ -331,7 +331,7 @@ certificate warning was bypassed and no trust settings were changed. The separat
 runtime acceptance above remains pending; Docker unit/lint execution has since succeeded.
 
 
-## Documentation repository ownership — 2026-10-09 (minor)
+## Documentation repository ownership (minor)
 
 All maintained narrative documentation, design/conformance records, module/integration
 and operations/test guides, governance prompts, diagrams, and documentation screenshots
@@ -348,7 +348,7 @@ sibling checkout. Design-contract entries in module catalogs reference sibling d
 source paths; machine-readable schema entries stay implementation-relative. All existing
 Markdown sources and documentation assets were moved, preserving working-tree design edits.
 
-See the [publishing and migration record](../../publishing.md#migration-record-9-october-2026)
+See the [publishing and migration record](../../publishing.md#migration-record)
 and [repository instructions](../../engineering/repository-instructions.md#documentation-ownership)
 for the layout and coordinated merge rules. Existing networking/production acceptance gaps
 recorded above are unchanged by this documentation migration.
@@ -359,7 +359,7 @@ passed; all 53 current Markdown pages appear in navigation; 89 Docker unit tests
 Migrated documentation assets and unrelated working-tree console edits were verified unchanged.
 The generated executable HTML console preview remains private with the implementation.
 
-## Portable documentation hosting — 2026-10-09 (minor)
+## Portable documentation hosting (minor)
 
 The site configuration uses build-time placeholders for its hosting base and documentation
 repository identity. GitHub Actions reads the configured Pages URL before building; local
@@ -378,3 +378,55 @@ canonical URLs, sitemap entries, stylesheet paths, and derived repository links 
 The local/delegated strict build, 89 Docker unit tests, lint, and base Kustomize rendering passed.
 Existing production/runtime acceptance gaps above remain unchanged. See the
 [build-time hosting guide](../../publishing.md#build-time-hosting-base).
+
+## Release documentation and date-free writing (minor)
+
+Documentation headings and prose use descriptive names without calendar dates. Existing dated
+headings and their internal links were updated; fixed timestamp examples now use a format
+placeholder or a value generated at execution time. Versions and paired commit references identify
+release baselines while Git retains change history.
+
+The site header uses Zensical's release dropdown, backed by a generated `versions.json` catalog.
+Latest documentation lives under `latest/`; `vMAJOR.MINOR.PATCH` tags in the documentation repo
+snapshot the content, navigation, and assets for matching application releases. Every Pages build
+includes all tagged snapshots alongside latest, using the configured hosting base and current
+pinned toolchain. Old unversioned URLs redirect to latest while retaining query strings/headings.
+Version switching retains equivalent pages when available and otherwise opens the selected
+release homepage. Search is scoped to each snapshot. No private-application access is required.
+
+Tag-triggered builds use main's publisher and latest documentation; deployments are serialized.
+Release-content preservation across repeat builds, version ordering, alternate-domain/nested-base
+URLs, and selector metadata are covered by isolated Git-fixture publishing tests. The strict site
+build and browser navigation verify the selector. Runtime APIs, trust boundaries, data owners,
+application deployment topology, and SLOs are unchanged; existing production acceptance gaps remain.
+
+Validation: 89 application unit tests, lint, and base Kustomize rendering passed. Release publishing
+tests verified version ordering and unchanged release content across repeated builds; a missing
+homepage left the previous artifact intact. Browser checks using clearly labelled sample releases
+verified page/heading/query preservation, missing-page fallback, redirects under a nested hosting
+base, and the dropdown's styling and availability after scrolling. The actual repository has no
+release tags yet and offers Latest until a reviewed release snapshot is tagged.
+
+Follow the [application-release documentation workflow](../../publishing.md#documentation-per-application-release)
+when recording paired implementation/documentation release commits.
+
+## Business documentation and management diagrams (minor)
+
+The dedicated Business navigation section expands the executive overview and adds compatibility,
+value/use-case, and adoption/governance guides. Its compatibility labels translate the product
+matrix's validated, configuration-ready, and planned states into business decisions; they do not
+claim vendor certification or production readiness. The guides distinguish manually driven agent
+lifecycle tests from planned autonomous execution and retain the existing network/operations gaps.
+
+Management Mermaid diagrams use four or five boxes, larger labels, accessible titles/descriptions,
+and navy/teal colours. The Business pages omit the secondary contents sidebar to give diagrams and
+tables more room. Diagram containers scroll horizontally on narrow screens without shrinking the
+labels or widening the page. The section uses relative links and the existing release snapshot
+pipeline; historical documentation tags keep their original content.
+
+Validation: strict documentation build and release publishing tests passed; all 56 Markdown pages
+appear once in navigation. Browser previews verified all four diagrams, light/dark contrast,
+Business navigation, and horizontal scrolling at a narrow viewport without page overflow.
+Application unit tests passed (89), lint passed, and base Kustomize rendering passed.
+There are no changes to application APIs, trust boundaries, data owners, runtime configuration,
+deployment topology, or SLOs. Existing production acceptance gaps remain as recorded above.

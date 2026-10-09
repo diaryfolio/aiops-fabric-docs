@@ -4,7 +4,7 @@ These previews use the actual management-console UI assets with explicit synthet
 data. They cover health badges, certificate expiry explanations, and light/dark
 presentation. They are documentation evidence rather than live installation health.
 
-See the [implementation conformance record](../../design/high-level/00-implementation-conformance.md#health-badges-and-certificate-explanations-minor-presentation-change-2026-10-09)
+See the [implementation conformance record](../../design/high-level/00-implementation-conformance.md#health-badges-and-certificate-explanations-minor-presentation-change)
 for validation scope and limitations.
 
 ## Health states in light mode

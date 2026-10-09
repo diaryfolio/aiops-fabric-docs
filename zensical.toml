@@ -13,8 +13,13 @@ extra_css = ["assets/stylesheets/viewsense.css"]
 
 nav = [
   { "Home" = "index.md" },
+  { "Business" = [
+    { "Executive overview" = "BUSINESS_README.md" },
+    { "Compatibility and product fit" = "business/compatibility.md" },
+    { "Value and use cases" = "business/value-and-use-cases.md" },
+    { "Adoption and governance" = "business/adoption-and-governance.md" },
+  ] },
   { "Get started" = [
-    { "Business overview" = "BUSINESS_README.md" },
     { "Quick start" = "QUICKSTART.md" },
     { "Test and validation" = "tests/README.md" },
     { "Technical guide" = "TECHNICAL_README.md" },
@@ -98,6 +103,10 @@ features = [
   "content.code.copy",
 ]
 icon.repo = "fontawesome/brands/github"
+
+[project.extra.version]
+provider = "mike"
+default = "latest"
 
 [project.markdown_extensions]
 pymdownx.superfences.custom_fences = [

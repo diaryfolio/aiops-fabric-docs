@@ -22,6 +22,16 @@ design/code validation, or set `DOCS_REPO` when invoking implementation Make tar
 Coordinate related changes across both repositories and record the paired commits
 or pull requests before merging a change that affects implementation claims.
 
+Keep documentation free of calendar dates in headings, prose, and fixed examples. Use descriptive
+section titles; identify documentation releases and evidence baselines by explicit versions or
+commit references when needed. Timestamp examples use format placeholders or values generated
+at runtime. Git history retains the chronology of documentation changes.
+
+For each application release, review and commit its matching documentation, then create the same
+`vMAJOR.MINOR.PATCH` tag in `aiops-fabric-docs`. Record the paired application/documentation commits
+in release notes. Preserve published documentation tags; corrections belong in a new patch release.
+See the [release publishing guide](../publishing.md#documentation-per-application-release).
+
 ## Mission
 
 ViewSense AI® is a Kubernetes-native, API-first, zero-trust enterprise AI backbone. Preserve component replaceability, provider neutrality, tenant isolation, workload identity, and data ownership boundaries in every change.

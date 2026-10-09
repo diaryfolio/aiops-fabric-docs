@@ -40,6 +40,40 @@ body {
   box-shadow: 0 8px 28px rgba(2, 23, 35, 0.22);
 }
 
+.md-version {
+  position: relative;
+}
+
+.md-header__title--active:has(.md-version) .md-header__topic:first-child {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  z-index: 0;
+}
+
+.md-header__title:has(.md-version) .md-header__topic + .md-header__topic {
+  display: none;
+}
+
+.md-version__list {
+  top: 100%;
+  margin-top: 0;
+  background: var(--vs-navy-900);
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  color: #ecfeff;
+}
+
+.md-version__current:focus-visible {
+  outline: 2px solid var(--vs-teal-300);
+  outline-offset: 3px;
+}
+
+.md-version__link:hover,
+.md-version__link:focus {
+  background: var(--vs-navy-800);
+  color: var(--vs-teal-300);
+}
+
 .md-tabs {
   background: rgba(6, 23, 35, 0.97);
   border-top: 1px solid rgba(94, 234, 212, 0.12);
@@ -218,6 +252,19 @@ body {
 .md-typeset .mermaid {
   padding: 1rem;
   background: var(--vs-card);
+}
+
+/* Business diagrams retain readable labels instead of shrinking on narrow screens. */
+.md-typeset:has(h1[id^="business-"]) .mermaid {
+  --md-mermaid-node-bg-color: #082a3a;
+  --md-mermaid-node-fg-color: #0f9f96;
+  --md-mermaid-label-fg-color: #ffffff;
+  --md-mermaid-edge-color: var(--vs-teal-500);
+  margin: 1.5rem 0 2rem;
+  padding: 1.5rem;
+  overflow-x: auto;
+  text-align: center;
+  border-top: 0.2rem solid var(--vs-teal-500);
 }
 
 .md-footer {
