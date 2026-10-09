@@ -1,0 +1,56 @@
+[project]
+site_name = "ViewSense AI® Documentation"
+site_url = "https://diaryfolio.github.io/aiops-fabric-docs/"
+site_description = "Business, architecture, security, operations, and integration documentation for the ViewSense AI® enterprise AI backbone."
+site_author = "ViewSense AI® contributors"
+copyright = "ViewSense AI® documentation"
+docs_dir = "docs"
+site_dir = "site"
+repo_url = "https://github.com/diaryfolio/aiops-fabric-docs"
+repo_name = "diaryfolio/aiops-fabric-docs"
+use_directory_urls = true
+extra_css = ["assets/stylesheets/viewsense.css"]
+
+nav = [
+  { "Home" = "index.md" },
+  { "Publishing" = "publishing.md" },
+]
+
+[project.theme]
+logo = "assets/images/viewsense-mark.svg"
+favicon = "assets/images/viewsense-mark.svg"
+features = [
+  "navigation.instant",
+  "navigation.instant.progress",
+  "navigation.tracking",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.sections",
+  "navigation.path",
+  "navigation.top",
+  "navigation.footer",
+  "toc.follow",
+  "content.code.copy",
+]
+icon.repo = "fontawesome/brands/github"
+
+[project.markdown_extensions]
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "teal"
+accent = "green"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "teal"
+accent = "green"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
