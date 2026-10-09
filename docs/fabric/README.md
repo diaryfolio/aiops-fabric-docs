@@ -21,7 +21,7 @@ Each capability directory in the implementation repository must contain:
 
 - `module.json` conforming to `module.schema.json`;
 - valid implementation-relative paths to code and machine-readable contracts;
-- canonical public documentation-source URLs for Markdown design contracts;
+- `../aiops-fabric-docs/docs/...` sibling paths for Markdown design contracts;
 - honest provider status: `bundled`, `external`, or `planned`.
 
 Each operator/developer README is maintained separately under the corresponding

@@ -344,8 +344,8 @@ deployment resource, or SLO change.
 The dedicated repo owns Zensical configuration, the ViewSense AI® theme, and the sole Pages
 workflow. Implementation Make targets delegate docs builds/previews to `DOCS_REPO` and mount
 its `docs/` read-only for Docker unit/catalog checks. Direct pytest uses `VS_DOCS_DIR` or the
-sibling checkout. Design-contract entries in module catalogs reference canonical docs-repo
-source URLs; machine-readable schema entries stay implementation-relative. All existing
+sibling checkout. Design-contract entries in module catalogs reference sibling docs-repo
+source paths; machine-readable schema entries stay implementation-relative. All existing
 Markdown sources and documentation assets were moved, preserving working-tree design edits.
 
 See the [publishing and migration record](../../publishing.md#migration-record-9-october-2026)
@@ -358,3 +358,23 @@ passed; all 53 current Markdown pages appear in navigation; 89 Docker unit tests
 `make lint`, base Kustomize rendering, Python/shell syntax, and whitespace checks passed.
 Migrated documentation assets and unrelated working-tree console edits were verified unchanged.
 The generated executable HTML console preview remains private with the implementation.
+
+## Portable documentation hosting — 2026-10-09 (minor)
+
+The site configuration uses build-time placeholders for its hosting base and documentation
+repository identity. GitHub Actions reads the configured Pages URL before building; local
+builds default to the preview server or accept `DOCS_SITE_URL`. Repository links derive from
+Actions metadata or the local Git origin. No hosting account or domain is fixed in the sources.
+Markdown and asset links remain relative, including navigation from nested pages.
+
+Implementation module catalogs reference Markdown contracts using
+`../aiops-fabric-docs/docs/...`. Catalog validation resolves these through `VS_DOCS_DIR`
+for alternate checkouts and Docker mounts; machine-readable schemas remain relative to the
+implementation repository. Runtime APIs, trust boundaries, data owners, deployment topology,
+and SLOs are unchanged.
+
+Evidence: a strict build for a different domain with a nested URL prefix passed; all 53 pages'
+canonical URLs, sitemap entries, stylesheet paths, and derived repository links were verified.
+The local/delegated strict build, 89 Docker unit tests, lint, and base Kustomize rendering passed.
+Existing production/runtime acceptance gaps above remain unchanged. See the
+[build-time hosting guide](../../publishing.md#build-time-hosting-base).

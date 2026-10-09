@@ -2,7 +2,8 @@
 
 The dedicated documentation repository for ViewSense AI® and AIOps Fabric.
 
-Documentation site: <https://diaryfolio.github.io/aiops-fabric-docs/>
+Start with the [documentation homepage](docs/index.md). The deployed URL comes from
+the repository’s GitHub Pages settings during the build.
 
 All maintained product documentation lives under `docs/`: business and technical guides,
 architecture/design, implementation conformance, module and integration guides, operations
