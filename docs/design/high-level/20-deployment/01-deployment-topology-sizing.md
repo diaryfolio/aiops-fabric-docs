@@ -36,7 +36,41 @@ flowchart TB
 | regulated | dedicated provider/data cluster or tenant cell | strict residency and blast-radius controls |
 | GPU scale | control cluster plus one or more inference clusters | large model fleets and independent capacity |
 
-The current manifests intentionally touch only `viewsense-dev`. Production overlays must not reuse development keys, issuer, mock providers, image tags, `imagePullPolicy: Never`, or single-replica databases.
+The base development manifests touch only `viewsense-dev`. The versioned evaluation installer
+uses an explicit `viewsense-release-*` namespace as its environment overlay, with separate
+generated PKI/credentials and fixed-version offline images. Production overlays must not reuse
+development keys, issuer, mock providers, `imagePullPolicy: Never`, or single-replica databases.
+
+## Downloadable release contract
+
+The [release installation guide](../../../releases/installation.md) defines the 1.0.1
+GitHub Release assets: a versioned Helm chart and per-architecture Linux image bundles with
+checksums, matching documentation and paired source commits. The image archive includes
+PostgreSQL and pgvector, so node installation does not require registry access. Images are
+loaded into every node runtime before the chart is installed. The evaluation installer
+requires an explicit context, refuses existing namespaces and installs one suite per namespace.
+It creates only namespaced application resources; it does not install CRDs or cluster operators.
+The Helm smoke workload has a dedicated ServiceAccount and exact HTTPS egress to its seven
+reference targets, plus the common DNS rule. Ingestion is an explicit memory-gateway ingress
+source, matching the implemented ingestion-to-memory request flow. No direct gateway-to-ingestion
+or orchestrator-to-MCP path is allowed by these corrections.
+
+Namespace deletion is available only for the matching release-owned disposable namespace and
+uses a UID precondition. Reset waits for deletion, regenerates isolated material and repeats
+installation/acceptance. All four database state owners remain unchanged; resetting destroys
+their evaluation state, subject to the storage provisioner's reclaim policy. Data-preserving
+replacement and production promotion require reviewed environment and migration evidence.
+
+```mermaid
+flowchart LR
+    Commits["paired clean source commits"] --> Package["chart + images + docs + checksums"]
+    Package --> Draft["GitHub Release draft"]
+    Draft --> Review["operator publication"]
+    Package --> Import["every node runtime"]
+    Import --> Namespace["new release-specific namespace"]
+    Namespace --> Acceptance["Helm smoke + CNI allowed/denied probes"]
+    Acceptance --> Reset["owned namespace delete/recreate"]
+```
 
 ## Workload rules
 
@@ -152,3 +186,15 @@ The existing cks PVCs are not transferred or removed. Install CNI only on an app
 apply STRICT/default-deny mesh policies before enrollment, then verify actual traffic and recovery.
 Installation alone is not security acceptance; current evidence and incomplete runtime gates are
 recorded in the conformance map. Provider replacement requires a staged cluster/trust/data plan.
+
+## Detachable release preview
+
+The source checkout can attach its host-side GUI to an installed evaluation reference with
+`scripts/release/console.py`. This creates only loopback debugging forwards; it adds no Kubernetes
+resource, changes no namespace identity or data, and uses existing smoke grants. Twelve API health
+checks, ingestion, memory writes and search are supported. These checks do not demonstrate CNI
+enforcement and the GUI does not implement production traffic switching. The original 1.0.1
+bundle remains a headless distribution; the preview is a follow-up source-checkout utility.
+
+The preview can test the installed mock inference path through the gateway response API without
+conversation writes. Real Tev1/Ollama models still require their separate adapter/upstream profile.

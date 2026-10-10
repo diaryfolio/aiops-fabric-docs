@@ -31,6 +31,14 @@ budget; current public-route timeouts do not certify the slow Qwen path.
 
 ## Release safety
 
+The 1.0.1 evaluation distribution supports fresh release-specific namespace installation,
+Helm smoke tests, CNI probes and owned namespace delete/recreate. The release-owner scripts
+record paired source commits, build checksummed per-architecture downloads and upload a GitHub
+Release draft. See the [release guide](../../../releases/installation.md). Parallel blue/green
+environments use the [replacement and traffic-switching plan](../../../releases/parallel-environments.md).
+An evaluation reset destroys its state; production cutover must reconcile state, workload
+trust and sessions, drain requests/work and define a data-safe fallback before old resources retire.
+
 - immutable signed image digests and GitOps promotion;
 - contract tests against every configured adapter;
 - expand/migrate/contract database changes with rollback compatibility;
@@ -178,3 +186,13 @@ load-based latency budgets, trust rotation, HA and durable telemetry remain sepa
 Istio owns its workload certificates; the certificate inventory does not yet integrate mesh-issued
 ephemeral certificates. Plaintext Cilium metrics are disabled in the provider profile until an
 authenticated collector is approved; Hubble relay uses TLS and no public telemetry UI is enabled.
+
+## Release preview lifecycle
+
+A workstation operator can attach the source-checkout GUI to one owned evaluation namespace
+using `make release-console`; see the [release guide](../../../releases/installation.md#attach-the-host-side-release-preview-gui).
+It starts only loopback port-forwards and a host GUI, retaining existing namespace state and
+workload grants. Ctrl+C stops those processes and removes temporary credentials. A namespace
+reset requires reattachment. Service health in this GUI is live mTLS reachability through a
+Kubernetes debugging path; headless smoke and CNI-negative tests remain independent gates.
+The old development namespace and local Ollama harness have separate recovery lifecycles.

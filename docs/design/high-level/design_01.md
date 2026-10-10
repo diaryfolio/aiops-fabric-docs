@@ -12,6 +12,13 @@ Product packaging uses four explicit modes: `bundled`, `adapter`, `managed-depen
 its upstream product is separate; a managed dependency is installed/operated at platform scope; an
 external product is reached through an API. Product selection never implies product installation.
 
+Application distributions use a versioned Helm chart and architecture-specific offline image
+bundles. Evaluation environments are replaceable release-specific namespaces with isolated state
+and credentials. Candidate environments can run in parallel; production traffic cutover requires
+an independently managed entry point and an explicit state/identity/drain plan. See the
+[release guide](../../releases/installation.md) and
+[parallel environment design](../../releases/parallel-environments.md).
+
 Implementation truth is maintained in
 [Implementation Conformance](00-implementation-conformance.md). Target-state requirements in this
 design are not evidence that a capability is deployed.
@@ -223,3 +230,12 @@ NetworkPolicy and a provider-neutral allowed-flow contract keep application APIs
 Cilium/Istio. The reference uses Cilium plus Istio ambient with strict workload identity, while
 application TLS/JWT/tenant checks remain mandatory. See
 [networking design](20-deployment/02-modular-networking-mesh.md).
+
+The optional host-side release preview attaches to one owned evaluation namespace through
+loopback port-forwards. It uses the existing fixed-tenant smoke identity for ingestion and memory
+APIs, observes service health, and retains browser session/CSRF protection. It does not provision
+a cluster service or expand workload grants. See the [release preview guide](../../releases/installation.md#attach-the-host-side-release-preview-gui).
+
+Release preview inference uses the existing gateway response API and smoke `api.invoke` grant,
+then the established orchestrator/LLM/mock path. Conversation writes are disabled for that test.
+Tev1/Ollama capability absence is separate from live LLM gateway health.

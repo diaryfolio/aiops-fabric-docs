@@ -2,6 +2,13 @@
 
 The chart is the modular installation interface. All components are independently toggled under `modules.*.enabled`; provider products are selected under `products.*`. Curated combinations live under `profiles/`; render them before installation and supply the Secrets named by the selected profile.
 
+The distribution version and application image tag are 1.0.1. Chart defaults use
+`IfNotPresent`; the offline evaluation installer supplies `Never` after node image import.
+For packaged downloads, isolated namespace lifecycle and parallel release simulations, use the
+[release installation guide](../../../releases/installation.md). The full mock reference
+includes a `helm test` smoke hook and its dedicated ServiceAccount. Alternative providers need
+their own acceptance tests; the default hook is omitted for incompatible provider selections.
+
 Examples:
 
 ```bash

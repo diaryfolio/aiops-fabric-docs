@@ -256,3 +256,20 @@ warning within seven days, critical within 24 hours, expired after not-after, he
 warning window, or unknown when expiry metadata is absent. Existing public readiness, not-before
 and issuance metadata adds context where available. These are display explanations of existing
 API fields; the browser does not reclassify certificate state or infer an issuer failure.
+
+## Release namespace preview
+
+The source-checkout release launcher attaches the same GUI to a validated owned namespace,
+using twelve fixed loopback mTLS forwards and existing fixed-tenant smoke credentials. Release
+context/version/namespace are visible; health is observed live. Ingestion, memory writes and
+search call existing scoped APIs. Deterministic evaluation vectors are explicitly labeled.
+Real-model configuration/tests, re-embedding, SSO/certificate administration and deployment/network
+plans are disabled in this preview. Local preview metadata and health observation remain
+console-owned; no backend API starts depending on the GUI. Temporary TLS/client material stays
+on the host, is removed when the launcher stops, and is never returned to JavaScript. An installed
+namespace reset requires reattachment. See the [operator guide](../../../releases/installation.md#attach-the-host-side-release-preview-gui).
+
+The preview also exercises `/v1/responses` through the gateway with the existing `api.invoke`
+grant, a fixed backend model route, and `remember: false`. Its UI calls this a mock LLM response
+and shows Tev1/Ollama as not installed. Deterministic embedding profile labels refer to the memory
+provider; absent capabilities and failed probes do not remain indefinitely checking.

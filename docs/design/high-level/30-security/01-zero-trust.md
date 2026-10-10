@@ -93,6 +93,14 @@ CI generates SBOMs, scans dependencies/images/IaC, signs artifacts and provenanc
 
 ## Required negative tests
 
+Release evaluation namespaces use independent CA/signing/client/database material and retain
+default-deny policy. The Helm test workload has exact namespaced HTTPS egress to its declared
+test targets. Ingestion is allowed into the memory gateway because it owns that documented call;
+other undeclared application edges remain denied. Parallel isolation probes temporarily grant
+only an exact source/target namespace, pod identity label and port, prove the transport control,
+remove the grants and re-prove denial. Independent mTLS/tenant authorization still applies.
+See the [release simulation guide](../../../releases/parallel-environments.md).
+
 - missing/expired token, wrong audience, wrong scope, and untrusted client certificate;
 - caller-supplied tenant substitution and cross-tenant memory search;
 - missing/malformed Trust Envelope, fixed-tenant delegation attempt, and legacy tenant header;
@@ -187,3 +195,19 @@ CNI/ztunnel tooling runs in system namespaces; applications retain restricted Po
 HBONE requires scoped port 15008 policy; inner authorization must be proven through data transfer,
 not only TCP connect. No prompt/body logs or automatic model-write retries are introduced. See the
 [networking design](../20-deployment/02-modular-networking-mesh.md).
+
+## Release preview operator access
+
+The optional host GUI attaches only to a checksum-verified release and an explicitly selected
+owned evaluation namespace. It copies the existing smoke TLS/client credentials to a private
+temporary host directory and removes them on exit. Only fixed loopback HTTPS forwards are accepted;
+the browser cannot choose a namespace, workload identity or upstream URL. Existing fixed-tenant,
+audience/scoped tokens, mTLS, session, Host/Origin and CSRF checks remain required. Preview routes
+are restricted to ingestion, memory and mock inference; writes are limited to ingestion and memory.
+No issuer grants or policies are broadened.
+The host operator needs Kubernetes Secret-read and port-forward permissions; production human
+identity/delegation and renewable workload credentials remain separate work.
+
+The release response preview uses the smoke client's existing gateway audience and `api.invoke`
+scope. The browser cannot substitute a model, tenant, upstream or persistence flag; the console
+sets `remember: false` and preserves the existing downstream trust envelope. No grant is added.

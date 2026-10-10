@@ -21,6 +21,9 @@ nav = [
   ] },
   { "Get started" = [
     { "Quick start" = "QUICKSTART.md" },
+    { "Release installation" = "releases/installation.md" },
+    { "Release 1.0.1" = "releases/1.0.1.md" },
+    { "Parallel release environments" = "releases/parallel-environments.md" },
     { "Test and validation" = "tests/README.md" },
     { "Technical guide" = "TECHNICAL_README.md" },
   ] },

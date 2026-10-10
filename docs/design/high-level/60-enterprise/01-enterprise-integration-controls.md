@@ -117,6 +117,15 @@ OTLP exporters, sampling, delivery acknowledgement, and fail-closed audit delive
 
 ## Current reference status
 
+The 1.0.1 distribution provides paired source commits, fixed-version Helm packaging,
+architecture-specific offline images, checksum verification and an explicit draft-publication
+step. Evaluation environments use release-specific namespaces and separate credentials/state,
+with acceptance before retirement or traffic promotion. See the
+[release guide](../../../releases/installation.md) and
+[parallel environment contract](../../../releases/parallel-environments.md). This does not
+implement signed supply-chain attestations, enterprise data migration, shared identity/session
+cutover or a production traffic controller; those matrix acceptance gates remain required.
+
 Implemented now: JSON access/runtime logs, `X-Request-ID` correlation, certificate-required TLS,
 audience/scoped tokens, signed Trust Envelope tenant delegation, external OIDC edge verification,
 built-in provider admission plus an OPA decision boundary, append-only safe evidence metadata,
@@ -165,3 +174,14 @@ promotion. Reference Cilium and Istio ambient remain independent operator-manage
 transport certificates do not replace application JWT authorization or prove application TLS hot
 reload. Networking APIs/GUI expose plans and timestamped evidence without cluster-admin mutation.
 Production additionally requires HA, load/capacity/failure-zone acceptance and durable flow telemetry.
+
+## Release preview boundary
+
+The source-checkout GUI can inspect an owned disposable release and exercise ingestion/memory
+through the existing evaluation identity. It is loopback operator tooling, not enterprise
+admin access or SSO acceptance. It changes no cluster grants, state owner or traffic routing.
+Temporary host credential handling and browser isolation are covered by negative tests;
+production user delegation, renewable identity and audited administrative actions remain gaps.
+
+Mock response preview reuses the existing gateway grant and does not certify real model
+inference or provider quality. Absent Tev1/Ollama capabilities are labeled not installed.
