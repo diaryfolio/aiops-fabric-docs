@@ -195,3 +195,6 @@ resource, changes no namespace identity or data, and uses existing smoke grants.
 checks, ingestion, memory writes and search are supported. These checks do not demonstrate CNI
 enforcement and the GUI does not implement production traffic switching. The original 1.0.1
 bundle remains a headless distribution; the preview is a follow-up source-checkout utility.
+
+The preview can test the installed mock inference path through the gateway response API without
+conversation writes. Real Tev1/Ollama models still require their separate adapter/upstream profile.

@@ -202,7 +202,12 @@ The optional host GUI attaches only to a checksum-verified release and an explic
 owned evaluation namespace. It copies the existing smoke TLS/client credentials to a private
 temporary host directory and removes them on exit. Only fixed loopback HTTPS forwards are accepted;
 the browser cannot choose a namespace, workload identity or upstream URL. Existing fixed-tenant,
-audience/scoped tokens, mTLS, session, Host/Origin and CSRF checks remain required. Preview write
-operations are restricted to ingestion and memory; no issuer grants or policies are broadened.
+audience/scoped tokens, mTLS, session, Host/Origin and CSRF checks remain required. Preview routes
+are restricted to ingestion, memory and mock inference; writes are limited to ingestion and memory.
+No issuer grants or policies are broadened.
 The host operator needs Kubernetes Secret-read and port-forward permissions; production human
 identity/delegation and renewable workload credentials remain separate work.
+
+The release response preview uses the smoke client's existing gateway audience and `api.invoke`
+scope. The browser cannot substitute a model, tenant, upstream or persistence flag; the console
+sets `remember: false` and preserves the existing downstream trust envelope. No grant is added.

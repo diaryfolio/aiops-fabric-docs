@@ -182,3 +182,6 @@ through the existing evaluation identity. It is loopback operator tooling, not e
 admin access or SSO acceptance. It changes no cluster grants, state owner or traffic routing.
 Temporary host credential handling and browser isolation are covered by negative tests;
 production user delegation, renewable identity and audited administrative actions remain gaps.
+
+Mock response preview reuses the existing gateway grant and does not certify real model
+inference or provider quality. Absent Tev1/Ollama capabilities are labeled not installed.

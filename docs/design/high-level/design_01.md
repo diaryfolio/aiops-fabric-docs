@@ -235,3 +235,7 @@ The optional host-side release preview attaches to one owned evaluation namespac
 loopback port-forwards. It uses the existing fixed-tenant smoke identity for ingestion and memory
 APIs, observes service health, and retains browser session/CSRF protection. It does not provision
 a cluster service or expand workload grants. See the [release preview guide](../../releases/installation.md#attach-the-host-side-release-preview-gui).
+
+Release preview inference uses the existing gateway response API and smoke `api.invoke` grant,
+then the established orchestrator/LLM/mock path. Conversation writes are disabled for that test.
+Tev1/Ollama capability absence is separate from live LLM gateway health.

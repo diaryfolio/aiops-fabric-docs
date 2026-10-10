@@ -17,7 +17,10 @@ bundle checksums and release namespace ownership, reads the existing smoke crede
 private temporary host files, and starts twelve loopback-only forwards plus the existing GUI.
 No Kubernetes resources or identity grants are changed. The selected context/namespace/version
 are visible; service health is observed over mTLS. Existing ingestion, memory write and search
-APIs use their original audience/scopes and fixed tenant. Other administration operations are
+APIs use their original audience/scopes and fixed tenant. A mock response preview uses the
+existing gateway `api.invoke` grant and disables conversation writes. The UI distinguishes absent
+Tev1/Ollama capabilities from the running LLM gateway and deterministic evaluation embeddings;
+completed/failed health requests never leave missing capabilities checking. Other administration operations are
 rejected in preview mode. Browser Host/Origin/session/CSRF protections remain intact.
 
 The original 1.0.1 download assets are unchanged and remain headless. Preview tests cover anonymous
@@ -26,7 +29,8 @@ URL refusal. Live Green validation includes ingestion/search and owner isolation
 deterministic vectors and does not claim real-model or production administration acceptance.
 Validation: 105 unit/security/design tests, Ruff and strict documentation build passed. Green
 headless Helm smoke/CNI checks passed with the preview attached; browser ingestion and search
-returned the synthetic document. The utility is separate from the original local Ollama harness
+returned the synthetic document. The mock response path and explicit component labels were
+verified in the browser. The utility is separate from the original local Ollama harness
 and `viewsense-dev` recovery.
 
 ## Release 1.0.1 packaging and environment replacement (major)
@@ -241,6 +245,7 @@ provider keys. This development console is not installed in the production Helm 
 | `POST /api/tests/model` | admin-authorized selected-model decision/embedding/chat preview without changing saved defaults |
 | `POST /api/tests/memory`, `POST /api/tests/search`, `POST /api/tests/reembed` | store/search/backfill through memory gateway |
 | `POST /api/tests/ingestion`, `POST /api/tests/rag` | document chunking and store/retrieve/optional decision on context |
+| `POST /api/tests/response` | release-preview-only mock gateway response; scoped `api.invoke`, fixed backend model route, conversation writes disabled |
 
 See [local console design](10-overall/06-local-ai-console.md) for trust boundaries and production
 gaps. The base Kubernetes mock regression does not prove Ollama networking, GPU sizing or local

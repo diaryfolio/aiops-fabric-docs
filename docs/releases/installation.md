@@ -110,11 +110,16 @@ make release-console RELEASE_BUNDLE=dist/releases/viewsense-1.0.1-linux-arm64 \
 ```
 
 The GUI opens at `http://127.0.0.1:8797`. It displays the exact context, namespace and release,
-checks twelve live service health endpoints over mTLS, and supports synthetic document ingestion,
-memory writes and owner-bound search. The reference uses deterministic 64-dimensional test
-vectors, so search verifies API/storage plumbing rather than semantic retrieval quality.
-Model configuration/previews, backfill, SSO/certificate administration, networking plans and
-agent/tool/governance administration remain outside this preview. Their live API health may
+checks twelve live service health endpoints over mTLS, and supports a mock LLM response test,
+synthetic document ingestion, memory writes and owner-bound search. The mock response goes through
+gateway → orchestrator → LLM gateway → mock provider with conversation writes disabled. The
+reference uses deterministic 64-dimensional test vectors, so search verifies API/storage plumbing
+rather than semantic retrieval quality.
+Tev1 and real Ollama chat/embedding models are not installed in this reference. The component
+view distinguishes not-installed capabilities from observed service health; an unavailable or
+failed probe does not remain indefinitely checking. Model configuration/previews, backfill,
+SSO/certificate administration, networking plans and agent/tool/governance administration remain
+outside this preview. Their live API health may
 be visible without an administration workspace.
 
 The launcher verifies the bundle and namespace ownership, then creates loopback-only Kubernetes
@@ -139,6 +144,16 @@ not attach to a release namespace. Existing `viewsense-dev` installation recover
 operator action and must preserve its credentials and state.
 
 ![Green preview retrieving a synthetic namespace document](assets/release-preview-green.jpg)
+
+The component view reports Tev1 as not installed and distinguishes the installed mock inference
+and deterministic embedding paths from real models:
+
+![Green preview component availability and live health](assets/release-preview-components.jpg)
+
+The mock response checks the existing inference integration. An owner-bound search after this
+test returned no memories, confirming that the synthetic conversation was not persisted:
+
+![Green preview completing a mock LLM response](assets/release-preview-llm.jpg)
 
 ## Acceptance and inspection
 
