@@ -12,6 +12,13 @@ Product packaging uses four explicit modes: `bundled`, `adapter`, `managed-depen
 its upstream product is separate; a managed dependency is installed/operated at platform scope; an
 external product is reached through an API. Product selection never implies product installation.
 
+Application distributions use a versioned Helm chart and architecture-specific offline image
+bundles. Evaluation environments are replaceable release-specific namespaces with isolated state
+and credentials. Candidate environments can run in parallel; production traffic cutover requires
+an independently managed entry point and an explicit state/identity/drain plan. See the
+[release guide](../../releases/installation.md) and
+[parallel environment design](../../releases/parallel-environments.md).
+
 Implementation truth is maintained in
 [Implementation Conformance](00-implementation-conformance.md). Target-state requirements in this
 design are not evidence that a capability is deployed.

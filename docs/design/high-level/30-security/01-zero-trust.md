@@ -93,6 +93,14 @@ CI generates SBOMs, scans dependencies/images/IaC, signs artifacts and provenanc
 
 ## Required negative tests
 
+Release evaluation namespaces use independent CA/signing/client/database material and retain
+default-deny policy. The Helm test workload has exact namespaced HTTPS egress to its declared
+test targets. Ingestion is allowed into the memory gateway because it owns that documented call;
+other undeclared application edges remain denied. Parallel isolation probes temporarily grant
+only an exact source/target namespace, pod identity label and port, prove the transport control,
+remove the grants and re-prove denial. Independent mTLS/tenant authorization still applies.
+See the [release simulation guide](../../../releases/parallel-environments.md).
+
 - missing/expired token, wrong audience, wrong scope, and untrusted client certificate;
 - caller-supplied tenant substitution and cross-tenant memory search;
 - missing/malformed Trust Envelope, fixed-tenant delegation attempt, and legacy tenant header;

@@ -31,6 +31,14 @@ budget; current public-route timeouts do not certify the slow Qwen path.
 
 ## Release safety
 
+The 1.0.1 evaluation distribution supports fresh release-specific namespace installation,
+Helm smoke tests, CNI probes and owned namespace delete/recreate. The release-owner scripts
+record paired source commits, build checksummed per-architecture downloads and upload a GitHub
+Release draft. See the [release guide](../../../releases/installation.md). Parallel blue/green
+environments use the [replacement and traffic-switching plan](../../../releases/parallel-environments.md).
+An evaluation reset destroys its state; production cutover must reconcile state, workload
+trust and sessions, drain requests/work and define a data-safe fallback before old resources retire.
+
 - immutable signed image digests and GitOps promotion;
 - contract tests against every configured adapter;
 - expand/migrate/contract database changes with rollback compatibility;

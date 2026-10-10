@@ -10,6 +10,55 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Release 1.0.1 packaging and environment replacement (major)
+
+The versioned Helm chart, architecture-specific offline image/download packager, checksummed
+installer and draft GitHub Release uploader are implemented. The installer requires an explicit
+context and a new namespace identifying the release, such as `viewsense-release-1-0-1-blue`.
+Independent PKI/signing/client/database material is generated outside existing development
+directories. All four state owners remain namespaced and separate. Owned namespace deletion
+has a UID precondition; reset recreates fresh state. Git checkout metadata, host credentials
+and development runtime directories are excluded; Python runtime assets remain in the image.
+
+The default full mock chart includes a Helm test Pod; selected external/partial profiles omit
+that hook and need their own acceptance. The shared CNI probe script pairs allowed and denied
+mTLS HTTP transfers. Negative unit tests cover namespace protection, existing-namespace refusal,
+ownership checks and artifact corruption. Paired clean source commits are recorded in artifacts,
+and draft upload verifies matching application/documentation tags.
+
+Parallel whole-suite environments and state-safe promotion are defined in the
+[replacement design](../../releases/parallel-environments.md). A stable cross-namespace or
+cross-cluster traffic switcher is not shipped: ingress/trust, shared identity, state replication,
+writer fencing and drain remain product-specific integration work. The default release is an
+evaluation distribution, not a production admission decision. Static seven-day certificates,
+mock inference/tools, deterministic embeddings, single-replica stores and existing enterprise
+security/HA/telemetry gaps remain explicit.
+
+### Release validation evidence
+
+- Docker unit/security/design tests: 100 passed; source, tests and release-script Ruff checks passed.
+  Helm lint/template for every profile, base Kustomize rendering, Kubernetes server-side dry run,
+  strict documentation build and documentation release-publishing tests passed.
+- ARM64 `k3d-cks`, Kubernetes `v1.31.5+k3s1` and Helm `v4.1.4`: independent blue and green
+  release namespaces were installed with separate Secrets and four bound PVCs each. Green was
+  deleted and recreated with a different namespace UID and new PVCs; end-to-end smoke passed.
+- Green's gateway → orchestrator and orchestrator → memory-gateway mTLS transfers succeeded;
+  gateway → ingestion and orchestrator → MCP gateway transfers were denied. Cross-namespace
+  gateway → peer identity and orchestrator → peer memory gateway deny/allow-control/deny probes
+  passed, with temporary policies removed. These are representative CNI checks, not complete
+  production or Istio-ambient acceptance.
+- The local server's CNI chain had no pod firewall rules after Docker resumed; restarting the
+  server restored rule programming and the denial checks above. A successful API/readiness
+  check alone must not be interpreted as CNI enforcement. Cluster resume/recovery still requires
+  live policy probes. The release installer never disables policy to get a passing smoke test.
+- Image imports on the small local runtime triggered transient disk pressure. Rebuildable unused
+  Docker build cache was reclaimed; namespace lifecycle/data stayed scoped to release-test
+  resources. The installer now refuses imports without disk headroom, waits for pressure to clear,
+  and supports reusing preloaded images for parallel environments.
+
+AMD64 image builds are supported by the packager; the local Kubernetes evidence is ARM64.
+GitHub publication and matching release tags are operator-owned steps, not claimed as completed.
+
 ## Executable reference topology
 
 Solid arrows are calls made by the current code. No arrow means no runtime dependency, even when a
@@ -265,7 +314,8 @@ the renewal action.
   gateway → ingestion returned probe status 0 despite the denial policy. This existing local CNI
   regression blocks production security acceptance; manifest rendering does not prove enforcement.
 
-Design sync remains FAIL for production acceptance while that isolation failure remains. Product
+Production acceptance for that SSO/certificate POC remains incomplete. The historical CNI failure
+has subsequent representative recovery evidence in the release 1.0.1 section above. Product
 suite selection is a plan; deployment apply, Okta live acceptance, HA identity/sessions, native OTLP,
 immutable audit export and coordinated workload/trust rotation are not implemented by this POC.
 
@@ -275,7 +325,9 @@ The replaceable CNI/mesh reference, neutral allowed-flow contract, strict Istio 
 headless networking metadata/evidence/plan APIs and GUI page are implemented in source. The portable
 base and Helm packaging preserve distinct database ServiceAccounts through redeployment. Runtime
 acceptance is incomplete; no installed chart or manifest alone establishes enforcement. Existing
-cks remains non-compliant and its data is not migrated by creating the networking acceptance cluster.
+cks was non-compliant at that networking baseline and its data is not migrated by creating the
+networking acceptance cluster. The release 1.0.1 evidence above records subsequent local CNI
+recovery and representative checks; full mesh acceptance is still incomplete.
 
 Networking routes: `GET /v1/networking/providers`, `GET /v1/networking/topology`,
 `GET /v1/networking/status`, `POST /v1/networking/plans`. Inspection requires `platform.inspect`;
@@ -306,8 +358,9 @@ topology/provider-profile hashes and timestamp; stale, failed or mismatched evid
   gateway mounts it read-only; status is `unverified` until complete matching checks exist, becomes
   `stale` after ten minutes, and always reports `live_health:not_monitored`.
 
-Design sync is **FAIL** pending required Docker/runtime/browser validation and the existing cks
-isolation regression. This reference is not production-ready: persistent-data cutover, provider
+Design sync for that networking/mesh baseline is **FAIL** pending its full runtime/browser
+acceptance. Release 1.0.1's Docker checks and representative local CNI recovery do not establish
+acceptance for the independent Cilium/Istio stack. This reference is not production-ready: persistent-data cutover, provider
 overlays beyond the base flow graph, HA/load tests, approved mesh trust/rotation, ingress/egress
 gateways and durable protected telemetry remain deployment work.
 

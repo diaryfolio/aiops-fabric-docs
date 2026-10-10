@@ -117,6 +117,15 @@ OTLP exporters, sampling, delivery acknowledgement, and fail-closed audit delive
 
 ## Current reference status
 
+The 1.0.1 distribution provides paired source commits, fixed-version Helm packaging,
+architecture-specific offline images, checksum verification and an explicit draft-publication
+step. Evaluation environments use release-specific namespaces and separate credentials/state,
+with acceptance before retirement or traffic promotion. See the
+[release guide](../../../releases/installation.md) and
+[parallel environment contract](../../../releases/parallel-environments.md). This does not
+implement signed supply-chain attestations, enterprise data migration, shared identity/session
+cutover or a production traffic controller; those matrix acceptance gates remain required.
+
 Implemented now: JSON access/runtime logs, `X-Request-ID` correlation, certificate-required TLS,
 audience/scoped tokens, signed Trust Envelope tenant delegation, external OIDC edge verification,
 built-in provider admission plus an OPA decision boundary, append-only safe evidence metadata,
