@@ -19,6 +19,13 @@ an independently managed entry point and an explicit state/identity/drain plan. 
 [release guide](../../releases/installation.md) and
 [parallel environment design](../../releases/parallel-environments.md).
 
+Release requests are versioned implementation configuration. A disabled-by-default JSON trigger
+pins the documentation snapshot; a `main` workflow separates read-only checks/builds from paired
+tag creation and draft attachment upload. The version is staged into packaging metadata without
+source edits. Existing tags and published assets cannot be replaced by retries. This adds a CI
+delivery path, with no runtime service, namespace deployment or traffic-switching change. See the
+[release trigger guide](../../releases/installation.md#automate-a-release-with-the-trigger-file).
+
 Implementation truth is maintained in
 [Implementation Conformance](00-implementation-conformance.md). Target-state requirements in this
 design are not evidence that a capability is deployed.

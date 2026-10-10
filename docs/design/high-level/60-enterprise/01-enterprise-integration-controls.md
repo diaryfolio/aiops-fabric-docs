@@ -117,6 +117,13 @@ OTLP exporters, sampling, delivery acknowledgement, and fail-closed audit delive
 
 ## Current reference status
 
+The follow-up release workflow separates read-only validation/build from contents-write draft
+upload, pins the documentation commit, verifies hashes/source bindings, and uses a distinct token
+scoped to the docs repository for its matching tag. Reviewed `main` trigger changes request a
+release; existing tags and published assets are preserved. Failed-job retries reuse retained
+artifacts, and real GitHub execution remains environment-dependent. These checks do not satisfy
+the matrix's SBOM/signing/provenance or production deployment gates.
+
 The 1.0.1 distribution provides paired source commits, fixed-version Helm packaging,
 architecture-specific offline images, checksum verification and an explicit draft-publication
 step. Evaluation environments use release-specific namespaces and separate credentials/state,

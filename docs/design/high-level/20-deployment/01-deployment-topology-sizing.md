@@ -43,6 +43,13 @@ development keys, issuer, mock providers, `imagePullPolicy: Never`, or single-re
 
 ## Downloadable release contract
 
+The optional release trigger workflow builds both architectures from exact paired commits,
+checks the existing reference/profile/docs contracts and uploads a checksummed GitHub draft.
+Its plain version controls staged chart/application/global-image metadata without changing the
+source chart. It creates no cluster resources and does not replace live namespace/CNI acceptance.
+Only `main` trigger changes or a manual `main` run can release; see the
+[automation procedure](../../../releases/installation.md#automate-a-release-with-the-trigger-file).
+
 The [release installation guide](../../../releases/installation.md) defines the 1.0.1
 GitHub Release assets: a versioned Helm chart and per-architecture Linux image bundles with
 checksums, matching documentation and paired source commits. The image archive includes

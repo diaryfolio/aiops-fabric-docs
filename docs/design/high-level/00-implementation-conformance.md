@@ -10,6 +10,28 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Release trigger automation (major)
+
+The application `release-trigger.json` contains an enabled boolean, plain three-part version and
+an immutable documentation commit. `.github/workflows/release.yml` runs only in the canonical
+application repository on a trigger-file push to `main` or a manual `main` dispatch. It preserves
+operator branch ownership and does not automatically edit sources. Read-only validation/build
+jobs run existing tests, profiles, Kustomize and docs checks, then package both node architectures.
+The requested version is applied to a temporary chart copy and image/archive metadata.
+
+A separate contents-write upload job verifies outer archives and extracted bundle checksums and
+binds their clean source commits to the requested application/docs checkouts before creating paired
+tags. Docs access uses a repository-scoped `RELEASE_DOCS_TOKEN`; checkout credentials are not
+persisted. Actions are pinned to commit SHAs. Completed drafts and published versions are skipped;
+existing tags cannot move and retries add only missing byte-matching draft attachments. Draft
+publication remains an explicit operator step. Retained build artifacts support failed-job retry
+for 14 days; a new build cannot overwrite an existing attachment with different bytes.
+
+The workflow does not deploy, switch traffic, generate SBOM/signatures or prove Kubernetes CNI,
+model quality or production admission. Configuration and a real remote Actions run remain required;
+no GitHub upload is claimed from local validation. See the
+[trigger operator guide](../../releases/installation.md#automate-a-release-with-the-trigger-file).
+
 ## Detachable release preview GUI (major)
 
 The follow-up source-checkout utility `scripts/release/console.py` is implemented. It verifies
@@ -80,7 +102,9 @@ security/HA/telemetry gaps remain explicit.
   and supports reusing preloaded images for parallel environments.
 
 AMD64 image builds are supported by the packager; the local Kubernetes evidence is ARM64.
-GitHub publication and matching release tags are operator-owned steps, not claimed as completed.
+The original download baseline has no claimed GitHub publication. Manual paired tags/upload
+remain supported; the follow-up trigger workflow above automates tags and draft attachments after
+repository configuration, while publication remains operator-owned.
 
 ## Executable reference topology
 
