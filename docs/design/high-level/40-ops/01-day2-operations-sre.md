@@ -31,6 +31,15 @@ budget; current public-route timeouts do not certify the slow Qwen path.
 
 ## Release safety
 
+The source trigger can request automated packaging and a GitHub draft after a reviewed `main`
+change. It pins docs, runs validation before building both architectures, verifies clean paired
+source/checksums and never moves existing version tags. A failed upload job can reuse its retained
+build artifact and add only missing matching draft attachments; publication remains explicit.
+Completed versions are skipped and unrelated commits do not retrigger an unchanged enabled file.
+Repository token/policy configuration and remote-run evidence are prerequisites. This workflow
+does not deploy or prove live CNI/model quality; use the
+[trigger and recovery guide](../../../releases/installation.md#automate-a-release-with-the-trigger-file).
+
 The 1.0.1 evaluation distribution supports fresh release-specific namespace installation,
 Helm smoke tests, CNI probes and owned namespace delete/recreate. The release-owner scripts
 record paired source commits, build checksummed per-architecture downloads and upload a GitHub

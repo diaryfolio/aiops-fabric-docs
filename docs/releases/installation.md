@@ -209,6 +209,72 @@ the affected server's rules by restarting that node and rerunning the full accep
 coordinate a node restart with its other workload owners. The installer does not restart nodes
 or weaken NetworkPolicies automatically.
 
+## Automate a release with the trigger file
+
+The application repository owns `release-trigger.json` and
+`.github/workflows/release.yml`. The trigger starts disabled. To request a release, commit its
+version, boolean switch and the full commit SHA of the reviewed documentation snapshot:
+
+```json
+{
+  "enabled": true,
+  "version": "1.0.1",
+  "documentation_commit": "<full lowercase 40-character documentation commit SHA>"
+}
+```
+
+Use `git -C ../aiops-fabric-docs rev-parse HEAD` after committing the matching documentation,
+and push that documentation commit before enabling the application trigger. The pinned checkout
+must contain `docs/releases/<version>.md`. Use a new version for changed published content.
+`enabled` is a JSON boolean, not the string `"true"`; the version has no `v` prefix. Unknown
+fields, mutable documentation branch names and malformed values fail validation.
+
+Merge the trigger change into `main` to run **Release package** in GitHub Actions. Branch pushes
+and pull requests do not release. The manual **Run workflow** action is also restricted to `main`;
+it reads the same committed trigger. An unchanged enabled file does not trigger on unrelated
+commits. Leave it enabled or disable it after completion; requesting the next version requires
+another reviewed file change. The workflow never creates a branch, edits the trigger or commits
+generated version changes.
+
+One-time configuration in `diaryfolio/aiops-fabric`:
+
+1. Enable GitHub Actions for the repository. The upload job requests `contents: write` for
+   application tags and releases; validation/build jobs have `contents: read`.
+2. Add an Actions repository secret named `RELEASE_DOCS_TOKEN`. Use a fine-grained token restricted
+   to `diaryfolio/aiops-fabric-docs`, with **Contents: Read and write**. It checks out the pinned docs
+   and creates the matching docs tag. The application `GITHUB_TOKEN` cannot access/tag a separate
+   private repository. Do not put the token in the trigger file or source control.
+3. Ensure repository/organization policy permits the pinned actions and creation of the release
+   tags. Protected tag rules must permit the workflow's respective token identities.
+
+The workflow validates the trigger, skips an already published version or completed draft, and
+checks out the exact application event commit plus pinned docs commit. It runs unit/security/design
+tests, lint, all Helm profiles, base Kustomize rendering and the strict docs build. Both ARM64 and
+AMD64 bundles are built, then checksummed downloads are retained as a workflow artifact for 14 days.
+The requested version sets staged chart `version`, `appVersion` and global image tag, the image
+tag/OCI version label, archive names and manifest; the source chart remains unchanged. Manual
+packaging can use the same staging behavior with `RELEASE_ARGS='--version 1.0.2'` when matching
+reviewed release notes exist.
+
+The separate upload job verifies archive checksums, safely extracts bundles and verifies their
+internal contents and exact clean source commits. It then creates matching `v<version>` tags in
+both repositories and attaches five downloads to a **draft** application GitHub Release. Review
+the draft in the application repository's **Releases** tab, then publish it explicitly.
+The workflow does not deploy to a Kubernetes cluster or establish CNI/model-quality
+acceptance; the [namespace acceptance procedure](#acceptance-and-inspection) remains required.
+
+Release runs are serialized. An existing tag pointing at different source fails without moving
+either tag. On an interrupted upload, use **Re-run failed jobs** so the upload job reuses the same
+build artifact. Matching existing draft attachments are checked by downloading and hashing them;
+only missing files are added. Different or unexpected existing attachments fail without overwrite,
+and a published release is never changed. A fresh rebuild may have different archive bytes; do not
+use it to replace an incomplete draft's existing downloads. If the retained artifact has expired,
+review recovery manually or choose a new version. Partial paired tag creation can be retried only
+with the same source commits.
+
+This automation requires repository setup and its first remote Actions run; local validation
+does not claim that GitHub has created a release. It preserves the prepared local 1.0.1 bundles.
+
 ## Build and upload as the release owner
 
 From the application checkout, after paired application/documentation review and commits:

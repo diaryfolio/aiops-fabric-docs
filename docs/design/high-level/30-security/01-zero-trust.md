@@ -196,6 +196,18 @@ HBONE requires scoped port 15008 policy; inner authorization must be proven thro
 not only TCP connect. No prompt/body logs or automatic model-write retries are introduced. See the
 [networking design](../20-deployment/02-modular-networking-mesh.md).
 
+## Release automation credentials
+
+The release workflow consumes only reviewed `main` source and an immutable docs commit, with
+strict trigger validation and commit-pinned actions. It has no pull-request release event and
+rejects other branches/repositories. Application build jobs use read-only `GITHUB_TOKEN`; only the
+upload job requests contents-write to create application tags and a release draft. A separate
+`RELEASE_DOCS_TOKEN` is scoped to Contents read/write on the docs repository for private checkout
+and its matching tag. Checkout credentials are not persisted; tokens are never release assets.
+Both source bindings and checksums are checked before tags or draft writes. Existing tag conflicts,
+non-404 API failures, different attachments and published-release mutation fail closed. This does
+not implement signed provenance, production admission or Kubernetes credentials/deployment.
+
 ## Release preview operator access
 
 The optional host GUI attaches only to a checksum-verified release and an explicitly selected
