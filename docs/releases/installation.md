@@ -98,6 +98,48 @@ python3 install.py install --context YOUR_CONTEXT \
 `--images-preloaded` is an operator assertion. `Never` pull policy fails visibly if any node
 lacks the images. Running `docker load` on a workstation alone does not load remote nodes.
 
+## Attach the host-side release preview GUI
+
+The source checkout provides `scripts/release/console.py` as a follow-up operator utility.
+It is not included in the original 1.0.1 download bundle. Install the console workstation
+dependencies with `make console-deps`, then attach to an already installed reference:
+
+```sh
+make release-console RELEASE_BUNDLE=dist/releases/viewsense-1.0.1-linux-arm64 \
+  RELEASE_CONTEXT=k3d-cks RELEASE_NAMESPACE=viewsense-release-1-0-1-green
+```
+
+The GUI opens at `http://127.0.0.1:8797`. It displays the exact context, namespace and release,
+checks twelve live service health endpoints over mTLS, and supports synthetic document ingestion,
+memory writes and owner-bound search. The reference uses deterministic 64-dimensional test
+vectors, so search verifies API/storage plumbing rather than semantic retrieval quality.
+Model configuration/previews, backfill, SSO/certificate administration, networking plans and
+agent/tool/governance administration remain outside this preview. Their live API health may
+be visible without an administration workspace.
+
+The launcher verifies the bundle and namespace ownership, then creates loopback-only Kubernetes
+port-forwards. It reads only the existing smoke client's credentials and TLS material into a
+private temporary directory; it does not alter namespace Secrets, issuer grants, workloads,
+NetworkPolicy, databases or the local AI harness. Browser access retains launch-key/session,
+Host/Origin and CSRF controls. Health checks are not NetworkPolicy enforcement evidence:
+port-forward is an operator debugging path through the Kubernetes API.
+
+Ctrl+C closes only the GUI/forwards and removes temporary credentials. Namespace data remains.
+After resetting a namespace, relaunch so the GUI uses its new credentials and pod forwards.
+To open Blue alongside Green, use another GUI port and a disjoint forwarding range:
+
+```sh
+make release-console RELEASE_BUNDLE=dist/releases/viewsense-1.0.1-linux-arm64 \
+  RELEASE_CONTEXT=k3d-cks RELEASE_NAMESPACE=viewsense-release-1-0-1-blue \
+  RELEASE_CONSOLE_ARGS='--port 8798 --base-port 28960'
+```
+
+The original `make console` continues to launch the independent local Ollama harness. It does
+not attach to a release namespace. Existing `viewsense-dev` installation recovery is a separate
+operator action and must preserve its credentials and state.
+
+![Green preview retrieving a synthetic namespace document](assets/release-preview-green.jpg)
+
 ## Acceptance and inspection
 
 Installation runs `helm test` for the full mock reference and paired allowed/denied mTLS
@@ -166,9 +208,12 @@ make docs-build
 # Default builds both node architectures; choose a fresh output directory each time.
 make release-package
 
-# Pair immutable local tags with the commits recorded in release.json.
-git tag -a v1.0.1 -m 'ViewSense AI release 1.0.1'
-git -C ../aiops-fabric-docs tag -a v1.0.1 -m 'ViewSense AI documentation 1.0.1'
+# Tag the exact packaged commits, even if the checkout has follow-up changes.
+RELEASE_BUNDLE=dist/releases/viewsense-1.0.1-linux-arm64
+RELEASE_APP_COMMIT=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source"]["application"]["commit"])' "$RELEASE_BUNDLE/release.json")
+RELEASE_DOCS_COMMIT=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source"]["documentation"]["commit"])' "$RELEASE_BUNDLE/release.json")
+git tag -a v1.0.1 "$RELEASE_APP_COMMIT" -m 'ViewSense AI release 1.0.1'
+git -C ../aiops-fabric-docs tag -a v1.0.1 "$RELEASE_DOCS_COMMIT" -m 'ViewSense AI documentation 1.0.1'
 
 # Push reviewed commits and matching tags to their respective repositories.
 git push origin HEAD

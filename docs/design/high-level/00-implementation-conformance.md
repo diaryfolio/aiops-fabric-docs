@@ -10,6 +10,25 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Detachable release preview GUI (major)
+
+The follow-up source-checkout utility `scripts/release/console.py` is implemented. It verifies
+bundle checksums and release namespace ownership, reads the existing smoke credentials/TLS into
+private temporary host files, and starts twelve loopback-only forwards plus the existing GUI.
+No Kubernetes resources or identity grants are changed. The selected context/namespace/version
+are visible; service health is observed over mTLS. Existing ingestion, memory write and search
+APIs use their original audience/scopes and fixed tenant. Other administration operations are
+rejected in preview mode. Browser Host/Origin/session/CSRF protections remain intact.
+
+The original 1.0.1 download assets are unchanged and remain headless. Preview tests cover anonymous
+and CSRF rejection, exact namespace routing/scopes, unsupported-operation rejection and nonlocal
+URL refusal. Live Green validation includes ingestion/search and owner isolation; the GUI labels
+deterministic vectors and does not claim real-model or production administration acceptance.
+Validation: 105 unit/security/design tests, Ruff and strict documentation build passed. Green
+headless Helm smoke/CNI checks passed with the preview attached; browser ingestion and search
+returned the synthetic document. The utility is separate from the original local Ollama harness
+and `viewsense-dev` recovery.
+
 ## Release 1.0.1 packaging and environment replacement (major)
 
 The versioned Helm chart, architecture-specific offline image/download packager, checksummed

@@ -186,3 +186,13 @@ load-based latency budgets, trust rotation, HA and durable telemetry remain sepa
 Istio owns its workload certificates; the certificate inventory does not yet integrate mesh-issued
 ephemeral certificates. Plaintext Cilium metrics are disabled in the provider profile until an
 authenticated collector is approved; Hubble relay uses TLS and no public telemetry UI is enabled.
+
+## Release preview lifecycle
+
+A workstation operator can attach the source-checkout GUI to one owned evaluation namespace
+using `make release-console`; see the [release guide](../../../releases/installation.md#attach-the-host-side-release-preview-gui).
+It starts only loopback port-forwards and a host GUI, retaining existing namespace state and
+workload grants. Ctrl+C stops those processes and removes temporary credentials. A namespace
+reset requires reattachment. Service health in this GUI is live mTLS reachability through a
+Kubernetes debugging path; headless smoke and CNI-negative tests remain independent gates.
+The old development namespace and local Ollama harness have separate recovery lifecycles.

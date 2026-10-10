@@ -230,3 +230,8 @@ NetworkPolicy and a provider-neutral allowed-flow contract keep application APIs
 Cilium/Istio. The reference uses Cilium plus Istio ambient with strict workload identity, while
 application TLS/JWT/tenant checks remain mandatory. See
 [networking design](20-deployment/02-modular-networking-mesh.md).
+
+The optional host-side release preview attaches to one owned evaluation namespace through
+loopback port-forwards. It uses the existing fixed-tenant smoke identity for ingestion and memory
+APIs, observes service health, and retains browser session/CSRF protection. It does not provision
+a cluster service or expand workload grants. See the [release preview guide](../../releases/installation.md#attach-the-host-side-release-preview-gui).

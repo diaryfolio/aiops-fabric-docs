@@ -174,3 +174,11 @@ promotion. Reference Cilium and Istio ambient remain independent operator-manage
 transport certificates do not replace application JWT authorization or prove application TLS hot
 reload. Networking APIs/GUI expose plans and timestamped evidence without cluster-admin mutation.
 Production additionally requires HA, load/capacity/failure-zone acceptance and durable flow telemetry.
+
+## Release preview boundary
+
+The source-checkout GUI can inspect an owned disposable release and exercise ingestion/memory
+through the existing evaluation identity. It is loopback operator tooling, not enterprise
+admin access or SSO acceptance. It changes no cluster grants, state owner or traffic routing.
+Temporary host credential handling and browser isolation are covered by negative tests;
+production user delegation, renewable identity and audited administrative actions remain gaps.

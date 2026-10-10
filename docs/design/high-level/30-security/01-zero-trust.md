@@ -195,3 +195,14 @@ CNI/ztunnel tooling runs in system namespaces; applications retain restricted Po
 HBONE requires scoped port 15008 policy; inner authorization must be proven through data transfer,
 not only TCP connect. No prompt/body logs or automatic model-write retries are introduced. See the
 [networking design](../20-deployment/02-modular-networking-mesh.md).
+
+## Release preview operator access
+
+The optional host GUI attaches only to a checksum-verified release and an explicitly selected
+owned evaluation namespace. It copies the existing smoke TLS/client credentials to a private
+temporary host directory and removes them on exit. Only fixed loopback HTTPS forwards are accepted;
+the browser cannot choose a namespace, workload identity or upstream URL. Existing fixed-tenant,
+audience/scoped tokens, mTLS, session, Host/Origin and CSRF checks remain required. Preview write
+operations are restricted to ingestion and memory; no issuer grants or policies are broadened.
+The host operator needs Kubernetes Secret-read and port-forward permissions; production human
+identity/delegation and renewable workload credentials remain separate work.

@@ -186,3 +186,12 @@ The existing cks PVCs are not transferred or removed. Install CNI only on an app
 apply STRICT/default-deny mesh policies before enrollment, then verify actual traffic and recovery.
 Installation alone is not security acceptance; current evidence and incomplete runtime gates are
 recorded in the conformance map. Provider replacement requires a staged cluster/trust/data plan.
+
+## Detachable release preview
+
+The source checkout can attach its host-side GUI to an installed evaluation reference with
+`scripts/release/console.py`. This creates only loopback debugging forwards; it adds no Kubernetes
+resource, changes no namespace identity or data, and uses existing smoke grants. Twelve API health
+checks, ingestion, memory writes and search are supported. These checks do not demonstrate CNI
+enforcement and the GUI does not implement production traffic switching. The original 1.0.1
+bundle remains a headless distribution; the preview is a follow-up source-checkout utility.
