@@ -19,14 +19,14 @@ an independently managed entry point and an explicit state/identity/drain plan. 
 [release guide](../../releases/installation.md) and
 [parallel environment design](../../releases/parallel-environments.md).
 
-Release requests are versioned implementation configuration. A disabled-by-default JSON trigger
-pins the documentation snapshot; a `main` workflow separates draft discovery and read-only builds
+Release requests are explicit manual workflow inputs: a version and immutable documentation commit.
+No file changes or automatic push events request a release. A `main` workflow separates draft discovery and read-only builds
 from paired tag creation and draft attachment upload. Discovery needs application push access to
 list unpublished drafts, while only the upload job performs release writes. Drafts are matched
 by tag in the authenticated release list and verified by release ID. The version is staged into packaging metadata without
 source edits. Existing tags and published assets cannot be replaced by retries. This adds a CI
 delivery path, with no runtime service, namespace deployment or traffic-switching change. See the
-[release trigger guide](../../releases/installation.md#automate-a-release-with-the-trigger-file).
+[release trigger guide](../../releases/installation.md#manually-build-a-release).
 
 Implementation truth is maintained in
 [Implementation Conformance](00-implementation-conformance.md). Target-state requirements in this

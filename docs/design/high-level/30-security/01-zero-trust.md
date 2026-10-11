@@ -199,7 +199,8 @@ not only TCP connect. No prompt/body logs or automatic model-write retries are i
 ## Release automation credentials
 
 The release workflow consumes only reviewed `main` source and an immutable docs commit, with
-strict trigger validation and commit-pinned actions. It has no pull-request release event and
+strict manual-input validation and commit-pinned actions. Only `workflow_dispatch` can start it;
+legacy trigger-file edits, pushes, tags and pull requests do not request release execution. It
 rejects other branches/repositories. Application build jobs use read-only `GITHUB_TOKEN`. The
 request job requests contents-write because GitHub lists drafts only for identities with push
 access; its API calls only read releases. The upload job also requests contents-write to create

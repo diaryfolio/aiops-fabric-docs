@@ -215,32 +215,37 @@ the affected server's rules by restarting that node and rerunning the full accep
 coordinate a node restart with its other workload owners. The installer does not restart nodes
 or weaken NetworkPolicies automatically.
 
-## Automate a release with the trigger file
+## Manually build a release
 
-The application repository owns `release-trigger.json` and
-`.github/workflows/release.yml`. The trigger starts disabled. To request a release, commit its
-version, boolean switch and the full commit SHA of the reviewed documentation snapshot:
+The application `.github/workflows/release.yml` runs only when an operator explicitly dispatches
+it. Pushes, merges, tags, pull requests and changes to `release-trigger.json` do not start it.
+The legacy trigger file may remain `enabled: false`; CI does not read it. No source/configuration
+edit is required for each release request.
 
-```json
-{
-  "enabled": true,
-  "version": "1.0.1",
-  "documentation_commit": "<full lowercase 40-character documentation commit SHA>"
-}
+After committing and pushing reviewed code and documentation:
+
+1. Open **Actions → Release package → Run workflow** in the application repository.
+2. Select **main**. Other branches are rejected by the workflow's release guard.
+3. Enter **version**, such as `1.0.2`, without a `v` prefix.
+4. Enter **documentation_commit**, the full lowercase 40-character SHA of the reviewed docs commit.
+   Obtain it with `git -C ../aiops-fabric-docs rev-parse HEAD`; push that commit before dispatching.
+   The pinned checkout must contain `docs/releases/<version>.md`.
+5. Click **Run workflow**. Successful runs create a draft with five downloadable assets; review
+   those downloads before explicitly publishing.
+
+The workflow definition must first be merged into the repository's default branch for GitHub to
+expose its manual inputs. Users with repository write access can also dispatch through GitHub CLI:
+
+```sh
+gh workflow run release.yml --repo diaryfolio/aiops-fabric --ref main \
+  -f version=1.0.2 -f documentation_commit=YOUR_FULL_LOWERCASE_40_CHARACTER_DOCS_COMMIT_SHA
 ```
 
-Use `git -C ../aiops-fabric-docs rev-parse HEAD` after committing the matching documentation,
-and push that documentation commit before enabling the application trigger. The pinned checkout
-must contain `docs/releases/<version>.md`. Use a new version for changed published content.
-`enabled` is a JSON boolean, not the string `"true"`; the version has no `v` prefix. Unknown
-fields, mutable documentation branch names and malformed values fail validation.
-
-Merge the trigger change into `main` to run **Release package** in GitHub Actions. Branch pushes
-and pull requests do not release. The manual **Run workflow** action is also restricted to `main`;
-it reads the same committed trigger. An unchanged enabled file does not trigger on unrelated
-commits. Leave it enabled or disable it after completion; requesting the next version requires
-another reviewed file change. The workflow never creates a branch, edits the trigger or commits
-generated version changes.
+Inputs are passed through quoted environment variables and validated before building. Mutable
+documentation references, malformed versions and incomplete inputs fail. The workflow never
+creates a branch, edits the legacy trigger or commits generated version changes. Use a new version
+for changed published content. The legacy file remains supported only by explicit local helper
+commands that omit the manual `--version` and `--documentation-commit` arguments.
 
 One-time configuration in `diaryfolio/aiops-fabric`:
 
@@ -256,7 +261,7 @@ One-time configuration in `diaryfolio/aiops-fabric`:
 3. Ensure repository/organization policy permits the pinned actions and creation of the release
    tags. Protected tag rules must permit the workflow's respective token identities.
 
-The workflow validates the trigger, skips an already published version or completed draft, and
+The workflow validates the manual inputs, skips an already published version or completed draft, and
 checks out the exact application event commit plus pinned docs commit. It runs unit/security/design
 tests, lint, all Helm profiles, base Kustomize rendering and the strict docs build. Both ARM64 and
 AMD64 bundles are built, then checksummed downloads are retained as a workflow artifact for 14 days.
@@ -301,7 +306,10 @@ python3 scripts/release/github.py --repo diaryfolio/aiops-fabric \
   --assets /tmp/viewsense-release-recovery --resume-draft
 ```
 
-Keep the trigger version matching the downloaded artifact. The uploader checks both original
+For the legacy extraction command above, keep the local trigger version matching the downloaded
+artifact; its enabled flag does not control extraction. Alternatively, supply `--version` and
+`--documentation-commit` with the original artifact's metadata to avoid reading the trigger file.
+The uploader checks both original
 tags against the bundle's source commits, verifies existing attachments byte for byte, adds
 only missing identical files and leaves publication manual. Never move a version tag to the
 corrected uploader commit. A new corrected workflow run can skip a completed draft without

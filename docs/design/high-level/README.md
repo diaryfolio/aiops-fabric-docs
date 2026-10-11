@@ -29,7 +29,7 @@ flowchart LR
 - [Networking and mesh design](20-deployment/02-modular-networking-mesh.md) — replaceable CNI,
   strict workload transport and headless networking management.
 - [Implementation conformance](00-implementation-conformance.md)
-- [Release automation and recovery](../../releases/installation.md#automate-a-release-with-the-trigger-file)
+- [Release automation and recovery](../../releases/installation.md#manually-build-a-release)
   — draft discovery permissions, release asset selection and recovery without rebuilding artifacts.
 - [Project status and local AI integration plan](01-project-status-and-local-ai-plan.md) — current
   capabilities, missing local inference/embedding integrations, and delivery acceptance gates.

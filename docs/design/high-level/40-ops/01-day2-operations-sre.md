@@ -31,18 +31,19 @@ budget; current public-route timeouts do not certify the slow Qwen path.
 
 ## Release safety
 
-The source trigger can request automated packaging and a GitHub draft after a reviewed `main`
-change. It pins docs, runs validation before building both architectures, verifies clean paired
+An explicit manual dispatch can request packaging and a GitHub draft from reviewed `main` source.
+Operators enter the version and docs commit in the Run workflow form; no enabled-flag edit is
+required. Pushes and merges never request a build. It pins docs, runs validation before building both architectures, verifies clean paired
 source/checksums and never moves existing version tags. A failed upload job can reuse its retained
 build artifact and add only missing matching draft attachments; publication remains explicit.
-Completed versions are skipped and unrelated commits do not retrigger an unchanged enabled file.
+Completed versions are skipped. The legacy trigger file is ignored by CI.
 Draft discovery uses the authenticated release list and verification uses a release ID. A draft
 creation URL followed by a published-tag HTTP 404 can indicate failed verification after successful
 upload; inspect the existing draft before retrying. Rerunning an old Actions run uses its original
 source, so an uploader correction must be run against the retained artifacts using corrected code.
 Repository token/policy configuration and remote-run evidence are prerequisites. This workflow
 does not deploy or prove live CNI/model quality; use the
-[trigger and recovery guide](../../../releases/installation.md#automate-a-release-with-the-trigger-file).
+[trigger and recovery guide](../../../releases/installation.md#manually-build-a-release).
 
 The 1.0.1 evaluation distribution supports fresh release-specific namespace installation,
 Helm smoke tests, CNI probes and owned namespace delete/recreate. The release-owner scripts

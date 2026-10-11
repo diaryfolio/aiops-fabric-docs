@@ -10,11 +10,12 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
-## Release trigger automation (major)
+## Manual release automation (major)
 
-The application `release-trigger.json` contains an enabled boolean, plain three-part version and
-an immutable documentation commit. `.github/workflows/release.yml` runs only in the canonical
-application repository on a trigger-file push to `main` or a manual `main` dispatch. It preserves
+The application `.github/workflows/release.yml` accepts a plain three-part version and an immutable
+documentation commit through required `workflow_dispatch` inputs. It runs only in the canonical
+application repository on an explicit manual `main` dispatch; no push, tag or merge event triggers
+packaging. CI ignores the legacy `release-trigger.json` and its enabled flag. It preserves
 operator branch ownership and does not automatically edit sources. The request job uses an
 application contents-write token to list drafts; it performs no release or tag writes. Read-only
 build jobs run existing tests, profiles, Kustomize and docs checks, then package both node architectures.
@@ -39,10 +40,15 @@ Correction validation: 136 tests passed both locally and through `make unit`, in
 release CI tests. `make lint`, actionlint, base Kustomize rendering and the strict documentation
 build passed. No release was rebuilt, retried or published during this correction.
 
+Manual-dispatch validation: `make unit` passed 145 tests, including 40 release CI tests. Tests
+verify explicit inputs work without a trigger file, ignore a disabled legacy flag without
+editing it, and reject invalid/incomplete metadata. `make lint`, actionlint, Kustomize rendering
+and the strict documentation build passed. No remote dispatch or release build was performed.
+
 The workflow does not deploy, switch traffic, generate SBOM/signatures or prove Kubernetes CNI,
 model quality or production admission. Configuration and a real remote Actions run remain required;
 no GitHub upload is claimed from local validation. See the
-[trigger operator guide](../../releases/installation.md#automate-a-release-with-the-trigger-file).
+[trigger operator guide](../../releases/installation.md#manually-build-a-release).
 
 ## Detachable release preview GUI (major)
 
