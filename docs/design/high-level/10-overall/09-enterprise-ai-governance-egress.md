@@ -216,3 +216,13 @@ grounding/quality gates, embedding migration, normalised safe errors, concurrent
 duplicate/uncertain usage reconciliation and evidence-loss handling. Replacing an approved model
 must leave client contracts and role restrictions intact. No containment, hard-spend or production
 audit guarantee is claimed until that executable evidence exists.
+
+## Implemented channel control-plane slice
+
+The channel catalogs/consoles, immutable reviewed snapshots, built-in qualified-grant evaluation
+and canonical OIDC assertion adapter now ship. Route policy is fixed to local-only models and no
+CRM retention in this pilot, but no new business dispatch is enabled. Permission previews are
+explicitly synthetic and create no execution authority. Runtime PII inspection, final adapter
+wire enforcement, hard-cost reservations, actual connector restrictions and complete immutable
+execution evidence remain planned as described above. Existing legacy inference routes do not
+acquire these guarantees from the new catalog.

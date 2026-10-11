@@ -41,8 +41,13 @@ After the forwards are ready, ensure an existing imported realm has Keycloak's b
 ```
 
 Open `http://127.0.0.1:8787/?page=overview`, choose **Keycloak POC** and sign in.
-POC users are `poc-operator` (management/tests/renewal), `poc-viewer` (inspection/inference/read-only
-certificates), and `poc-other` (read-only user in tenant-b). Random passwords are in the private,
+Fresh POC realm fixtures include `poc-viewsense-admin`, `poc-operations`, `poc-sales` and `poc-siem`.
+They follow the [console role matrix](../../fabric/governance/channel-console.md#console-roles-in-the-poc):
+Admin sees all workspaces; Operations has read-only Overview/Certificates/Identity/Channels;
+Sales/SIEM have read-only Channels. Legacy `poc-operator` maps explicitly to Admin and
+`poc-viewer` to Operations; `poc-other` remains the Operations profile in tenant-b.
+The provider scopes no longer assign every console profile to the legacy operator or retain
+model invocation on the viewer. Random passwords are in the private,
 ignored `.viewsense/local-ai/sso/poc-credentials.json`; do not put them in source control or tickets.
 `bootstrap-admin` administers Keycloak using its separate `admin_password`. The provider's console
 is `https://127.0.0.1:8848/admin/`. The development CA is private; trust the public CA explicitly in
@@ -54,6 +59,14 @@ volumes retain data. Realm import never resets existing users or passwords. Appl
 `make k8s-deploy` resets certificate-controller integration to disabled; rerun `certificates-enable`.
 The forwards reconnect when a pod rolls. Keycloak POC restart preserves its embedded database;
 production requires the upstream Operator and an approved HA database.
+
+Rerun `scripts/bootstrap-sso-poc.py` with the console Python environment to regenerate the approved
+provider role mappings while retaining passwords. Fresh realm imports provision the additional
+roles/users; existing realms are not overwritten. For an existing realm, provision the new
+accounts and role assignments through its operator-owned administration workflow. This development
+change does not modify a running enterprise identity provider or silently add users to an existing
+realm. Unknown/unmapped roles have no console workspace access. Core AuthN/AuthZ contracts remain
+product-neutral; these realm fixtures are an optional example.
 
 ## Management workspaces
 

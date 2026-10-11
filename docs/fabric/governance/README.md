@@ -6,10 +6,10 @@ The bundled service is an executable reference. It does not yet claim production
 
 Helm controls are `modules.governance` and `datastores.governance`. Applications never write its database directly.
 
-## Planned enterprise authorisation and execution policy
+## Enterprise authorisation control-plane pilot
 
 The [channel-role design](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md)
-extends this owner with framework roles, qualified external mappings, Input bindings, Output
+now extends this owner with framework roles, qualified external mappings, Input bindings, Output
 capability grants and immutable reviewed policy revisions. Separate Input/Output pages call its
 headless APIs. The selected identity system owns user/group role assignment; the framework owns
 resource permissions. A replaceable AuthZ Provider evaluates canonical decisions against reviewed
@@ -22,3 +22,7 @@ complete safe evidence. Inspection and final wire checks belong to local process
 adapters; governance does not hold their credentials or capture their payloads. These APIs,
 enforcement and budget ledger remain planned. Current explicit provider admission and append-only
 evidence endpoints do not enforce runtime privacy, resource grants or hard spending by themselves.
+
+See the [channel console operator guide](channel-console.md) for implemented resources, scopes,
+revision handling, review/publication and the synthetic Sales acceptance flow. Runtime dispatch,
+external policy adapters and authoritative entitlement refresh remain planned.

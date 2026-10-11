@@ -67,6 +67,7 @@ nav = [
     { "Tools and MCP" = "fabric/mcp-registry/README.md" },
     { "Workflows" = "fabric/workflows/README.md" },
     { "Governance" = "fabric/governance/README.md" },
+    { "Channel console pilot" = "fabric/governance/channel-console.md" },
     { "Observability" = "fabric/observability/README.md" },
     { "Helm chart" = "fabric/charts/viewsense/README.md" },
     { "Enterprise integrations" = [

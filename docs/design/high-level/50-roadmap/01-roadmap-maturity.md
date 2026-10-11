@@ -105,3 +105,15 @@ Exit: stated SLO/RPO/RTO and isolation targets pass load, chaos, restore, failov
 4. Static development security being promoted; block production overlays that reference the dev issuer/CA/mocks.
 5. Kubernetes NetworkPolicy support varying by CNI; verify enforcement, do not infer it from accepted YAML.
 6. Unbounded provider fallback violating residency; route only among policy-equivalent providers.
+
+## Channel console delivery boundary
+
+The control-plane slice now implements Input/Output workspaces, framework roles, exact external
+role-source mappings, bindings/profiles/grants/routes, PostgreSQL snapshots, independent review,
+emergency disable and non-executing previews. V2 OIDC assertion normalisation remains compatible
+with v1 scope configuration. Complete-grant/deny/freshness behavior is tested on the built-in
+evaluator and two independent signed identity fixture shapes.
+
+Next promotion requires authoritative entitlements, external AuthZ conformance, narrowed tool
+delegation and connector-enforced account/field scopes. Real Oracle/Teams, assembled-context and
+wire-payload PII gates, hard budgets and independent immutable audit export remain planned.

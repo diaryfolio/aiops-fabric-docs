@@ -234,3 +234,18 @@ bundle remains a headless distribution; the preview is a follow-up source-checko
 
 The preview can test the installed mock inference path through the gateway response API without
 conversation writes. Real Tev1/Ollama models still require their separate adapter/upstream profile.
+
+## Channel policy control-plane deployment
+
+The existing governance service owns `channel_policy_state` in its database. No new Kubernetes
+service or per-channel database is added. Base NetworkPolicy and Helm allow gateway → governance
+on TLS port 8443. The unused orchestrator ingress permission on MCP is removed in base/Helm
+so the tool path is denied at both declared boundaries. Other unused tool/CRM paths stay denied. The development issuer grants the
+gateway only the explicit governance management/decision scopes needed by the facade.
+
+The local harness adds governance at `https://127.0.0.1:8847` and a separate loopback PostgreSQL
+instance at port 15433 with an independent user/password and retained volume. The GUI is optional.
+Startup creates the additive table idempotently; old services ignore it on rollback. Back up the
+governance database before upgrade, retain snapshots/disabled entries during rollback and restore
+them as one consistent state. Do not roll back to a consumer that ignores channel decisions to
+continue business execution. Full channel execution remains disabled in this slice.

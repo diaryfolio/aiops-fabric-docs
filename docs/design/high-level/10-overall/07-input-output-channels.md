@@ -14,8 +14,9 @@ the verified initiating session through its reply binding. Teams, an LLM chat ap
 console, and a headless API are entry surfaces for an Input Channel. A Teams conversation named
 Sales is not evidence that its participants have Sales permissions.
 
-This is a **major, design-only change**. Channel administration, channel-aware routing,
-Tool-Sense execution from chat, the CRM/Oracle connector, and Teams integration are **planned**.
+This is a **major uplift**. Channel catalogs and administration consoles now ship as a
+control-plane slice with non-executing policy and synthetic Sales previews. Channel-aware routing,
+Tool-Sense execution from chat, the CRM/Oracle connector and Teams integration remain **planned**.
 The shipped orchestrator calls memory and the LLM, but does not call the MCP gateway. Its existing
 tool registry and manual agent lifecycle do not implement this design. See
 [implementation conformance](../00-implementation-conformance.md#input-and-output-channels-major-design-only).
@@ -176,7 +177,9 @@ rule-match reasons and a practical next step for the employee to review.
 
 ## Proposed headless contracts
 
-These are **target API shapes**, not shipped routes or committed JSON schemas. Implementation must
+The table describes the full **target API shapes**. Catalog administration and preview contracts
+now ship; execution and connector contracts remain planned. The implemented subset and frozen
+field names are documented in the [console guide](../../../fabric/governance/channel-console.md). Implementation must
 add machine-readable channel, route, execution-context and opportunity contracts in the application
 repository and validate them end to end before promotion.
 

@@ -10,6 +10,97 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Channel policy consoles and canonical identity assertions (major)
+
+### POC console roles
+
+The console implements separate server-bound **ViewSense Admin**, **Operations**, **Sales** and
+**SIEM** identities. `GET /api/console-roles` exposes the canonical workspace matrix to Admin and
+Operations. `GET /api/session` adds canonical roles, narrowed scopes and permitted `workspaces`.
+Only Admin sees all workspaces, model tests and test history. Operations sees Overview & suites,
+Certificates, Identity & access and both Channel pages. Sales and SIEM see only the Channel pages.
+Non-admin profiles are read-only. Hidden navigation, overview links, startup calls and direct
+console mutations obey the same policy; denied API calls return 403 before any downstream call.
+
+Local credentials bind to distinct least-privilege workload clients. Selecting another identity,
+forging a role field/header or changing a URL cannot promote the credential. Named POC identities
+also encounter the workspace ceiling at the edge. For SSO, operator-approved external role mappings
+produce `console.role.<canonical-role>` scopes; unknown external roles provide no console access.
+Legacy headless clients retain their existing scope contracts. Business framework grants remain a
+separate governance policy and are never implied by a console profile. No new state owner, service
+or network edge is introduced. Evidence for the role matrix is recorded in the operator guide.
+The coordinated role revision passed all **203** tests. Live API acceptance and browser checks
+verified every profile, credential/role spoof rejection, read-only denials, hidden links and
+forbidden URL fallback. Lint, JavaScript syntax, Kustomize and strict docs checks passed; Kubernetes
+smoke and network denial probes passed on the existing Cilium cluster. POC role credentials remain
+private local state, while the original Admin credential and all persisted policy data are retained.
+
+The application now ships an implemented **control-plane pilot**, not full business execution.
+Governance owns tenant-scoped drafts, immutable frozen candidates/reviews, active snapshots,
+emergency disables/epochs and a bounded safe journal in `channel_policy_state`. PostgreSQL row
+locking serialises writes; whole-draft optimistic revisions prevent lost updates. Independent
+review precedes atomic publication. The edge and optional console are explicit owner API clients;
+they hold no grant state and query no governance database. Gateway → governance is a new scoped
+mTLS runtime edge, reflected in base/Helm NetworkPolicy and the topology catalog. Unused
+orchestrator ingress on MCP is removed to align both declared boundaries with the absent runtime edge.
+
+| Capability | State | Evidence / boundary |
+|---|---|---|
+| Input/Output workspaces, role/mapping/binding/profile/grant/route forms | implemented pilot | Detachable console, authenticated/CSRF-protected facades, typed owner API updates and safe empty/error/conflict states |
+| Policy validation/freeze/review/activation/disable | implemented pilot | PostgreSQL snapshots, immutable review, denied self-approval, epoch and optimistic concurrency; tenant-wide operator scopes only |
+| Product-neutral identity adapter | implemented pilot | Strict v2 OIDC approved-source extraction after token validation; v1 legacy scope policy preserved; two independent signed claim-shape fixtures |
+| Canonical AuthZ decisions and own-access summaries | implemented pilot | Built-in complete-grant evaluator, deny precedence, exact issuer/audience/source/revision mapping, strict role-age bound and narrowing obligations |
+| Synthetic Sales opportunity preview | implemented fixture | Explicit non-executing sample facts with field/result ceilings; no CRM queries, outbound model calls, outreach or permissions granted |
+| Authoritative membership refresh and external AuthZ provider | planned | Current token snapshots expire at the configured bound; no live directory/revocation feed or external evaluator equivalence evidence |
+| CRM/Oracle, Teams and Tool-Sense channel execution | planned | Every pilot decision has `execution_authority: false`; connector enforcement/delegation/reply binding are still required |
+| Runtime PII egress, hard costs and production immutable evidence | planned | Legacy inference routes do not enforce these new policies; catalog fields do not supply wire-level privacy or spend guarantees |
+
+Implemented governance surfaces (explicit edge facades retain management paths; console equivalents
+use `/api/`):
+
+- `/v1/channels/input`, `/v1/channels/output`: GET lists, PUT `/{identifier}`, POST `/{identifier}:disable`.
+- `/v1/framework-roles`, `/v1/idp-role-mappings`, `/v1/input-role-bindings`,
+  `/v1/output-capability-profiles`, `/v1/output-role-grants`, `/v1/channel-routes`: same bounded
+  list/update/disable operations.
+- `/v1/access-policy-draft`, `/v1/access-policy-draft:seed`, `/v1/access-policy-revisions`,
+  `/v1/access-policy-revisions:validate`, `/v1/access-policy-revisions/{revision}:review`,
+  `/v1/access-policy-revisions/{revision}:activate`.
+- `/v1/authorization:simulate`, `/v1/authorization:sales-example`, `/v1/authorization-providers`.
+- `/v1/authorization:decide`, `/v1/authorization:access`: internal trusted-edge assertions only.
+- Edge `/v1/auth/channel-access` and `/v1/authorization:decide`: own access/selection decisions
+  from verified identities, never caller-supplied roles. Console `/api/auth/channel-access`.
+
+Contracts: `channel-policy-v1`, `identity-assertion-v1`, `channel-selection-v1`,
+`channel-decision-request-v1`, `channel-decision-response-v1`, `channel-preview-request-v1`, and
+`oidc-provider-v2`; generated owner OpenAPI includes typed resource bodies. Existing provider
+files remain compatible. Fixed-tenant development clients cannot delegate another subject.
+The local harness adds governance port 8847 and a separate retained governance database at port
+15433, using its own user/password. No new Kubernetes service/database domain is introduced.
+
+The [operator guide](../../fabric/governance/channel-console.md) documents lifecycle, scope
+boundaries, pilot capacities and opt-in acceptance. Source baselines are application `bbb5f23`
+and documentation `359158f`; coordinated edits remain uncommitted for the owner's manual handoff.
+The initial pilot validation passed all **191** unit/design/catalog/security tests and lint. Base
+Kustomize rendering and the strict documentation build passed. Opt-in local acceptance exercised
+session/CSRF boundaries, the three synthetic Sales facts, denied writes, independent review,
+publication, concurrent PUT rejection and draft isolation. Browser checks covered the empty state,
+Input/Output/Identity forms, stale-edit error, denied/stale preview, keyboard focus and narrow-screen
+navigation. Installed TEV1 decision and EmbeddingGemma 768-dimension tests passed; synthetic memory
+retrieval/isolation, safe history/log checks and restart persistence passed. After restart the
+governance database retained draft revision 4, active revision 1, epoch 1 and its review evidence.
+
+End-to-end Kubernetes smoke and all positive/negative NetworkPolicy probes passed on the existing
+`viewsense-network` cluster with Cilium, including gateway → governance allowed and orchestrator →
+MCP denied. The existing `k3d-cks` cluster passed smoke and other probes but unexpectedly allowed
+orchestrator → MCP even with the tightened policies applied. That installation has unresolved
+network enforcement evidence and must not be promoted on these results. These tests validate the
+control-plane pilot; they do not validate Oracle/Teams execution or external PII/budget guarantees.
+GUI evidence is linked in the [operator guide](../../fabric/governance/channel-console.md#verified-local-evidence).
+
+The earlier design-only
+assessments below retain their original baselines; this section supersedes their planned
+control-plane rows while their runtime/production gaps remain in force.
+
 ## Product-neutral identity and policy providers (major, design-only)
 
 The [AuthN/AuthZ contract design](10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
