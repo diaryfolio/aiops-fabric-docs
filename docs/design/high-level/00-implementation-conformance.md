@@ -20,6 +20,9 @@ operator branch ownership and does not automatically edit sources. The request j
 application contents-write token to list drafts; it performs no release or tag writes. Read-only
 build jobs run existing tests, profiles, Kustomize and docs checks, then package both node architectures.
 The requested version is applied to a temporary chart copy and image/archive metadata.
+The build job first runs `package.py --check-only` after paired checkout and before Docker setup.
+It requires `docs/releases/<version>.md` in the selected documentation commit and clean source
+checkouts. The 1.0.2 notes are prepared for review; publication and live acceptance remain pending.
 
 A separate contents-write upload job verifies outer archives and extracted bundle checksums and
 binds their clean source commits to the requested application/docs checkouts before creating paired
@@ -44,6 +47,12 @@ Manual-dispatch validation: `make unit` passed 145 tests, including 40 release C
 verify explicit inputs work without a trigger file, ignore a disabled legacy flag without
 editing it, and reject invalid/incomplete metadata. `make lint`, actionlint, Kustomize rendering
 and the strict documentation build passed. No remote dispatch or release build was performed.
+
+Release prerequisite correction (minor): `make unit` passed 148 tests, including 43 release CI
+tests. New cases reject missing version notes and dirty sources, and verify successful preflight
+does not stage charts or build artifacts. `make lint`, actionlint, base Kustomize rendering and
+the strict documentation build passed. The 1.0.2 notes and navigation are added for review;
+no 1.0.2 package, remote dispatch or live Kubernetes acceptance is claimed.
 
 The workflow does not deploy, switch traffic, generate SBOM/signatures or prove Kubernetes CNI,
 model quality or production admission. Configuration and a real remote Actions run remain required;
