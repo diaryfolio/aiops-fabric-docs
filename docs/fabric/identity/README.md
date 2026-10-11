@@ -15,14 +15,26 @@ Keycloak is an optional OIDC provider, not part of the ViewSense AI® trust core
 integration is a cluster-scoped managed dependency, not an application sidecar bundled into every pod. See
 `deploy/integrations/keycloak.md` and `deploy/integrations/spire.md`.
 
-## Planned framework role mapping
+## Framework role mapping pilot
+
+Console admission separately uses ViewSense Admin, Operations, Sales and SIEM profiles. Approved
+external mappings emit canonical `console.role.*` scopes; local POC credentials bind to separate
+least-privilege workload clients. Operations is a read-only platform/Channel viewer; Sales/SIEM
+only inspect Channels. The [console role matrix](../governance/channel-console.md#console-roles-in-the-poc)
+defines exact workspace access. The optional Keycloak fixture provides matching profiles and
+retains legacy account credentials; existing realms need operator provisioning for additional
+users. This registry cannot substitute for business framework grants or current CRM entitlements.
 
 [Channel consoles and role mapping](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md)
 distinguishes IdP user/group assignment from governance-owned framework roles and channel grants.
 Verify a pinned provider/trust-source/audience/tenant assertion namespace, map exact external roles to framework
 roles, then require Input entry and qualified Output action/account/field grants. Existing
-`role_scopes` maps external names to broad API scopes; it is not this resource policy. New verified
-role extraction, provenance, bounded entitlement freshness and emergency revocation remain planned.
+`role_scopes` maps external names to broad API scopes; it is not this resource policy. The
+[channel policy pilot](../governance/channel-console.md) implements approved v2 OIDC role-source
+extraction, qualified provenance, framework mappings, strict snapshot-age bounds and emergency
+catalog disables. Governance owns these resources. V1 provider files remain compatible.
+Authoritative membership refresh/revocation, external AuthZ adapters and business execution remain
+planned; a fresh token snapshot does not prove current directory membership.
 The selected AuthN Provider and Identity Entitlement Adapter implement canonical verified identity/
 current entitlement contracts. The AuthZ Provider separately evaluates framework resource policy;
 governance retains role/channel catalog ownership. Product credentials and claim/administration

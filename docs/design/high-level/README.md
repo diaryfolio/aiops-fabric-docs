@@ -59,3 +59,7 @@ Cloud model integration is represented by a credential-owning provider adapter, 
 vendor keys in the edge, orchestrator, or generic LLM gateway. The OpenAI reference path and its
 development/production egress distinction are described across the runtime, security, deployment,
 and operations documents above.
+
+The Input/Output console control-plane pilot now ships reviewed governance catalogs and
+non-executing policy/Sales previews. See the [channel console guide](../../fabric/governance/channel-console.md)
+and current conformance section before interpreting the broader execution target designs.

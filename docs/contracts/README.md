@@ -82,3 +82,12 @@ and topology, contain the complete required checks and be less than ten minutes 
 a verified observation. It never reports continuous health. Missing, malformed, incomplete, stale,
 mismatched and failed evidence have distinct visible states. Networking plans are typed, scoped,
 headless and `applied:false`; no API takes a kubeconfig, executes kubectl or hot-swaps a CNI.
+
+## Channel control-plane pilot contracts
+
+The implementation adds closed v1 policy catalog, canonical identity assertion, selection,
+decision and synthetic-preview schemas, plus a strict v2 OIDC provider configuration with named
+role sources. V1 identity configuration is unchanged. Governance OpenAPI describes the eight
+resource update models. The edge derives business assertions from verified tokens; simulation
+accepts synthetic assertions only under separate operator scopes. All pilot decisions explicitly
+carry no execution authority. See the [implemented contract/lifecycle guide](../fabric/governance/channel-console.md).

@@ -4,9 +4,10 @@
 
 Provide separate **Input Channels** and **Output Channels** management workspaces, and extend
 **Identity & access** with framework roles and external role mappings. All are detachable clients
-of authenticated headless APIs. This is a **major, design-only uplift** to the
-[channel model](07-input-output-channels.md); the pages, catalogs, grants, administration APIs and
-enforcement described here are **planned**, not existing controls.
+of authenticated headless APIs. The **major control-plane implementation slice** now ships the
+Input/Output workspaces, framework role/mapping forms, governance catalogs, reviewed snapshots
+and non-executing policy/Sales previews. The broader execution, provider-refresh and connector
+requirements below remain target design. See the [implemented console guide](../../../fabric/governance/channel-console.md).
 
 Attach roles at both channel boundaries with distinct semantics:
 
@@ -18,6 +19,41 @@ Attach roles at both channel boundaries with distinct semantics:
 The Input page displays effective CRM access by reading these same Output grants. Do not maintain
 a second copy of CRM permissions on the Input Channel. A route and Output capability catalog are
 ceilings, not permissions automatically inherited by everyone in Sales.
+
+## Implemented slice and promotion boundary
+
+The POC adds four **console admission roles**, separate from business framework grants:
+ViewSense Admin sees all workspaces; Operations sees Overview & suites, Certificates, Identity &
+access and Channels; Sales/SIEM see Channels only. Non-admin roles are read-only. Server-bound
+local credentials or approved `console.role.*` SSO scopes establish the profile. The server returns
+permitted workspaces and narrowed scopes; GUI links, direct console APIs and named-role edge calls
+enforce the same ceiling. Unknown SSO mappings confer no console access. See the
+[operator role matrix](../../../fabric/governance/channel-console.md#console-roles-in-the-poc).
+Workspace visibility never implies a CRM action or a framework grant. Dynamic console role
+editing, enterprise account provisioning and membership refresh remain promotion work.
+
+Governance persists tenant-scoped drafts, frozen candidates, independent review evidence, active
+snapshots, emergency disables and a bounded audit journal in its own PostgreSQL state domain.
+The console and edge expose explicit owner API facades. Each resource update requires `If-Match`
+with the whole-draft revision; publication freezes and reviews a consistent catalog atomically.
+All eight resource families are supported. Active profiles and grants refer to the same immutable
+snapshot revision; changing a draft profile cannot expand an active grant. The first slice uses
+separate tenant-wide operator scopes, without resource-specific administration or role inheritance.
+
+The built-in AuthZ evaluator selects one complete grant with deny precedence, exact qualified
+mapping, Input entry, route/action/purpose/surface ceilings, field/account-policy obligations and
+an assertion age strictly below the configured bound (at most 60 seconds). Decisions explicitly
+carry `execution_authority: false`. No connector, MCP or model consumer may treat them as tokens.
+The v2 OIDC role-source adapter normalises verified claims independently of legacy scope mapping;
+v1 configuration remains accepted unchanged. Two independent signed claim-shape fixtures exercise
+the canonical mapping contract. Authoritative membership refresh and external AuthZ adapters are
+still planned; token snapshots are not claims of immediate identity-provider revocation.
+
+The sample Sales draft uses a reserved example issuer and synthetic facts. Its preview checks
+field ceilings and result limits, grants no business access, contacts nobody and makes no model
+call. Real CRM/Oracle execution, Teams delivery, runtime PII egress enforcement, hard budgets,
+provider conformance beyond the built-in evaluator and production immutable evidence remain
+promotion gates. Explicit channel-context inference requests fail safely until execution ships.
 
 ## Provider-neutral authentication and authorisation
 
@@ -55,7 +91,7 @@ Target adapter contracts are:
   Governance validates the result and enforcement points apply it. No product-specific policy
   response becomes a grant without validation.
 
-These are planned versioned schemas/APIs. Each provider advertises supported assurance, role
+The pilot schemas and APIs are versioned; production refresh and execution adapters remain planned. Each provider advertises supported assurance, role
 sources, entitlement refresh/revocation and administration/discovery capabilities. No capability
 is silently emulated. AuthZ adapters must evaluate the same reviewed framework policy semantics,
 including deny precedence and complete-grant rules, and pass the same consumer conformance suite.
@@ -237,7 +273,7 @@ recalled. Emergency disable blocks subsequent dispatch/delivery and cancels work
 Keep persistent verified tenant/environment context. Add shareable `?page=input-channels` and
 `?page=output-channels` workspaces to the management console; add **Framework roles** and
 **Identity mappings** tabs under `?page=identity`. IDs in URLs are selection only, not tenant overrides.
-These pages manage configuration; ordinary employees select permitted channels in chat/API clients.
+These implemented pages manage configuration; ordinary employees select permitted channels in chat/API clients.
 
 Identity & access also separates **Authentication providers** from **Authorisation providers**:
 show selected adapter, protocol/capability support, trust/policy revision and independently observed
@@ -339,7 +375,7 @@ CRUD verbs and schemas must be frozen during the contract slice, including `If-M
 conflicts, idempotent draft creates, review evidence and disable semantics. Schema families cover
 framework roles, qualified external mappings, Input bindings, capability profiles, Output grants,
 policy snapshots, decisions and safe effective-access summaries. Machine-readable assets belong
-in the implementation repository; none is shipped by this design. Console calls these backend
+in the implementation repository; the pilot schemas now ship; broader execution contracts remain planned. Console calls these backend
 APIs and owns no grant database or policy algorithm. Existing `/v1/auth/roles` remains a legacy
 scope-policy view; it is not silently renamed or treated as the new framework-role catalog.
 
@@ -374,4 +410,4 @@ tests against built-in and selected external AuthZ evaluators; incompatible poli
 missing capabilities and unavailable mandatory providers deny. These are target replaceability
 gates, not claims that two production products are certified.
 
-All runtime, identity-provider freshness, UI and CRM evidence remains pending implementation.
+Control-plane, headless and GUI evidence is recorded in the conformance map. Live CRM, identity-provider refresh, external AuthZ and execution-consumer evidence remains pending.

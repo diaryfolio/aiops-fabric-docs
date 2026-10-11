@@ -19,6 +19,59 @@ reference does not expose OpenMetrics or native OTLP. Production requires propag
 tenant pseudonymization, route/provider and retry fields, RED/USE plus AI metrics, and a collector.
 Prompt, completion, memory, and tool bodies remain excluded from baseline logs.
 
+## Console access profiles
+
+The local console provisions separate Admin, Operations, Sales and SIEM credentials. Operations
+has read-only Overview/Certificates/Identity/Channels access; certificate renewal and policy
+publication require an appropriately scoped Admin identity. Sales/SIEM only inspect Channels.
+Credential files and their role/client bindings stay in private local state; restart after an
+operator configuration change to invalidate browser sessions. Back up governance data independently
+of these development credentials. Console role visibility supplies no CRM execution grant.
+
+### Local POC sign-in and launch credentials
+
+Run the following commands from the `aiops-fabric` implementation checkout. If the local harness
+is not running, start it in a terminal and leave that terminal open:
+
+```bash
+make console
+```
+
+The launcher provisions the private credential files on first start and reuses them on subsequent
+starts. Open the console at `http://127.0.0.1:8787/`. In a separate terminal, retrieve only the
+credential for the intended POC identity:
+
+| POC identity | Command from the implementation checkout |
+|---|---|
+| ViewSense Admin | `cat .viewsense/local-ai/console-access-key` |
+| Operations | `cat .viewsense/local-ai/console-operations-access-key` |
+| Sales | `cat .viewsense/local-ai/console-sales-access-key` |
+| SIEM | `cat .viewsense/local-ai/console-siem-access-key` |
+
+1. Sign out if another identity is already signed in.
+2. Select the matching **POC identity** on the sign-in page.
+3. Paste the command output into **Launch credential**, then sign in.
+4. Confirm the role shown in the header and the permitted navigation links. Operations has five
+   workspaces; Sales and SIEM have only Input Channels and Output Channels. ViewSense Admin has
+   all workspaces.
+
+A credential for one identity cannot sign in as another. A missing credential file usually means
+the harness has not provisioned this checkout; start it and check that the terminal is in the
+correct implementation directory. An authentication failure can indicate a mismatched identity
+or stale credential; retrieve the matching file again and retry. These are local development
+credentials, not enterprise AuthN provider passwords. Keep their output out of shared logs,
+screenshots and tickets. Enterprise SSO uses an approved provider mapping instead.
+
+For read-only verification of all four profiles against the running local harness:
+
+```bash
+.venv-console/bin/python scripts/test-console-roles.py
+```
+
+See the [Channel console operating guide](../../../fabric/governance/channel-console.md) for
+the role matrix, policy workflow and the distinction between console visibility and business
+capabilities.
+
 ## SLOs and dependency budgets
 
 Define SLOs separately for edge/control overhead, memory, each model route, and each MCP class. End-to-end alerts use multi-window error-budget burn. A provider outage must identify the dependency instead of presenting as generic orchestrator failure. Route changes and degraded no-memory operation are visible events.
@@ -244,3 +297,18 @@ workload grants. Ctrl+C stops those processes and removes temporary credentials.
 reset requires reattachment. Service health in this GUI is live mTLS reachability through a
 Kubernetes debugging path; headless smoke and CNI-negative tests remain independent gates.
 The old development namespace and local Ollama harness have separate recovery lifecycles.
+
+## Operating the channel policy pilot
+
+Track governance catalog availability separately from connector admission/health. Draft revision,
+active revision and revocation epoch are visible in each workspace. Validate references, freeze
+a snapshot, inspect the before/after diff and obtain an independent authorised reviewer before
+activation. A conflict requires refreshing/reviewing current state. Emergency disable applies
+immediately to subsequent decisions and cannot be undone by publication in this slice.
+
+`channel_policy_state` stores the bounded pilot journal (500 events) and up to 100 immutable
+candidates per tenant; the service refuses a new candidate at capacity. Independent archival,
+production retention and recovery automation remain promotion work. Include this table in the
+governance database backup and restore the catalog, active snapshot, candidates and disabled set
+together. Run the local sample acceptance and verify retained revisions after restart. Decision
+latency/freshness SLOs and authoritative role-refresh outages require later runtime acceptance.

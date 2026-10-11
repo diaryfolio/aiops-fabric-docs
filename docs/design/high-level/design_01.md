@@ -67,7 +67,16 @@ The [channel consoles and role mapping](10-overall/08-channel-consoles-role-mapp
 framework roles to Input entry and qualified Output capabilities. The selected identity system assigns external roles;
 governance owns explicit external-to-framework mappings, Input bindings, Output grants and atomic
 policy revisions. CRM action/data restrictions live on the Output grant; Input displays effective
-access. General API scopes do not grant CRM permissions. The separate pages/APIs remain planned.
+access. General API scopes do not grant CRM permissions. The separate pages, governance catalogs, independent review/activation and policy previews now ship.
+Business execution remains disabled until connector and delegation acceptance passes. The edge
+uses a new mTLS/scoped API edge to governance; no peer reads its database.
+
+Console admission is independently limited by four POC profiles: Admin has every workspace,
+Operations has Overview/Certificates/Identity/Channels, and Sales/SIEM have Channels. Non-admin
+profiles are read-only. The server supplies permitted workspaces, restricts direct API calls and
+binds each local credential to a scoped workload client. Approved AuthN mappings supply neutral
+console-role scopes for SSO. This adds no service, database or network edge, and grants no business
+execution authority. See the [operator role matrix](../../fabric/governance/channel-console.md#console-roles-in-the-poc).
 
 Authentication and Identity Providers (**AuthN Providers**) and Authorisation Policy Providers
 (**AuthZ Providers**) are separate replaceable capabilities. Identity/entitlement adapters expose

@@ -17,6 +17,13 @@ flowchart LR
 The table below is a production acceptance contract. It is not a list of capabilities already
 implemented by the reference.
 
+The POC console admission matrix is implemented for Admin, Operations, Sales and SIEM. It verifies
+workspace visibility, direct API/read-only denial, separate local credential binding and approved
+canonical SSO role scopes. This is distinct from governance-owned business role grants. Enterprise
+account provisioning, live membership revocation, per-workload renewable identity and resource-level
+administration remain production acceptance work; SIEM console visibility does not configure a
+telemetry export integration.
+
 | Domain | Required capability | Integration contract | Acceptance evidence |
 |---|---|---|---|
 | SSO | OIDC federation, MFA/conditional access at IdP, group/role claims | standard OIDC discovery/JWKS; issuer/audience/claim mapping config | login, logout, expiry, group change, disabled user, wrong issuer/audience tests |
@@ -227,3 +234,13 @@ production user delegation, renewable identity and audited administrative action
 
 Mock response preview reuses the existing gateway grant and does not certify real model
 inference or provider quality. Absent Tev1/Ollama capabilities are labeled not installed.
+
+## Channel control-plane evidence
+
+The governance owner APIs, explicit edge/console facades, reviewed snapshots and product-neutral
+role-source contracts now ship. Tenant-wide operator scopes and distinct review identities protect
+administration. Policy simulation is synthetic and has no execution authority; qualified gateway
+assertions are the only accepted input for own-access/decision APIs. AuthN v2 supports bounded
+verified-token snapshots, with no authoritative directory refresh yet. The built-in AuthZ contract
+is tested; external AuthZ equivalence remains a promotion gate. No connector/Oracle/Teams or
+external-model PII guarantee follows from this control-plane evidence.

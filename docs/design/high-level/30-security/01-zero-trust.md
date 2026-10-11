@@ -19,6 +19,36 @@ In the development reference, the certificate proves possession of a CA-issued c
 the JWT supplies the application workload identity. Binding a SPIFFE ID from the certificate to the
 token subject is a production integration, not current application behavior.
 
+## Channel control-plane enforcement
+
+Console workspace admission uses server-bound Admin/Operations/Sales/SIEM profiles. Non-admin
+profiles deny every mutation, model test and admin-only read before downstream dispatch. Separate
+local credentials select separate fixed-tenant workload clients with read-only component grants.
+The browser receives no credential or authority from selecting an identity or changing a page URL.
+For SSO, only operator-approved mappings yield canonical `console.role.*` scopes; arbitrary role
+claims fail closed for the console. The edge applies workspace ceilings to these scopes and named
+POC workload subjects even if transport scopes are excessive. Existing unrelated headless clients
+retain their capability scopes. Channel/business authorisation remains a separate policy decision;
+the console registry cannot supply CRM grants. The local POC uses shared development client TLS
+material; production per-workload identity and external account provisioning remain requirements.
+
+The edge-to-governance hop is allow-listed using mTLS, an exact governance audience and distinct
+`channels.*` / `authz.*` scopes. The edge qualifies delegated human references by a digest of the
+verified issuer and subject, preventing cross-issuer reviewer identity collisions. Only the
+configured gateway presenter may supply canonical identity assertions to governance decisions;
+the signed delegated subject must match that qualified reference. Browser-supplied roles are
+accepted only by an explicitly scoped non-executing simulation, never as business authority.
+Fixed-tenant development clients cannot delegate another subject.
+
+Draft edits cannot affect active policy. Independent approval precedes atomic activation; stale
+revision writes and self-review deny. Emergency disables persist across later activation and
+advance the revocation epoch. Decision consumers for tool/CRM execution are not shipped: the
+returned decision explicitly grants no execution authority. Signed role snapshots older than
+the grant bound deny; an authoritative entitlement refresh/revocation feed remains required for
+production. Read-only/local-only fields in a catalog do not prove database or PII enforcement.
+The pilot journal stores resource identifiers and change events, excluding claims and payloads;
+independent immutable export and production database TLS remain outstanding.
+
 ## Target trust boundaries and controls
 
 | Boundary | Authentication | Authorization | Containment |
