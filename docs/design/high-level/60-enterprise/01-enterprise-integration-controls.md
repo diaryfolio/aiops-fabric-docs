@@ -244,3 +244,7 @@ assertions are the only accepted input for own-access/decision APIs. AuthN v2 su
 verified-token snapshots, with no authoritative directory refresh yet. The built-in AuthZ contract
 is tested; external AuthZ equivalence remains a promotion gate. No connector/Oracle/Teams or
 external-model PII guarantee follows from this control-plane evidence.
+
+## End-user playground boundary
+
+The local playground separates end-user chat/AI destinations from administrative channel policy. Its local-only engine verifies tenant, approved console role/model and durable decision evidence; it blocks external/unknown destinations and credential payloads. Internal AI sensitivity assessment is optional for this local-only slice. External AI remains a future supported capability whose adapter-level inspection, enterprise-boundary review and receiver-observed containment gates must pass before activation. This does not satisfy the full company-boundary/PII matrix row across legacy model, embedding, tool or telemetry paths.

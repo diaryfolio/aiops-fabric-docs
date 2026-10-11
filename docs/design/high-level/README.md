@@ -63,3 +63,5 @@ and operations documents above.
 The Input/Output console control-plane pilot now ships reviewed governance catalogs and
 non-executing policy/Sales previews. See the [channel console guide](../../fabric/governance/channel-console.md)
 and current conformance section before interpreting the broader execution target designs.
+
+- [User playground and Internal AI policy engine](10-overall/10-user-playground-policy-engine.md) — end-user chat, approved AI destinations and the local-only runtime boundary.

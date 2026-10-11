@@ -295,3 +295,7 @@ a cluster service or expand workload grants. See the [release preview guide](../
 Release preview inference uses the existing gateway response API and smoke `api.invoke` grant,
 then the established orchestrator/LLM/mock path. Conversation writes are disabled for that test.
 Tev1/Ollama capability absence is separate from live LLM gateway health.
+
+## User playground and local-only policy
+
+The [user playground design](10-overall/10-user-playground-policy-engine.md) adds a separate Sales/SIEM experience: ViewSense chat source, approved Internal AI destination, bounded single-turn generation and mandatory governance decisions. Channel management stays with Admin/Operations. General chat grants do not authorise CRM/memory/tools. External AI remains a future route and is always denied by this playground; existing legacy inference paths are separate.

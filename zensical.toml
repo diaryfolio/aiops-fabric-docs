@@ -40,6 +40,7 @@ nav = [
     { "Input and Output Channels" = "design/high-level/10-overall/07-input-output-channels.md" },
     { "Channel consoles and role mapping" = "design/high-level/10-overall/08-channel-consoles-role-mapping.md" },
     { "AI governance and data egress" = "design/high-level/10-overall/09-enterprise-ai-governance-egress.md" },
+    { "User playground and policy engine" = "design/high-level/10-overall/10-user-playground-policy-engine.md" },
     { "Local AI console" = "design/high-level/10-overall/06-local-ai-console.md" },
     { "Agent runtime and ingestion" = "design/high-level/70-agentic/01-agent-runtime-ingestion-workflows.md" },
     { "Enterprise controls" = "design/high-level/60-enterprise/01-enterprise-integration-controls.md" },

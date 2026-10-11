@@ -23,7 +23,7 @@ Prompt, completion, memory, and tool bodies remain excluded from baseline logs.
 
 The local console provisions separate Admin, Operations, Sales and SIEM credentials. Operations
 has read-only Overview/Certificates/Identity/Channels access; certificate renewal and policy
-publication require an appropriately scoped Admin identity. Sales/SIEM only inspect Channels.
+publication require an appropriately scoped Admin identity. Sales/SIEM use the Channel playground and approved AI destination list; they cannot inspect administrative catalogs.
 Credential files and their role/client bindings stay in private local state; restart after an
 operator configuration change to invalidate browser sessions. Back up governance data independently
 of these development credentials. Console role visibility supplies no CRM execution grant.
@@ -52,7 +52,7 @@ credential for the intended POC identity:
 2. Select the matching **POC identity** on the sign-in page.
 3. Paste the command output into **Launch credential**, then sign in.
 4. Confirm the role shown in the header and the permitted navigation links. Operations has five
-   workspaces; Sales and SIEM have only Input Channels and Output Channels. ViewSense Admin has
+   workspaces; Sales and SIEM have only Input Channels (playground) and Output Channels (AI destinations). ViewSense Admin has
    all workspaces.
 
 A credential for one identity cannot sign in as another. A missing credential file usually means
@@ -315,3 +315,18 @@ production retention and recovery automation remain promotion work. Include this
 governance database backup and restore the catalog, active snapshot, candidates and disabled set
 together. Run the local sample acceptance and verify retained revisions after restart. Decision
 latency/freshness SLOs and authoritative role-refresh outages require later runtime acceptance.
+
+## Playground operation and recovery
+
+The [Channel operating guide](../../../fabric/governance/channel-console.md#end-user-playground)
+contains the user flow, operator-owned model/tenant/role policy, optional Internal AI assessment
+and startup instructions. No external destination can be enabled by the current playground policy.
+Use a generation-capable installed chat model; TEV sensitivity decisions and EmbeddingGemma
+embeddings are separate capabilities. Model/policy changes require a harness restart and new
+acceptance; existing launch/workload credentials and database state are retained.
+
+If policy or evidence storage is unavailable, generation stops. Restore the governance database
+before retrying. If Internal AI is unavailable, restore its approved runtime/model; never introduce
+an automatic external fallback. Back up the operator policy and governance evidence independently
+of credentials. This evidence is not an immutable external audit sink. Decision IDs appear in the
+user panel and JSON request metadata for correlation; payloads remain excluded from service logs.

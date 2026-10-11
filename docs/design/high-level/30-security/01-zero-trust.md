@@ -22,8 +22,9 @@ token subject is a production integration, not current application behavior.
 ## Channel control-plane enforcement
 
 Console workspace admission uses server-bound Admin/Operations/Sales/SIEM profiles. Non-admin
-profiles deny every mutation, model test and admin-only read before downstream dispatch. Separate
-local credentials select separate fixed-tenant workload clients with read-only component grants.
+profiles deny configuration mutations, model tests and admin-only reads before downstream dispatch;
+scoped playground POSTs are explicitly permitted. Separate
+local credentials select separate fixed-tenant workload clients with profile-specific component grants.
 The browser receives no credential or authority from selecting an identity or changing a page URL.
 For SSO, only operator-approved mappings yield canonical `console.role.*` scopes; arbitrary role
 claims fail closed for the console. The edge applies workspace ceilings to these scopes and named
@@ -317,3 +318,7 @@ identity/delegation and renewable workload credentials remain separate work.
 The release response preview uses the smoke client's existing gateway audience and `api.invoke`
 scope. The browser cannot substitute a model, tenant, upstream or persistence flag; the console
 sets `remember: false` and preserves the existing downstream trust envelope. No grant is added.
+
+## Playground execution boundary
+
+Sales/SIEM now use the end-user playground and cannot read administrative channel catalogs. Only `playground.use` admits chat through the edge. Governance accepts role context only from the verified edge presenter and checks its operator-owned tenant/role/model policy. It durably records safe decision metadata before generation; policy/evidence outage denies. External/unknown destinations always deny. The internal generation adapter requires a gateway token, `playground.generate`, an exact approved model and the fixed message layout. Optional Internal AI assessment never grants permission. No business tool or CRM entitlement is implied. See the [playground policy design](../10-overall/10-user-playground-policy-engine.md).

@@ -18,9 +18,11 @@ The console implements separate server-bound **ViewSense Admin**, **Operations**
 **SIEM** identities. `GET /api/console-roles` exposes the canonical workspace matrix to Admin and
 Operations. `GET /api/session` adds canonical roles, narrowed scopes and permitted `workspaces`.
 Only Admin sees all workspaces, model tests and test history. Operations sees Overview & suites,
-Certificates, Identity & access and both Channel pages. Sales and SIEM see only the Channel pages.
-Non-admin profiles are read-only. Hidden navigation, overview links, startup calls and direct
-console mutations obey the same policy; denied API calls return 403 before any downstream call.
+Certificates, Identity & access and both Channel pages. Sales and SIEM see the separate Channel
+playground and approved Internal AI destination list. Non-admin configuration access is read-only;
+Sales/SIEM cannot read management catalogs. Scoped playground policy checks and chat are permitted.
+Hidden navigation, overview links, startup calls and direct configuration mutations obey the same
+policy; denied API calls return 403 before any downstream call.
 
 Local credentials bind to distinct least-privilege workload clients. Selecting another identity,
 forging a role field/header or changing a URL cannot promote the credential. Named POC identities
@@ -28,7 +30,8 @@ also encounter the workspace ceiling at the edge. For SSO, operator-approved ext
 produce `console.role.<canonical-role>` scopes; unknown external roles provide no console access.
 Legacy headless clients retain their existing scope contracts. Business framework grants remain a
 separate governance policy and are never implied by a console profile. No new state owner, service
-or network edge is introduced. Evidence for the role matrix is recorded in the operator guide.
+or network edge was introduced by the original role revision. The later playground revision below
+adds explicit internal policy/generation paths. Evidence is recorded in the operator guide.
 The coordinated role revision passed all **203** tests. Live API acceptance and browser checks
 verified every profile, credential/role spoof rejection, read-only denials, hidden links and
 forbidden URL fallback. Lint, JavaScript syntax, Kustomize and strict docs checks passed; Kubernetes
@@ -750,3 +753,11 @@ Business navigation, and horizontal scrolling at a narrow viewport without page 
 Application unit tests passed (89), lint passed, and base Kustomize rendering passed.
 There are no changes to application APIs, trust boundaries, data owners, runtime configuration,
 deployment topology, or SLOs. Existing production acceptance gaps remain as recorded above.
+
+## User playground and policy engine (major)
+
+The [playground slice](10-overall/10-user-playground-policy-engine.md) implements end-user source/destination selection, single-turn Internal AI generation and deny-by-default external/unknown destinations. The governance policy file binds tenant, console role and approved model; decision metadata is durably recorded before generation. Credentials block both routes; optional internal TEV assessment fails closed when enabled. Sales/SIEM lose direct management-catalog access and gain only edge `playground.use`. Canonical schemas, negative API tests and local GUI acceptance cover this slice. Teams, actual CRM execution, external adapter final-wire enforcement, budgets and immutable execution audit remain planned. Existing OpenAI/legacy inference routes do not inherit playground guarantees.
+
+Playground routes: `GET /api/playground/options`, `POST /api/playground/policy-check`, `POST /api/playground/chat`, edge equivalents `/v1/playground/options`, `/v1/playground/policy-check`, `/v1/playground/chat`, governance `POST /v1/playground/options:resolve` and internal provider `POST /v1/playground/generate`.
+
+The playground revision passed **224** unit tests, JavaScript syntax, lint, strict documentation build and Helm/Kustomize rendering. Live local role/policy acceptance and real Internal AI generation/optional TEV assessment passed. Kubernetes baseline smoke and Cilium network probes are separate evidence; an in-cluster Internal AI runtime and playground policy still require operator provisioning. Baseline source references for the owner’s manual paired handoff: implementation `bc5626f`, documentation `bcf0a12`.

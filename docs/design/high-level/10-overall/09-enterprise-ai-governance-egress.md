@@ -226,3 +226,7 @@ explicitly synthetic and create no execution authority. Runtime PII inspection, 
 wire enforcement, hard-cost reservations, actual connector restrictions and complete immutable
 execution evidence remain planned as described above. Existing legacy inference routes do not
 acquire these guarantees from the new catalog.
+
+## Local-only user playground
+
+The [playground policy engine](10-user-playground-policy-engine.md) implements a bounded local-only chat path and durable pre-generation policy evidence. External destinations deny unconditionally in this slice. Internal AI assessment is optional for local traffic. External processing remains a future supported route requiring the inspection/adapter/network gates above; neither a model score nor the playground policy can enable it.

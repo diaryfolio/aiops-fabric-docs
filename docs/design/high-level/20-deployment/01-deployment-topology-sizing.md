@@ -249,3 +249,22 @@ Startup creates the additive table idempotently; old services ignore it on rollb
 governance database before upgrade, retain snapshots/disabled entries during rollback and restore
 them as one consistent state. Do not roll back to a consumer that ignores channel decisions to
 continue business execution. Full channel execution remains disabled in this slice.
+
+## Local-only playground deployment
+
+The edge-to-governance policy path requires `policy.evaluate`; governance is the sole decision
+journal owner. New allow-listed flows permit governance to identity/Internal AI inspection and
+edge to the approved Internal AI generation adapter. The local harness provisions private policy
+and distinct scoped clients. Kubernetes defaults keep playground execution disabled without policy.
+
+For Helm, enable `playground.enabled`, set `playground.policySecret` to an operator-provisioned
+Secret containing `policy.json`, and set `playground.internalModel`. Enable the Ollama adapter with
+an enterprise-approved internal runtime. Provision a `governance` workload credential with only
+`ollama-adapter/provider.invoke` for optional inspection, and extend gateway grants with
+`governance/policy.evaluate` and `ollama-adapter/playground.generate`. Human or fixed-tenant clients
+need edge `playground.use` and a canonical approved console role. The policy model and adapter
+model must agree. The source-checkout console attaches independently; it owns no database.
+
+No external egress route is introduced by the playground. Future external AI needs adapter-level
+final-wire inspection and receiver-observed containment tests before activation. See the
+[playground design](../10-overall/10-user-playground-policy-engine.md).
