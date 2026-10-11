@@ -105,9 +105,29 @@ root-CA requests with 403. It leaves service certificates and the development CA
 `contracts/schemas/oidc-provider-v1.schema.json`. Providers pin issuer, API audience, JWKS URL,
 claim paths, allowed scopes, role-to-scope allowlists, optional HTTPS code/token endpoints, client ID,
 server-side secret file and registered callback. Keycloak and Okta/generic OIDC share this contract.
-For Keycloak use `realm_access.roles`; for Okta configure an API authorization server, explicit API
+The existing Keycloak POC uses `realm_access.roles`; for Okta configure an API authorization server, explicit API
 audience and custom tenant/groups claims (`scope_claim: scp`, `roles_claim: groups` where applicable).
 Okta live acceptance requires an actual provider tenant and remains pending.
+
+### Planned business-channel role mapping
+
+The [channel console/role design](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md)
+adds a separate framework role catalog. For the Sales pilot, external client role
+`sales-crm-logistics1-reader` on API resource client `viewsense-api` maps through the qualified
+`resource_access.viewsense-api.roles` source to framework role **Sales CRM Logistics1**. Keycloak
+continues to assign users/groups to external roles; ViewSense AI® owns Input entry bindings and
+qualified Output capability grants. This is planned and does not change the existing POC realm
+or static `role_scopes` configuration. No framework UI stores Keycloak administrative credentials.
+
+Configure and evaluate token role/scope/audience mappings using the installed provider's supported
+settings and the [official administration guide](https://www.keycloak.org/docs/latest/server_admin/index.html).
+Roles from another issuer/client/realm source cannot match by name alone. Implement versioned
+verified role-source extraction independent of legacy scope mapping, preserve existing config,
+and test effective claims before enabling the route. User/group assignments remain in Keycloak;
+the first framework console links to its administration surface rather than synchronising writes.
+Current POC role updates wait for token reissue/expiry. The proposed CRM route requires authoritative
+freshness/revocation within its 60-second assertion-age bound, with denied execution on stale or
+unverifiable entitlement; this provider adapter/feed remains implementation work.
 
 The edge validates issuer/audience/algorithm/expiry/tenant and bounds JWKS caching to 60 seconds.
 Browser login uses code + PKCE S256 + state + nonce and verifies the ID-token authorized party.

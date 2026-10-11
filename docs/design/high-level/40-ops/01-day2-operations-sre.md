@@ -113,6 +113,21 @@ production metrics, reliable evidence export or CRM acceptance ships from this d
 
 ### Common readiness requirements
 
+The [role console design](../10-overall/08-channel-consoles-role-mapping.md) adds immutable reviewed
+policy revisions and emergency deny epochs. Restore role/mapping/grant metadata with tenant-bound
+references, preserve revocations and revalidate IdP entitlements before traffic. Monitor freshness
+violations, mapping drift, source/feed outages and failed/denied activations; the first Sales slice
+requires the declared 60-second role-assertion bound. Keycloak changes and framework policy publish
+are separate operations; compare effective test identities without logging access tokens.
+
+The [AI egress/cost design](../10-overall/09-enterprise-ai-governance-egress.md) requires inspection,
+decision and final adapter enforcement metrics, safe PII/deny counts, budget reservations/usage and
+complete evidence correlation. Policy/detector/mandatory audit outage blocks protected dispatch.
+Back up the budget ledger through governance; restore pending reservations and reconcile uncertain
+calls before resuming traffic. Provider/model rollout requires conformance, quality, PII/residency,
+cost and fallback gates. Rollback cannot lower privacy ceilings or erase charges/revocations.
+These runtime controls and production evidence remain planned, independently of UI availability.
+
 No production provider is enabled until it has ownership/on-call, dashboard and alerts, SLO, capacity test, failure-mode test, security review, data-flow record, backup/restore where stateful, credential rotation, and rollback/disable instructions.
 
 Provider readiness is represented by an expiring passport plus evaluation/admission records. The

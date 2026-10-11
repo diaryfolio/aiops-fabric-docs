@@ -10,6 +10,47 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Channel consoles, framework roles and AI egress governance (major, design-only)
+
+The [console/role design](10-overall/08-channel-consoles-role-mapping.md) adds planned Input/Output
+workspaces, Identity role/mapping tabs, exact IdP-to-framework mapping, Input entry bindings and
+qualified Output capability grants. CRM restrictions belong to the Output grant; the Input page
+displays derived access. Governance owns role/policy resources, while Keycloak owns external
+user/group role assignments. The existing OIDC verifier maps recognised external roles directly
+to broad platform scopes; `/v1/auth/roles` is static configuration, not a framework role catalog.
+
+The [enterprise AI governance design](10-overall/09-enterprise-ai-governance-egress.md) defines the
+layer's role between enterprise users/apps and approved models/services. It requires policy before
+external dispatch, assembled-context PII inspection, final wire-payload/endpoint validation,
+provider-neutral contracts/adapters, safe model swaps and budget/evidence controls.
+
+| Capability | Current state | Missing implementation / evidence |
+|---|---|---|
+| Input/Output console and Identity framework-role pages | planned | Headless APIs, forms, scoped mutations, safe preview, atomic draft/review/activation and UI tests |
+| Qualified external mapping and channel/resource grants | planned | Schemas, verified role-source extraction separate from legacy `role_scopes`, tenant/resource enforcement and direct-tool negative tests |
+| Current role freshness/revocation | planned | Authoritative role refresh/feed, configured 60-second pilot assertion-age bound, monotonic deny epoch and mid-run/delivery tests; existing POC changes wait for token reissue/expiry |
+| Canonical provider API foundation | implemented subset | FastAPI OpenAPI and mock/OpenAI/Ollama translations exist; full capability discovery, snapshots, semantic replaceability and provider conformance remain gaps |
+| Company-boundary and PII egress enforcement | planned | Local inspection/minimisation, payload-bound decision and final adapter enforcement, bypass prevention and actual-wire canary tests across all outbound capabilities |
+| Runtime admission, guardrail and channel policy enforcement | planned extension | Governance admission APIs exist but runtime model/tool routes do not enforce this full policy chain |
+| Hard cost limits | planned | Governance budget ledger/reservations, trusted usage/pricing reconciliation, concurrency/retry/idempotency and uncertain-call evidence |
+| Production auditability | partial foundation | Safe append-only evidence API exists; complete acknowledged dispatch/outcome delivery and independent immutable export remain gaps |
+
+This revision changes narrative design and navigation only: no executable schema, route, scope,
+manifest, grant, provider configuration, Keycloak assignment, deployment or database changes.
+No PII containment, hard-spend or model-equivalence guarantee is claimed from documentation.
+A local-only Sales pilot is the implementation starting point until external egress gates pass.
+
+Source pairing: application baseline `9e561e0df65f9e9f42dd9fc6b5a2b5f0d0adf241`, documentation
+parent `7d3be8481785741f5ae6db62ff5c0034be7a63d0`; the documentation commit containing this
+section is the paired design revision. Runtime, Keycloak role freshness, PII and console
+acceptance remain pending; no new application commit is required for this design-only revision.
+
+Design-revision validation: all 148 unit/design/catalog/security tests passed; `make lint`, base
+Kustomize rendering, strict delegated documentation build and whitespace checks passed. New
+designs are included in published navigation and balanced Mermaid checks. Runtime deployment,
+Keycloak role mutation, wire-level PII tests, hard-cost enforcement and new-page browser QA are
+not claimed by these source checks and remain implementation acceptance work.
+
 ## Input and Output Channels (major, design-only)
 
 The [channel design](10-overall/07-input-output-channels.md) introduces planned tenant-scoped

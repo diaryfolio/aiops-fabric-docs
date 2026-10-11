@@ -38,6 +38,8 @@ not a fixed taxonomy: Support, Finance, partner workflows, and machine clients u
 | Input Channel | ID, label, tenant binding, business owner, accepted entry adapters, IdP membership policy, allowed purposes, retention and reply policy, revision, enabled state | Governance channel catalog; membership remains IdP-owned |
 | Output Channel | ID, label, tenant binding, application/data owner, approved connector/provider reference, capabilities and action schemas, classification/residency, freshness policy, revision, enabled state | Governance channel catalog; business data remains application-owned |
 | Channel Route | ID, input/output IDs, intent, action allow-list, account/field policy references, rule-set version, budgets, admission and approval requirements, revision, enabled state | Governance route catalog |
+| Input role binding | Framework role, Input ID, entry surfaces/purposes, revision/state | Governance; IdP assigns external roles to users/groups |
+| Output role grant | Framework role, Output ID, allowed Inputs/routes, explicit capability profile and account/field policies, revision/state | Governance; CRM action restrictions live here |
 | Entry adapter | Verified transport-to-user mapping, replay protection and reply binding | Entry integration; edge validates identity and membership |
 | Tool binding | Output ID to admitted provider/tool/schema version | MCP gateway registry, referenced by route |
 | CRM facts and approved query views | Accounts, contracts, entitlements, usage, assets and pricing terms | CRM owner; Oracle is outside the ViewSense AI® data plane |
@@ -48,6 +50,15 @@ they resolve versioned references through owner APIs. Catalog objects contain se
 never credentials. This introduces metadata resources, not a fifth platform database or a
 database per channel. Admission, user entitlement and enabled state are rechecked during execution;
 a cached catalog revision cannot override a revocation.
+
+The [channel consoles and role-mapping design](08-channel-consoles-role-mapping.md) defines the
+Input/Output management pages and Keycloak → framework role → channel binding/grant chain.
+The **Sales CRM Logistics1** role gets entry rights on Sales and a qualified read-only opportunity
+grant on CRM-Logistics1. Output grants own CRM action/data restrictions; the Input console shows
+their derived effective access. The runtime requires both bindings plus route/data policy; no
+Input membership or broad API scope alone grants CRM access. Provider calls also obey the
+[enterprise AI governance and egress design](09-enterprise-ai-governance-egress.md), including
+PII inspection before external dispatch, bounded cost and provider contract compatibility.
 
 ## Practical Sales flow
 
@@ -87,6 +98,8 @@ flowchart LR
 4. Governance/policy checks subject, tenant, purpose, Input Channel, Output Channel, action,
    classification/residency, current account entitlement and admitted provider. The resulting
    execution context is authenticated, short-lived and bound to the route and revision.
+   Resolve approved external roles to framework roles, requiring an Input binding and complete
+   qualified Output grant. Read-only means the explicitly permitted actions, not every read tool.
 5. Tool-Sense validates the allow-listed tool and typed arguments, repeats the policy check at
    the execution boundary, and calls only the registered CRM connector. The LLM can propose an
    intent or parameters, but cannot select a URL, Oracle schema, credential or arbitrary tool.
@@ -97,6 +110,10 @@ flowchart LR
    explanation. It validates the structured answer against tool evidence; unsupported numeric
    claims or unrecognised accounts are rejected. If generation fails, it can return deterministic
    tool results when the route permits that behaviour.
+   Inspect the assembled context, including user prompt/history, before any external model or
+   embedding request. The adapter checks the final wire payload against an authenticated egress
+   decision; missing/uncertain PII disposition denies external dispatch or uses an approved local
+   route. Granting Sales access to CRM facts does not authorise disclosing them to an external LLM.
 8. Delivery policy checks the current recipient and conversation visibility before replying.
    Private results must not be posted into a shared Teams room with unauthorised participants;
    deliver privately or return an access-controlled result reference. Report completeness and
@@ -166,6 +183,7 @@ repository and validate them end to end before promotion.
 |---|---|---|
 | Governance | `GET/PUT /v1/channels/input/{id}` and `/v1/channels/output/{id}`; filtered list APIs | Scoped metadata read/admin, optimistic revision checks, audited enable/disable; no secret values |
 | Governance | `GET/PUT /v1/channel-routes/{id}` and `POST /v1/channel-routes:resolve` | Filtered discovery; deterministic policy resolution returning a revision-bound authorised route |
+| Governance / edge | Framework roles, IdP mappings, Input bindings, Output grants, policy preview/decision APIs | Planned [qualified role contracts](08-channel-consoles-role-mapping.md#planned-headless-apis-and-contracts); all console operations are headless |
 | Edge | Optional `channel_context` on `POST /v1/responses` | User-supplied IDs are selection hints; tenant, membership, permissions and reply binding are server-derived |
 | MCP gateway/provider | Channel-aware extension of `POST /v1/tools/call` | Validated action and parameters plus authenticated route context; no raw external URL/SQL |
 | CRM connector | `sales.opportunities.list` tool | Bounded read; typed account filter, limit/cursor, structured opportunities and completeness metadata |
@@ -189,7 +207,8 @@ defines them. A typed field cannot be smuggled into current `metadata` to obtain
 
 Internal context binds identity-derived tenant and subject, purpose, channel IDs, route ID and
 revision, action, account/field-policy reference, decision ID, classification/residency, correlation
-ID, expiry and deadline/budget. Each hop obtains audience-specific credentials and narrows grants.
+ID, expiry and deadline/budget. Include authorising framework-role/grant and mapping/policy
+revisions plus entitlement freshness. Each hop obtains audience-specific credentials and narrows grants.
 Use an explicitly versioned signed delegation extension or equally authenticated policy grant;
 unsigned headers or echoed public fields are insufficient. Trust Envelope v1 does not currently
 enforce these new channel fields. Large account entitlements use an integrity-bound policy

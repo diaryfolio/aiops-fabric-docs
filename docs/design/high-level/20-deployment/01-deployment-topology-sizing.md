@@ -95,6 +95,19 @@ implementing the slice. Current manifests and their orchestrator-to-MCP denial r
 Validate real allowed/denied connectivity, encrypted database transport, rotation and rollback
 before admission; successful manifest rendering is not channel security acceptance.
 
+The [role/console uplift](../10-overall/08-channel-consoles-role-mapping.md) adds governance-owned
+policy resources and authorised edge facades, not a console-owned database. A provider-specific
+entitlement-refresh adapter requires its own least-privilege IdP identity/egress; browser and generic
+gateway pods must not receive IdP administrative credentials. Protect the existing governance
+store for policy revisions and budget reservations with owner-only access and tested recovery.
+
+[PII/egress enforcement](../10-overall/09-enterprise-ai-governance-egress.md) requires inspection
+within an approved processing boundary and adapter-only constrained external egress. No generic
+orchestrator/client path may reach external models directly. An optional reversible-token privacy
+adapter needs a separate approved state/secret/retention design before deployment. Policy bundles,
+inspection capabilities, route revisions and actual wire/negative connectivity evidence must agree
+before an external route is admitted. This design changes no current manifest or secret grant.
+
 ### Common workload requirements
 
 - one service account and workload identity per component;

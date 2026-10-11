@@ -95,6 +95,27 @@ in this subsection remain planned; this documentation change grants no runtime a
 
 ### Common AI threats
 
+The [qualified role/grant model](../10-overall/08-channel-consoles-role-mapping.md#effective-authorisation-and-enforcement)
+requires exact issuer/tenant/client-role-source mapping, Input entry and a complete Output grant
+for the requested route/action/accounts. Broad scopes cannot bypass it, including direct MCP
+calls. Multiple roles must not combine one grant's action with another's account scope. Enforce
+bounded authoritative role freshness, monotonic emergency revocation and independent review for
+privilege expansion; existing POC token-expiry behaviour does not implement those controls.
+
+The [PII/company-boundary design](../10-overall/09-enterprise-ai-governance-egress.md#example-no-pii-may-leave-the-company-boundary)
+requires inspection inside the approved boundary before any external dispatch, plus an endpoint/
+payload-bound decision verified against actual adapter wire data. Inspect prompt/history and
+retrieved/tool data, not just CRM field projections. Apply the same controls to embeddings, tools,
+workflows, retries and telemetry. Unknown/uncertain classification blocks external transfer or
+uses a separately approved local route. Redaction/pseudonyms alone cannot prove anonymisation.
+Source labels impose a floor; role access cannot declassify data or override enterprise ceilings.
+
+Production acceptance adds role-source collision, grant-combination, stale-entitlement and preview
+impersonation denials, actual-wire PII canaries, malformed/expired egress permits, post-translation
+payload changes, policy/detector/evidence failure and direct-egress bypass probes. Payload inspection,
+hard-budget reservations and these runtime checks remain planned; documentation or existing
+NetworkPolicy/HTTPS alone cannot establish containment.
+
 - Prompt injection: retrieved/tool content is marked as data, tools are authorized independently of model output, and high-risk actions require deterministic policy or approval.
 - Data exfiltration: outbound providers are chosen by data policy; payload logging is off by default; egress is deny-by-default.
 - Cross-tenant retrieval: tenant predicates, provider-level isolation, negative tests, and post-retrieval policy filters.

@@ -133,6 +133,18 @@ database or additional Tool-Sense service is introduced. These APIs and runtime 
 Memory, ingestion, agents and workflows must preserve channel/source/account policy and recheck
 revocation; their current APIs do not yet provide this complete channel contract.
 
+Governance also owns planned framework roles, external role mappings, Input entry bindings,
+qualified Output grants and policy revisions. Keycloak owns assignment of external roles to
+identities; framework roles do not create another user directory. Input/Output console pages are
+API clients of these owners. See the [role ownership model](08-channel-consoles-role-mapping.md#resource-and-state-ownership).
+
+Planned enterprise enforcement uses policy/inspection/budget decisions before dispatch and final
+wire-payload checks inside credential-owning adapters. Governance owns budget-policy/reservation
+metadata; adapters provide trusted usage. Any reversible privacy token mapping remains inside an
+isolated privacy provider, requiring its own state/lifecycle design before implementation. No
+generic gateway or orchestrator receives that provider's secrets. See
+[enterprise governance and egress](09-enterprise-ai-governance-egress.md).
+
 Runtime implementations remain small, independently deployable Python packages under `src/viewsense_*`; they are not nested inside deployment packaging. The `fabric/<capability>/` directories are the machine-readable installable catalog. Every capability directory contains a `module.json` descriptor and README that declare maturity, owned contracts, implementation paths, Helm selection paths, data ownership, and bundled/external provider choices. `fabric/module.schema.json` defines the descriptor format and the catalog conformance test rejects missing, undocumented, or dangling module entries.
 
 This separation avoids coupling application source layout to Helm or a future operator while ensuring packaging folders are executable metadata rather than placeholders. A `contract-only` catalog entry is deliberately visible but cannot be represented as implemented; Helm and documentation must retain the same maturity statement.

@@ -22,6 +22,16 @@ the design are not runtime contracts, and existing `metadata` or Trust Envelope 
 grant channel/action/account permissions. Implement additive opt-in fields with old-client
 compatibility and explicit denial for unauthorised or unavailable channel routes.
 
+The [console/role uplift](../design/high-level/10-overall/08-channel-consoles-role-mapping.md#planned-headless-apis-and-contracts)
+also requires framework-role, qualified IdP-mapping, Input-binding, capability-profile, Output-grant,
+atomic policy-revision, decision and effective-access schemas. Preserve v1 provider configuration
+and legacy external `roles`/scope fields; add separately verified framework-role provenance.
+[Enterprise egress governance](../design/high-level/10-overall/09-enterprise-ai-governance-egress.md)
+requires inspection/egress-permit and budget-reservation/usage contracts tied to actual payload,
+destination and policy revisions. These machine-readable assets are planned, not present in this
+documentation repository or implemented by existing OpenAPI. Adapters must pass canonical and
+semantic/capability tests; OpenAPI and OpenAI-compatible protocol syntax are distinct concepts.
+
 `model-test-request-v1.schema.json` is an additive opt-in administrative contract for installed-model
 decision, embedding and text-chat previews. It accepts a selected model only at `/v1/model-tests`,
 requires `provider.admin`, and never changes saved configuration or memory profiles. Conditional

@@ -41,6 +41,9 @@ implemented by the reference.
 | provider admission | expiring passports, capabilities, evaluations, residency, provenance and revocation | provider passport/evaluation APIs plus policy decision | expired/revoked/unevaluated provider cannot receive new traffic |
 | execution evidence | payload-minimized lineage and decision events | append-only evidence API and immutable export | reconstruct route/policy/approval sequence without sensitive payloads |
 | business channels | verified Input membership, governed Output routes, account/field policy and authorised reply delivery | channel/route APIs and authenticated context; isolated enterprise connector | Sales → CRM-Logistics1 headless/chat equivalence; forged channel/account, revoked route, injection and shared-recipient denial |
+| framework role mapping | exact external role source to framework role; Input entry and qualified Output capability/data grants | governance role/mapping/grant APIs, versioned decisions and current IdP entitlements | issuer/client/tenant collision, multi-role scope mixing, stale-role, draft/self-approval and direct-tool deny tests |
+| company-boundary/PII enforcement | inspect before external dispatch and after final wire transformation; deny uncertain transfer | local inspection and payload/destination-bound egress decision with bypass-resistant adapter/network boundary | receiver-observed PII canaries across prompts/history/tools/embeddings/retries/logs; policy/detector outage denies |
+| hard spend controls | atomic reservation before dispatch and measured usage reconciliation | budget-policy/ledger and adapter usage contracts | concurrent exhaustion, duplicate/retry/uncertain-charge and unknown-price handling |
 
 The [Input/Output Channel design](../10-overall/07-input-output-channels.md) defines this new
 acceptance boundary. Channel APIs, Tool-Sense routing from chat, Oracle business tools and Teams
@@ -48,6 +51,14 @@ entry/delivery are planned. Existing OIDC, MCP registration and provider admissi
 not satisfy it. Sales/CRM owners must approve semantic mappings, opportunity rules, freshness and
 per-user account scope; evidence must distinguish a complete empty result from missing coverage.
 The model may explain approved facts but cannot invent entitlements, discounts or numeric savings.
+
+ViewSense AI® is the target governance layer between enterprise users/apps and selected AI models/
+services. See [channel consoles/role mapping](../10-overall/08-channel-consoles-role-mapping.md) and
+[AI governance/egress](../10-overall/09-enterprise-ai-governance-egress.md). OpenAPI and canonical
+adapters contain ordinary provider changes within the platform, subject to semantic/quality/data
+policy gates. Full PII containment, qualified runtime authorisation, hard spending and acknowledged
+immutable audit remain planned. Existing scopes, passport APIs and field minimisation are foundations,
+not evidence that these enterprise matrix rows pass.
 
 ## Target JSON log schema
 
