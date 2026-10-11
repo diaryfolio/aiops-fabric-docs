@@ -230,6 +230,8 @@ After committing and pushing reviewed code and documentation:
 4. Enter **documentation_commit**, the full lowercase 40-character SHA of the reviewed docs commit.
    Obtain it with `git -C ../aiops-fabric-docs rev-parse HEAD`; push that commit before dispatching.
    The pinned checkout must contain `docs/releases/<version>.md`.
+   For example, version `1.0.2` requires `docs/releases/1.0.2.md` in that exact commit;
+   a SHA from before those notes were added will fail even if the docs branch has since advanced.
 5. Click **Run workflow**. Successful runs create a draft with five downloadable assets; review
    those downloads before explicitly publishing.
 
@@ -262,7 +264,9 @@ One-time configuration in `diaryfolio/aiops-fabric`:
    tags. Protected tag rules must permit the workflow's respective token identities.
 
 The workflow validates the manual inputs, skips an already published version or completed draft, and
-checks out the exact application event commit plus pinned docs commit. It runs unit/security/design
+checks out the exact application event commit plus pinned docs commit. A build prerequisite step
+runs `package.py --version <version> --check-only` immediately after checkout, before Docker setup;
+missing version-specific notes or dirty sources stop the job without building images. It runs unit/security/design
 tests, lint, all Helm profiles, base Kustomize rendering and the strict docs build. Both ARM64 and
 AMD64 bundles are built, then checksummed downloads are retained as a workflow artifact for 14 days.
 The requested version sets staged chart `version`, `appVersion` and global image tag, the image
