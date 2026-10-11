@@ -27,6 +27,12 @@ Each bundle includes `images.tar` containing the application, PostgreSQL and pgv
 Generated credentials are never packaged. The application API contract versions remain
 independent of the distribution version.
 
+GitHub also supplies **Source code (zip)** and **Source code (tar.gz)** archives of the tagged
+repository. These contain source files, tests, build scripts and agent guidance such as
+`CLAUDE.md` and `AGENTS.md`; they are not the installation bundles. Download a named
+`viewsense-<version>-linux-<architecture>.tar.gz` asset for installation. The container image
+itself contains readable Python application source; container packaging does not hide that code.
+
 ## Prerequisites
 
 - Kubernetes 1.28 or newer with ready nodes of the selected architecture, working DNS and
@@ -209,37 +215,45 @@ the affected server's rules by restarting that node and rerunning the full accep
 coordinate a node restart with its other workload owners. The installer does not restart nodes
 or weaken NetworkPolicies automatically.
 
-## Automate a release with the trigger file
+## Manually build a release
 
-The application repository owns `release-trigger.json` and
-`.github/workflows/release.yml`. The trigger starts disabled. To request a release, commit its
-version, boolean switch and the full commit SHA of the reviewed documentation snapshot:
+The application `.github/workflows/release.yml` runs only when an operator explicitly dispatches
+it. Pushes, merges, tags, pull requests and changes to `release-trigger.json` do not start it.
+The legacy trigger file may remain `enabled: false`; CI does not read it. No source/configuration
+edit is required for each release request.
 
-```json
-{
-  "enabled": true,
-  "version": "1.0.1",
-  "documentation_commit": "<full lowercase 40-character documentation commit SHA>"
-}
+After committing and pushing reviewed code and documentation:
+
+1. Open **Actions → Release package → Run workflow** in the application repository.
+2. Select **main**. Other branches are rejected by the workflow's release guard.
+3. Enter **version**, such as `1.0.2`, without a `v` prefix.
+4. Enter **documentation_commit**, the full lowercase 40-character SHA of the reviewed docs commit.
+   Obtain it with `git -C ../aiops-fabric-docs rev-parse HEAD`; push that commit before dispatching.
+   The pinned checkout must contain `docs/releases/<version>.md`.
+5. Click **Run workflow**. Successful runs create a draft with five downloadable assets; review
+   those downloads before explicitly publishing.
+
+The workflow definition must first be merged into the repository's default branch for GitHub to
+expose its manual inputs. Users with repository write access can also dispatch through GitHub CLI:
+
+```sh
+gh workflow run release.yml --repo diaryfolio/aiops-fabric --ref main \
+  -f version=1.0.2 -f documentation_commit=YOUR_FULL_LOWERCASE_40_CHARACTER_DOCS_COMMIT_SHA
 ```
 
-Use `git -C ../aiops-fabric-docs rev-parse HEAD` after committing the matching documentation,
-and push that documentation commit before enabling the application trigger. The pinned checkout
-must contain `docs/releases/<version>.md`. Use a new version for changed published content.
-`enabled` is a JSON boolean, not the string `"true"`; the version has no `v` prefix. Unknown
-fields, mutable documentation branch names and malformed values fail validation.
-
-Merge the trigger change into `main` to run **Release package** in GitHub Actions. Branch pushes
-and pull requests do not release. The manual **Run workflow** action is also restricted to `main`;
-it reads the same committed trigger. An unchanged enabled file does not trigger on unrelated
-commits. Leave it enabled or disable it after completion; requesting the next version requires
-another reviewed file change. The workflow never creates a branch, edits the trigger or commits
-generated version changes.
+Inputs are passed through quoted environment variables and validated before building. Mutable
+documentation references, malformed versions and incomplete inputs fail. The workflow never
+creates a branch, edits the legacy trigger or commits generated version changes. Use a new version
+for changed published content. The legacy file remains supported only by explicit local helper
+commands that omit the manual `--version` and `--documentation-commit` arguments.
 
 One-time configuration in `diaryfolio/aiops-fabric`:
 
-1. Enable GitHub Actions for the repository. The upload job requests `contents: write` for
-   application tags and releases; validation/build jobs have `contents: read`.
+1. Enable GitHub Actions for the repository. The request and upload jobs request `contents: write`:
+   the request job needs push access to see unpublished drafts but makes only read calls; the
+   upload job creates application tags and releases. Build jobs have `contents: read`.
+   GitHub provides these jobs' `GITHUB_TOKEN` automatically and passes it as `GH_TOKEN`;
+   no additional application token or secret is required.
 2. Add an Actions repository secret named `RELEASE_DOCS_TOKEN`. Use a fine-grained token restricted
    to `diaryfolio/aiops-fabric-docs`, with **Contents: Read and write**. It checks out the pinned docs
    and creates the matching docs tag. The application `GITHUB_TOKEN` cannot access/tag a separate
@@ -247,7 +261,7 @@ One-time configuration in `diaryfolio/aiops-fabric`:
 3. Ensure repository/organization policy permits the pinned actions and creation of the release
    tags. Protected tag rules must permit the workflow's respective token identities.
 
-The workflow validates the trigger, skips an already published version or completed draft, and
+The workflow validates the manual inputs, skips an already published version or completed draft, and
 checks out the exact application event commit plus pinned docs commit. It runs unit/security/design
 tests, lint, all Helm profiles, base Kustomize rendering and the strict docs build. Both ARM64 and
 AMD64 bundles are built, then checksummed downloads are retained as a workflow artifact for 14 days.
@@ -260,6 +274,10 @@ The separate upload job verifies archive checksums, safely extracts bundles and 
 internal contents and exact clean source commits. It then creates matching `v<version>` tags in
 both repositories and attaches five downloads to a **draft** application GitHub Release. Review
 the draft in the application repository's **Releases** tab, then publish it explicitly.
+Draft discovery uses the authenticated release list matched by `tag_name`, including pagination;
+final verification fetches the release by ID. GitHub's `releases/tags/<tag>` endpoint finds
+published releases and can return HTTP 404 for an existing draft. Multiple matching releases
+require manual review rather than choosing one or creating another.
 The workflow does not deploy to a Kubernetes cluster or establish CNI/model-quality
 acceptance; the [namespace acceptance procedure](#acceptance-and-inspection) remains required.
 
@@ -271,6 +289,31 @@ and a published release is never changed. A fresh rebuild may have different arc
 use it to replace an incomplete draft's existing downloads. If the retained artifact has expired,
 review recovery manually or choose a new version. Partial paired tag creation can be retried only
 with the same source commits.
+
+If the upload command returned a draft URL and then failed with a tag-lookup HTTP 404, first
+inspect that draft: its attachments may already be complete. Rerunning an old Actions job uses
+the old source and does not pick up an uploader fix. To verify or resume the original downloads,
+use the corrected uploader with the original retained artifact, not a rebuild. From the corrected
+application checkout, with GitHub CLI authenticated and the original version tags fetched in
+both repositories, choose a fresh destination and run:
+
+```sh
+gh run download <original-run-id> --repo diaryfolio/aiops-fabric \
+  --name release-1.0.1 --dir /tmp/viewsense-release-recovery
+python3 scripts/release/ci.py extract --repo diaryfolio/aiops-fabric \
+  --assets /tmp/viewsense-release-recovery
+python3 scripts/release/github.py --repo diaryfolio/aiops-fabric \
+  --assets /tmp/viewsense-release-recovery --resume-draft
+```
+
+For the legacy extraction command above, keep the local trigger version matching the downloaded
+artifact; its enabled flag does not control extraction. Alternatively, supply `--version` and
+`--documentation-commit` with the original artifact's metadata to avoid reading the trigger file.
+The uploader checks both original
+tags against the bundle's source commits, verifies existing attachments byte for byte, adds
+only missing identical files and leaves publication manual. Never move a version tag to the
+corrected uploader commit. A new corrected workflow run can skip a completed draft without
+building again, but cannot retroactively change the failed run's result.
 
 This automation requires repository setup and its first remote Actions run; local validation
 does not claim that GitHub has created a release. It preserves the prepared local 1.0.1 bundles.
