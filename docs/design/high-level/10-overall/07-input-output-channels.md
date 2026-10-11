@@ -52,7 +52,8 @@ database per channel. Admission, user entitlement and enabled state are rechecke
 a cached catalog revision cannot override a revocation.
 
 The [channel consoles and role-mapping design](08-channel-consoles-role-mapping.md) defines the
-Input/Output management pages and Keycloak → framework role → channel binding/grant chain.
+Input/Output management pages and AuthN Provider/identity adapter → framework role → channel
+binding/grant → AuthZ Provider decision chain. Keycloak is an example identity adapter only.
 The **Sales CRM Logistics1** role gets entry rights on Sales and a qualified read-only opportunity
 grant on CRM-Logistics1. Output grants own CRM action/data restrictions; the Input console shows
 their derived effective access. The runtime requires both bindings plus route/data policy; no

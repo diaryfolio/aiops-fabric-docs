@@ -64,10 +64,18 @@ Channel routing, Teams and Oracle integration are not implemented. See the
 [channel design and practical Sales flow](10-overall/07-input-output-channels.md).
 
 The [channel consoles and role mapping](10-overall/08-channel-consoles-role-mapping.md) attach
-framework roles to Input entry and qualified Output capabilities. Keycloak assigns external roles;
+framework roles to Input entry and qualified Output capabilities. The selected identity system assigns external roles;
 governance owns explicit external-to-framework mappings, Input bindings, Output grants and atomic
 policy revisions. CRM action/data restrictions live on the Output grant; Input displays effective
 access. General API scopes do not grant CRM permissions. The separate pages/APIs remain planned.
+
+Authentication and Identity Providers (**AuthN Providers**) and Authorisation Policy Providers
+(**AuthZ Providers**) are separate replaceable capabilities. Identity/entitlement adapters expose
+verified canonical assertions; policy adapters evaluate canonical resource decisions against
+governance-owned framework policy. A product may implement both contracts, but selecting an
+identity product does not confer framework policy ownership. Keycloak is an AuthN example; OPA
+is an AuthZ example. Provider-specific role claims, administration and policy syntax stay behind
+adapters. See the [neutral contracts and swap gates](10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
 
 Documentation ownership is a repository boundary: `aiops-fabric` owns executable
 implementation, deployment resources, runtime catalogs, and machine-readable schemas;

@@ -10,12 +10,34 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Product-neutral identity and policy providers (major, design-only)
+
+The [AuthN/AuthZ contract design](10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
+separates Authentication and Identity Provider, Identity Entitlement Adapter and Authorisation
+Policy Provider capabilities. Governance continues to own framework roles, mappings, channel
+grants and policy revisions. Canonical identity/entitlement assertions and resource decisions
+isolate provider claim layouts, administration APIs and policy syntax from console/CRM code.
+Keycloak and OPA are implementation examples, not mandatory dependencies. Existing POC evidence
+below remains product-specific evidence, not proof of provider-neutral replacement acceptance.
+
+These normalised adapter contracts, console provider views, identity-linkage migration and
+two-adapter conformance gates are planned. Current generic OIDC verification and the governance
+OPA admission boundary are foundations, not the complete channel AuthN/AuthZ contract. No
+runtime schema, API, trust configuration, provider, grant, deployment or data owner changes in
+this documentation revision. Source baselines are application `58243f5` and docs `d42ad05`;
+changes remain in the working tree for the owner's manual paired-change handoff.
+
+Validation: all 148 unit/design/catalog/security tests passed; `make lint`, base Kustomize
+rendering, the strict delegated documentation build and whitespace checks passed. No provider
+configuration changed. Provider replacement, live entitlement revocation and canonical decision
+conformance tests remain implementation acceptance work.
+
 ## Channel consoles, framework roles and AI egress governance (major, design-only)
 
 The [console/role design](10-overall/08-channel-consoles-role-mapping.md) adds planned Input/Output
 workspaces, Identity role/mapping tabs, exact IdP-to-framework mapping, Input entry bindings and
 qualified Output capability grants. CRM restrictions belong to the Output grant; the Input page
-displays derived access. Governance owns role/policy resources, while Keycloak owns external
+displays derived access. Governance owns role/policy resources, while the selected identity system owns external
 user/group role assignments. The existing OIDC verifier maps recognised external roles directly
 to broad platform scopes; `/v1/auth/roles` is static configuration, not a framework role catalog.
 
@@ -42,13 +64,13 @@ A local-only Sales pilot is the implementation starting point until external egr
 
 Source pairing: application baseline `9e561e0df65f9e9f42dd9fc6b5a2b5f0d0adf241`, documentation
 parent `7d3be8481785741f5ae6db62ff5c0034be7a63d0`; the documentation commit containing this
-section is the paired design revision. Runtime, Keycloak role freshness, PII and console
+section is the paired design revision. Runtime, identity-provider role freshness, PII and console
 acceptance remain pending; no new application commit is required for this design-only revision.
 
 Design-revision validation: all 148 unit/design/catalog/security tests passed; `make lint`, base
 Kustomize rendering, strict delegated documentation build and whitespace checks passed. New
 designs are included in published navigation and balanced Mermaid checks. Runtime deployment,
-Keycloak role mutation, wire-level PII tests, hard-cost enforcement and new-page browser QA are
+external identity role mutation, wire-level PII tests, hard-cost enforcement and new-page browser QA are
 not claimed by these source checks and remain implementation acceptance work.
 
 ## Input and Output Channels (major, design-only)

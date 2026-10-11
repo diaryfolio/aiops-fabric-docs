@@ -72,7 +72,7 @@ nav = [
     { "Enterprise integrations" = [
       { "Overview" = "deploy/integrations/README.md" },
       { "Networking and mesh" = "deploy/integrations/networking.md" },
-      { "Keycloak" = "deploy/integrations/keycloak.md" },
+      { "Keycloak example" = "deploy/integrations/keycloak.md" },
       { "SPIRE" = "deploy/integrations/spire.md" },
       { "Observability and workflows" = "deploy/integrations/observability-workflows.md" },
     ] },

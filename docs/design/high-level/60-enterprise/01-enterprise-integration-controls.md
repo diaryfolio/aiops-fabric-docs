@@ -98,14 +98,27 @@ Secrets, tokens, authorization headers, raw prompts/completions, memory content,
 
 ## SSO and identity boundary
 
+Architecture names capabilities, not required products: **AuthN Provider** for authentication/
+identity assertions, **Identity Entitlement Adapter** for current membership and **AuthZ Provider**
+for canonical resource-policy decisions. The selected providers remain replaceable while
+governance owns framework role/channel policy. A combined product must conform separately to
+each capability contract. See the [provider-neutral role design](../10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
 The edge validates external enterprise tokens against configured issuer/JWKS and maps stable subject, tenant, groups, authentication strength, and session risk. Internal services never accept human tokens as workload identity; the edge performs controlled delegation with a short-lived audience token. SCIM may automate user/group provisioning, but authorization remains based on current verified claims and policy. Break-glass identity is separate, time-bound, approval-gated, and always audited.
 
-Keycloak is an approved integration choice, not part of the mandatory core. Use the official
-Keycloak Operator or an existing enterprise service, then configure only issuer/JWKS/audience/claim
-mapping in ViewSense AI®. SPIRE is similarly operated at cluster scope. OPA is suited to a local sidecar
+For example, the reference AuthN integration uses Keycloak's OIDC interface and an independently
+operated instance; its operator/realm/role-mapper details belong in the example integration guide.
+Other providers use their own adapters and the same canonical identity/mapping requirements.
+SPIRE is similarly an example workload-identity product operated at cluster scope. OPA is an
+example AuthZ integration suited to a local sidecar
 for low-latency fail-closed decisions, while a centrally managed external OPA endpoint is appropriate
 only when its availability, mTLS, egress, and policy-bundle lifecycle meet the protected operation's
 SLO.
+
+Acceptance must prove issuer/assertion-source isolation, explicit identity linkage, current
+entitlements and role mapping across two identity adapters, plus equivalent allow/deny/obligation
+semantics across selected policy evaluators. No product name or shared token syntax substitutes
+for these checks; full replaceability remains planned.
 
 ## Suite selection rule
 

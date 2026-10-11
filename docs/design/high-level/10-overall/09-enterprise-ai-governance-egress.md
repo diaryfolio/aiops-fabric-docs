@@ -15,6 +15,13 @@ manager, networking and audit systems remain authoritative for their domains. Se
 [channels](07-input-output-channels.md), [role grants](08-channel-consoles-role-mapping.md) and
 [sovereign control](../80-future/01-sovereign-control-evidence-fabric.md).
 
+Identity and policy integrations are product-neutral capabilities: an **AuthN Provider** supplies
+verified identity, an **Identity Entitlement Adapter** supplies current approved assertions, and
+an **AuthZ Provider** evaluates canonical resource decisions against governance-owned framework
+policy. Keycloak and OPA are example adapters, not architectural dependencies. One product may
+implement both capabilities only through the separate validated contracts. See the
+[provider-neutral boundary](08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
 This is a **major, design-only uplift**. Authentication/scoped delegation, adapter isolation,
 explicit provider admission/evidence APIs and some bounded calls exist. Runtime general-purpose
 policy/admission enforcement, PII inspection/transformation, payload-bound egress permits, dynamic

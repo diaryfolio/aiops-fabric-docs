@@ -134,9 +134,17 @@ Memory, ingestion, agents and workflows must preserve channel/source/account pol
 revocation; their current APIs do not yet provide this complete channel contract.
 
 Governance also owns planned framework roles, external role mappings, Input entry bindings,
-qualified Output grants and policy revisions. Keycloak owns assignment of external roles to
-identities; framework roles do not create another user directory. Input/Output console pages are
+qualified Output grants and policy revisions. The selected AuthN Provider/authoritative identity
+system owns assignment of external roles to identities; framework roles do not create another
+user directory. Input/Output console pages are
 API clients of these owners. See the [role ownership model](08-channel-consoles-role-mapping.md#resource-and-state-ownership).
+
+The [provider-neutral contracts](08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
+separate AuthN/verified identity, current entitlement adapters and AuthZ/decision evaluation.
+Governance retains framework catalog/revision ownership even when an external policy provider
+evaluates decisions. Protocol/product translations live inside adapters. Keycloak and OPA are
+example implementations, not prerequisites; one product implementing both capabilities still
+must conform to both contracts and cannot redefine channel permissions.
 
 Planned enterprise enforcement uses policy/inspection/budget decisions before dispatch and final
 wire-payload checks inside credential-owning adapters. Governance owns budget-policy/reservation

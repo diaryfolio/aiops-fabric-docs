@@ -77,6 +77,11 @@ In the same coordinated change across the two repositories:
 
 ## Architecture rules
 
+- Name replaceable integration boundaries by capability/provider role and canonical contract,
+  such as AuthN Provider, Identity Entitlement Adapter and AuthZ Provider. Keep product-specific
+  protocols, claims, SDKs and administration inside adapters and example operating guides.
+  Product names such as Keycloak and OPA are reference implementations, not required design
+  dependencies. A combined product must still conform separately to each capability contract.
 - Use `ViewSense AI®` for the human-facing product name in prose, generated documentation,
   API titles, and operator messages. Preserve established ASCII protocol and deployment identifiers
   such as `X-ViewSense-Tenant`, `viewsense-dev`, `VS_*`, package names, image names, and URLs.

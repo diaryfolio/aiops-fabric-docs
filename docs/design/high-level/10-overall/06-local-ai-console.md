@@ -243,8 +243,9 @@ Navigation uses shareable URLs (`?page=overview|ai|identity|certificates|observa
 management area can be bookmarked while keeping the frontend a detachable API client.
 
 Planned `?page=input-channels` and `?page=output-channels` pages manage channel metadata and
-role bindings/grants through governance APIs. Identity adds Framework roles and IdP mappings;
-Keycloak still owns user/group assignments. Input Entry roles controls context admission; Input
+role bindings/grants through governance APIs. Identity adds Framework roles, Identity mappings and
+separate Authentication/Authorisation provider views. The selected identity system owns user/group
+assignments; Keycloak is an example POC adapter. Input Entry roles controls context admission; Input
 Output access is a derived view of the Output grant, with its authoritative editor on Output.
 CRM-Logistics1 Role grants maps **Sales CRM Logistics1** to the explicit **Read-only — Sales
 opportunities** profile, assigned-account scope and allowed Sales route. Metadata admins cannot

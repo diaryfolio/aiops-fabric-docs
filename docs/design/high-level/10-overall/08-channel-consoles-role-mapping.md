@@ -19,11 +19,60 @@ The Input page displays effective CRM access by reading these same Output grants
 a second copy of CRM permissions on the Input Channel. A route and Output capability catalog are
 ceilings, not permissions automatically inherited by everyone in Sales.
 
+## Provider-neutral authentication and authorisation
+
+Use capability names in the architecture and console, with products selected behind adapters:
+
+| Capability | Responsibility | Example implementation, not a requirement |
+|---|---|---|
+| **Authentication and Identity Provider (AuthN Provider)** | Authenticate humans/machines; provide verified identity, tenant binding, authentication assurance and external role/group/entitlement assertions | An enterprise OIDC provider; Keycloak is the reference example |
+| **Identity Entitlement Adapter** | Normalise approved identity/role sources and establish current entitlement/freshness/revocation; provide an authorised administration reference | Adapter for the selected identity provider or authoritative directory |
+| **Authorisation Policy Provider (AuthZ Provider)** | Evaluate canonical subject/resource/action/context against framework grants and policy; return an allow/deny decision and narrowed obligations | Built-in evaluator or an external policy-engine adapter; OPA is an example |
+| **Framework governance catalog** | Own framework roles, mappings, Input bindings, Output grants and reviewed policy revisions | Existing governance state domain; independent of the selected AuthN/AuthZ products |
+
+AuthN answers who the caller is and which externally managed assertions are verified. AuthZ
+answers what that caller may do to a particular channel/resource under current policy. A valid
+identity assertion is input to a resource decision, not permission by itself. A product can supply
+both capabilities, but must implement the separate contracts; choosing it for authentication does
+not automatically make it the authority for framework policy or CRM capabilities.
+
+OIDC is the current authentication protocol boundary. Other protocols require explicit evaluated
+adapters and remain planned; direct product SDKs, management APIs, realm/client terminology and
+claim layouts stay inside the relevant adapter/configuration. Framework role IDs, channel grants,
+policy input and console forms cannot depend on a particular product's role representation.
+
+Target adapter contracts are:
+
+- **Verified identity assertion:** provider/trust-source revision, opaque issuer/subject,
+  identity-derived tenant, authentication assurance, issuance/expiry and approved role-source
+  references. Each role assertion includes its source namespace, exact value and observation time.
+- **Current entitlements:** scoped identity reference, verified role values and source revision,
+  observation time, freshness limit, revocation state and completeness. Unsupported or unavailable
+  required freshness yields no execution authority.
+- **Authorisation request/decision:** canonical subject/tenant, mapped framework roles and
+  provenance, Input/Output/route/action, purpose, data/account/field policies and budgets; result
+  includes allow/deny, reason, policy/grant revisions, expiry and enforceable narrowing obligations.
+  Governance validates the result and enforcement points apply it. No product-specific policy
+  response becomes a grant without validation.
+
+These are planned versioned schemas/APIs. Each provider advertises supported assurance, role
+sources, entitlement refresh/revocation and administration/discovery capabilities. No capability
+is silently emulated. AuthZ adapters must evaluate the same reviewed framework policy semantics,
+including deny precedence and complete-grant rules, and pass the same consumer conformance suite.
+Policy-provider changes cannot redefine a grant, ignore an obligation or widen access.
+
+Replace a provider through reviewed trust, adapter and mapping configuration plus conformance
+and migration checks. Preserve framework role/channel IDs where semantics are unchanged. Identity
+references are qualified by provider/issuer; equal usernames or subject strings across providers
+do not establish the same person. Any stable enterprise identity linkage and CRM account mapping
+must be explicit, verified and audited before cutover. Do not silently fall back to another IdP,
+the development issuer or a more permissive policy engine on failure.
+
 ## The Sales CRM Logistics1 role
 
 | Mapping layer | Pilot configuration |
 |---|---|
-| Keycloak role | Client role `sales-crm-logistics1-reader` on API resource client `viewsense-api` |
+| External identity role | Approved source assertion `sales-crm-logistics1-reader` from the selected AuthN Provider/entitlement adapter |
 | Framework role | ID `sales-crm-logistics1`; display name **Sales CRM Logistics1** |
 | Input binding | Role may use `sales` through approved chat/API surfaces for `sales.opportunities` |
 | Output grant | Role may use `crm-logistics1`, only from `sales` and its approved opportunity route |
@@ -38,13 +87,13 @@ masking, purpose, freshness, export, retention and model-egress policy.
 
 ```mermaid
 flowchart LR
-    User["Enterprise user"] --> KC["Keycloak user/group client-role assignment"]
-    KC --> Token["Verified access-token role source"]
+    User["Enterprise user"] --> Identity["AuthN Provider + Identity Entitlement Adapter"]
+    Identity --> Token["Verified identity and scoped external roles"]
     Token --> Mapping["Exact external-to-framework role mapping"]
     Mapping --> Role["Sales CRM Logistics1 framework role"]
     Role --> Input["Sales Input binding: enter"]
     Role --> Grant["CRM-Logistics1 Output grant: named read actions"]
-    Input --> Policy["Policy: complete grant + route + data + egress"]
+    Input --> Policy["AuthZ Provider: complete grant + route + data + egress"]
     Grant --> Policy
     Policy --> Tool["Tool-Sense and CRM connector enforce decision"]
 ```
@@ -60,7 +109,7 @@ This is the target authorisation chain. None of its new edges is implementation 
 | Input role binding | Role and Input IDs, accepted purposes/surfaces, revision/state | Governance |
 | Output capability/profile | Output ID, explicit action IDs, tool/schema versions, side-effect class, data ceiling, revision/state | Governance channel catalog; MCP owns executable tool registration |
 | Output role grant | Role, Output, allowed Input/route IDs, profile revision, account/field policies, purpose, conditions, budgets and expiry | Governance |
-| User/group role assignment | Identity, memberships, effective external roles and credential lifecycle | Keycloak or another enterprise IdP |
+| User/group role assignment | Identity, memberships, effective external roles and credential lifecycle | Selected AuthN Provider / authoritative identity system |
 | Access policy revision | Consistent references to mappings, bindings, profiles, grants and route versions; review and activation evidence | Governance |
 
 Framework roles are portable business authorisation objects, not a duplicate user directory.
@@ -70,30 +119,21 @@ explicit machine-role mappings and grants; a bot's transport identity cannot imp
 Governance uses its existing state domain, with tenant-keyed resources and owner APIs. Peers never
 query that database. Role labels and client names are not globally unique authorisation keys.
 
-## Keycloak role mapping
+## External identity role mapping
 
-Keep these separate in operator language: Keycloak assigns roles to users/groups; its token
-configuration determines which roles are emitted; ViewSense AI® maps verified external roles to
-framework roles; Output grants define what a framework role can do. Keycloak does not need copies
-of every CRM tool/field permission. See the official
-[Keycloak role and token administration guide](https://www.keycloak.org/docs/latest/server_admin/index.html#_roles).
-
-For the pilot, use a dedicated API resource client `viewsense-api` and a separate browser client.
-Read the API client's role list at `resource_access.viewsense-api.roles`. Keycloak normally puts
-client roles in `resource_access` and realm roles in `realm_access`; protocol mappers and client
-role scope settings control token contents. Ensure the access token includes the API audience,
-and evaluate effective token mappings against the installed Keycloak version. Explicitly scope
-roles to the API client rather than accepting all realm/client roles. See
-[token role mappings](https://www.keycloak.org/docs/latest/server_admin/index.html#_token_role_mappings)
-and [audience configuration](https://www.keycloak.org/docs/latest/server_admin/index.html#_audience).
+Keep these separate in operator language: the selected identity system assigns roles/groups to
+identities; its configured adapter verifies and normalises approved assertions; ViewSense AI® maps
+them to framework roles; Output grants define resource capabilities. The identity product does
+not need copies of every CRM tool/field permission. Role source selection is explicit provider
+configuration, not a fixed client-role claim path in the framework.
 
 Target mapping example; this is not a payload accepted by the existing provider schema:
 
 ```json
 {
-  "id": "kc-sales-logistics1",
-  "provider_id": "enterprise-keycloak",
-  "role_source_ref": "viewsense-api-client-roles",
+  "id": "identity-sales-logistics1",
+  "provider_id": "enterprise-identity",
+  "role_source_ref": "approved-application-roles",
   "external_role": "sales-crm-logistics1-reader",
   "framework_role_id": "sales-crm-logistics1",
   "state": "draft",
@@ -101,22 +141,36 @@ Target mapping example; this is not a payload accepted by the existing provider 
 }
 ```
 
-The pinned role source binds configured provider/issuer, API audience, claim path, client-role
-namespace and allowed tenant relationship. Tenant comes from verified identity, not this request.
+The pinned role source binds configured provider/trust source, intended audience, adapter extraction
+configuration, assertion namespace and allowed tenant relationship. Tenant comes from verified
+identity, not this request. Product-specific claim paths exist only in adapter configuration.
 The tuple `(tenant, provider, role source, exact role value)` selects a mapping. The same role
-string from another issuer, realm-role list or client grants nothing. Reject malformed role claims,
+string from another issuer, assertion namespace or application grants nothing. Reject malformed role claims,
 unbounded lists, unregistered sources and duplicate/conflicting mappings. Do not use fuzzy matching,
 case folding, display names or wildcard role values. Unknown roles map to no framework authority.
 First-slice mappings have one target role; different external roles/providers can explicitly map
 to the same framework role. Framework role inheritance is excluded from the first slice.
 
-Keycloak can supply effective composite/group-assigned roles in tokens. ViewSense AI® uses only
-roles emitted by the approved source; it does not expand Keycloak group trees or composites itself.
-Review IdP composite changes as entitlement changes and test their effective claims. The first
-release links operators to Keycloak for user/group/role assignment. Optional role discovery later
-uses an isolated read-only IdP adapter, never Keycloak administrative credentials in a browser,
-LLM, generic gateway or governance record. Keycloak mutations would require a separate audited
-integration; no bidirectional role synchronisation is implied.
+ViewSense AI® consumes only verified assertions from approved sources. Provider-specific group
+trees, nested/composite roles and membership rules are resolved by the selected identity system/
+adapter, not by CRM routing code. Review changes to effective external entitlement semantics and
+test normalised assertions. The first release links operators to the configured provider's
+administration surface. Optional role discovery uses an isolated read-only adapter, never provider
+administrative credentials in a browser, LLM, generic gateway or governance record. Mutating the
+external identity system requires a separate audited integration; no bidirectional role
+synchronisation is implied.
+
+### Example adapter: Keycloak
+
+Keycloak is one replaceable AuthN Provider, not a framework dependency. An example configuration
+uses API resource client `viewsense-api`, a separate browser client and external client role
+`sales-crm-logistics1-reader`. Its adapter's approved source reads
+`resource_access.viewsense-api.roles`; realm/client role namespaces remain qualified and separate.
+The framework receives the same normalised identity/role assertions and **Sales CRM Logistics1**
+mapping as any accepted provider. Product claim layouts and audience/role-mapper setup belong in
+the [Keycloak example operating guide](../../../deploy/integrations/keycloak.md#planned-business-channel-role-mapping).
+Using another conforming provider changes adapter/trust/source configuration, not the Input/
+Output permission model. Keycloak is not a prerequisite in the acceptance gates below.
 
 ### Compatibility with the current verifier
 
@@ -163,7 +217,7 @@ The provider adapter checks the actual outbound payload against its egress decis
 revocation on execution, resume, approval and delivery. Direct calls to tool APIs require equivalent
 authorisation; choosing a server name or holding `mcp.invoke` cannot bypass Output grants.
 
-JWT role claims are a snapshot. Removing a Keycloak assignment does not by itself rewrite an
+Signed role assertions are a snapshot. Removing an external identity assignment does not by itself rewrite an
 already issued token. Target channel policy defines `max_role_age_seconds`; the pilot maximum is
 60 seconds, with authoritative entitlement revalidation or a supported revocation feed required
 once the assertion exceeds that age. Measure age from the verified assertion/revalidation time,
@@ -182,15 +236,22 @@ recalled. Emergency disable blocks subsequent dispatch/delivery and cancels work
 
 Keep persistent verified tenant/environment context. Add shareable `?page=input-channels` and
 `?page=output-channels` workspaces to the management console; add **Framework roles** and
-**IdP mappings** tabs under `?page=identity`. IDs in URLs are selection only, not tenant overrides.
+**Identity mappings** tabs under `?page=identity`. IDs in URLs are selection only, not tenant overrides.
 These pages manage configuration; ordinary employees select permitted channels in chat/API clients.
+
+Identity & access also separates **Authentication providers** from **Authorisation providers**:
+show selected adapter, protocol/capability support, trust/policy revision and independently observed
+health. Product labels appear as configured implementations, not fixed workspace names. **Manage
+identities** opens an approved provider administration reference. Provider selection is a reviewed
+configuration plan, not an immediate trust switch; cutover requires identity linkage, fresh grants,
+policy conformance and revocation/session handling. UI removal leaves both provider contracts usable.
 
 | Workspace | List view | Detail tabs and actions |
 |---|---|---|
 | Input Channels | Name, owner, accepted surfaces, attached role count, route count, policy revision, enabled state | Overview; Entry roles; Output access; Routes; Delivery/retention; Audit |
 | Output Channels | Name, application owner, connector, capability profile count, granted role count, catalog state, separately observed health | Overview; Capabilities; Role grants; Data/egress policy; Connector status; Audit |
 | Framework roles | Role name/ID, owner, mapped IdP sources, Input bindings, Output grants, revision/state | Overview; External mappings; Channel access; Policy preview; Audit |
-| IdP mappings | Provider/role source, external role, framework role, active revision and validation status | Select configured provider/source; exact role value; target role; validate, preview and draft lifecycle |
+| Identity mappings | Provider/role source, external role, framework role, active revision and validation status | Select configured provider/source; exact role value; target role; validate, preview and draft lifecycle |
 
 Input **Entry roles** attaches a framework role to Sales with purposes/surfaces. **Output access**
 shows a derived matrix: `Sales CRM Logistics1 | CRM-Logistics1 | Read-only: opportunity list |
@@ -231,7 +292,7 @@ For CRM-Logistics1 the grant editor shows **Sales CRM Logistics1**, Input **Sale
 **Read-only — Sales opportunities**, action **List sales opportunities**, account scope
 **Assigned accounts**, and the permitted fact fields. Creation/contact/export actions remain
 outside this grant. Buttons use business labels; protocol/connector details sit in operator
-detail panels. Saving a grant does not test Oracle, activate a provider or create Keycloak roles.
+detail panels. Saving a grant does not test Oracle, activate a provider or create external identity roles.
 
 Every detail page distinguishes draft/active/disabled configuration, mapping validation, provider
 admission and live connector health. An unavailable API has an unavailable state and no fabricated
@@ -246,7 +307,7 @@ Separate metadata editing, capability/profile management, role/mapping/grant man
 activation and audit viewing. Proposed scopes are `channels.read`, `channels.admin`, `authz.read`,
 `authz.admin`, `authz.review` and `authz.simulate`, each further constrained by tenant, resource and
 operation policy. They are not existing scopes. Channel administration does not grant business
-data access or permission to administer Keycloak; role admins cannot approve their own expansion.
+data access or permission to administer an external identity product; role admins cannot approve their own expansion.
 Initial admin authority comes from explicitly provisioned operator identities, not from a role a
 user creates in the console.
 
@@ -291,8 +352,8 @@ scope-policy view; it is not silently renamed or treated as the new framework-ro
 3. Implement Input/Output pages and Identity role/mapping tabs on the same APIs, then pilot the
    Sales reader path with the existing CRM/channel delivery requirements.
 
-Required evidence: correct Keycloak client role permits Sales opportunity reads for assigned
-accounts; realm/unrelated-client/issuer/tenant collisions, malformed claims and unknown roles grant
+Required evidence: an approved external role assertion permits Sales opportunity reads for assigned
+accounts; assertion-source/application/issuer/tenant collisions, malformed claims and unknown roles grant
 nothing. Missing Input binding or Output grant denies; Support cannot reuse a Sales-only grant;
 another CRM, unlisted read, write, export and outreach deny. Multiple roles cannot manufacture
 action/account combinations. Disabled mappings/grants, role removal, stale claims, feed outage,
@@ -305,4 +366,12 @@ backend operation. Test navigation, inaccessible deep links, empty/error/loading
 operation, separate configuration/health and GUI removal. Demonstrate secret/PII-free logs and
 safe lineage showing external source → framework role → Input binding → Output grant → decision.
 
-All runtime, IdP freshness, UI and CRM evidence remains pending implementation.
+Run the same identity/mapping/freshness suite against two distinct adapters: the selected reference
+product and an independent standards-based fixture/provider. Verify that an AuthN/entitlement
+adapter swap preserves qualified framework roles, subject isolation and channel permissions after
+reviewed identity linkage, without changing console or CRM code. Run the same canonical decision
+tests against built-in and selected external AuthZ evaluators; incompatible policy semantics,
+missing capabilities and unavailable mandatory providers deny. These are target replaceability
+gates, not claims that two production products are certified.
+
+All runtime, identity-provider freshness, UI and CRM evidence remains pending implementation.

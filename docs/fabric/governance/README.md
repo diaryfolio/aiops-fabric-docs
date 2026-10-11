@@ -11,7 +11,10 @@ Helm controls are `modules.governance` and `datastores.governance`. Applications
 The [channel-role design](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md)
 extends this owner with framework roles, qualified external mappings, Input bindings, Output
 capability grants and immutable reviewed policy revisions. Separate Input/Output pages call its
-headless APIs. Keycloak owns user/group role assignment; the framework owns resource permissions.
+headless APIs. The selected identity system owns user/group role assignment; the framework owns
+resource permissions. A replaceable AuthZ Provider evaluates canonical decisions against reviewed
+framework policy; governance validates decisions and retains policy/catalog ownership. Selecting
+a combined AuthN/AuthZ product cannot bypass these separate contracts. Keycloak and OPA are examples.
 
 The [enterprise AI governance design](../../design/high-level/10-overall/09-enterprise-ai-governance-egress.md)
 adds runtime payload/egress decisions, company-boundary/PII rules, cost policies/reservations and

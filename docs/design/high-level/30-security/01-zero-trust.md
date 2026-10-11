@@ -33,6 +33,20 @@ token subject is a production integration, not current application behavior.
 
 ## Identity
 
+Design contracts use **Authentication and Identity Provider (AuthN Provider)** and
+**Authorisation Policy Provider (AuthZ Provider)** as separate replaceable capabilities, with an
+Identity Entitlement Adapter for verified roles/current membership. Keycloak and OPA are examples.
+Product-specific claims, administration credentials and policy syntax remain inside adapters;
+framework roles and qualified channel grants remain governance-owned. A successful login never
+substitutes for a resource decision. See the
+[neutral provider contracts](../10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
+Provider changes require reviewed trust/source mappings and explicit verified subject linkage;
+matching usernames or `sub` strings across issuers cannot establish identity. Conforming AuthZ
+providers must preserve deny precedence, complete-grant semantics and obligations. Unsupported
+freshness/assurance, invalid decisions, unknown obligations and mandatory-provider outage deny;
+never fall back to the development issuer or a permissive policy implementation.
+
 Human identity federates to the enterprise IdP using OIDC Authorization Code + PKCE or workload-appropriate OAuth flows. Workloads receive renewable, short-lived identities through SPIFFE/SPIRE, service mesh, or cloud workload identity. Application tokens have exact `aud`, narrow scopes, expiry, unique ID, and issuer. Shared bearer tokens, namespace trust, and long-lived API keys are prohibited.
 
 The development issuer uses client credentials and RS256 plus a generated CA to make these properties testable. It is not an enterprise IdP and must not be promoted. At the edge, the external OIDC verifier pins an HTTPS issuer and JWKS URL, exact audience, supported signature algorithms, required scopes, subject, and configured tenant claim. Keycloak is one compatible IdP, not a mandatory control-plane component. JWKS/IdP unavailability fails authentication closed.

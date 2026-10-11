@@ -59,13 +59,18 @@ extensions follow separately; no CRM writes or outreach are implied by read acce
 
 Before enabling that business slice, implement the
 [console/role authorisation foundation](../10-overall/08-channel-consoles-role-mapping.md): framework
-roles, exact Keycloak client-role mapping, Input bindings, qualified Output read grants, scoped
+roles, exact provider-qualified external-role mapping, Input bindings, qualified Output read grants, scoped
 admin APIs, current entitlement/revocation and atomic policy revisions. Attach separate Input/
 Output pages and Identity mapping tabs only after headless enforcement passes. Start Sales with
 a local-only model route. External models require the
 [PII/egress and governance gates](../10-overall/09-enterprise-ai-governance-egress.md), actual-wire
 containment tests, final adapter checks, atomic budgets and reliable evidence. Model swaps require
 canonical contract and semantic/quality/data-policy acceptance, not just successful API calls.
+
+Qualify AuthN/entitlement and AuthZ adapters separately through their neutral contracts; Keycloak
+and OPA are reference examples, not delivery prerequisites. Identity-provider replacement needs
+explicit subject/CRM linkage, freshness/revocation and issuer/source-isolation evidence. Policy
+replacement must preserve complete-grant and deny semantics across the same decision suite.
 
 Extend the shipped agent-run contract/checkpoints/approvals with autonomous workers, transactional
 flight-recorder export, and side-effect replay protection. Add the workflow-provider contract,

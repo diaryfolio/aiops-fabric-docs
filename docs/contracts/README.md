@@ -32,6 +32,13 @@ destination and policy revisions. These machine-readable assets are planned, not
 documentation repository or implemented by existing OpenAPI. Adapters must pass canonical and
 semantic/capability tests; OpenAPI and OpenAI-compatible protocol syntax are distinct concepts.
 
+[Neutral AuthN/AuthZ provider contracts](../design/high-level/10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
+require verified identity assertions, namespaced role/entitlement observations, current membership/
+revocation and canonical resource decisions with obligations. Product claim paths, user/role APIs
+and policy syntax are adapter configuration, not framework schemas. These contract families and
+replaceability evidence remain planned; the current OIDC provider schema and OPA admission boundary
+are narrower foundations. Keep existing protocol fields compatible while adding neutral envelopes.
+
 `model-test-request-v1.schema.json` is an additive opt-in administrative contract for installed-model
 decision, embedding and text-chat previews. It accepts a selected model only at `/v1/model-tests`,
 requires `provider.admin`, and never changes saved configuration or memory profiles. Conditional

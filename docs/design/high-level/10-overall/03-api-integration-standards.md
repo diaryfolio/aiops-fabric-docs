@@ -17,6 +17,7 @@
 | synchronous ingestion | `POST /v1/documents:ingest` | paragraph chunking and memory writes; no durable job resource yet |
 | development identity | `POST /oauth2/token` | development-only client credentials and Trust Envelope minting |
 | framework/channel authorisation | Governance role/mapping/binding/grant and policy decision APIs | Planned; [headless contracts](08-channel-consoles-role-mapping.md#planned-headless-apis-and-contracts) preserve legacy external-role scope fields |
+| identity and policy provider adapters | Canonical verified-identity, current-entitlement and authorisation decision contracts | Planned [AuthN/AuthZ contracts](08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation); provider-specific protocols/claims remain behind adapters |
 | payload/egress and cost decisions | Versioned inspection, payload-bound permit and budget reservation/reconciliation contracts | Planned; see [governance requirements](09-enterprise-ai-governance-egress.md) |
 | long operations | operation resources plus CloudEvents | planned |
 | health | `/healthz` | must reveal no tenant/provider secrets |

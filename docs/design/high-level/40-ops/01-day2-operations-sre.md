@@ -117,7 +117,7 @@ The [role console design](../10-overall/08-channel-consoles-role-mapping.md) add
 policy revisions and emergency deny epochs. Restore role/mapping/grant metadata with tenant-bound
 references, preserve revocations and revalidate IdP entitlements before traffic. Monitor freshness
 violations, mapping drift, source/feed outages and failed/denied activations; the first Sales slice
-requires the declared 60-second role-assertion bound. Keycloak changes and framework policy publish
+requires the declared 60-second role-assertion bound. External identity changes and framework policy publish
 are separate operations; compare effective test identities without logging access tokens.
 
 The [AI egress/cost design](../10-overall/09-enterprise-ai-governance-egress.md) requires inspection,

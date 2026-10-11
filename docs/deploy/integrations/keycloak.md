@@ -1,4 +1,12 @@
-# ViewSense AI® modular SSO and certificate POC
+# ViewSense AI® Keycloak example: SSO and certificate POC
+
+This is a product-specific reference example of the **Authentication and Identity Provider
+(AuthN Provider)** capability. Keycloak is optional; framework roles, channels and authorisation
+contracts are product-neutral. The **Authorisation Policy Provider (AuthZ Provider)** is a separate
+capability and need not use the same product. Other conforming adapters implement the same
+[identity, entitlement and decision contracts](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
+with their own protocol/claim/administration configuration. Commands and claim paths below apply
+only to this Keycloak POC and do not define core framework APIs.
 
 The framework runs headless. The gateway exposes provider metadata, verified user/role context,
 component APIs, product catalogs, suite plans and certificate administration. The optional
