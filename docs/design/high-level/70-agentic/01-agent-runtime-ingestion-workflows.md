@@ -169,4 +169,20 @@ Selection order is security/residency → capability/quality → reliability/ope
 
 ## Operator roadmap
 
+### Planned Input and Output Channel integration
+
+Apply the [channel/module contract](../10-overall/07-input-output-channels.md#integration-with-the-existing-modules)
+to online and background work. Agent profiles/runs retain references to Input, Output, route and
+policy revisions plus bounded grants, not connector credentials or a frozen permission snapshot.
+Resume, approval, tool steps and final delivery recheck current membership, account scope, provider
+admission and route state. Checkpoint recovery never broadens access or replays a CRM write blindly.
+
+Scheduled workflows use explicitly authorised machine Input identities and the same Output/tool
+policy; callbacks bind authenticated tenant/run/channel context and reject replays. Recipient
+membership and conversation visibility are rechecked when delivering delayed results. Ingestion
+of CRM/product knowledge preserves Output/source/version lineage, row/field ACLs, freshness and
+tombstones; indexed facts cannot substitute for fresh contract/usage reads without an explicit
+policy. These channel integrations and durable workflow adapters are planned. The Sales pilot is
+a bounded read workflow and does not require an autonomous agent or ingesting the Oracle database.
+
 Helm installs chosen modules. A future ViewSense AI® operator should reconcile custom resources such as `ModelProvider`, `MemoryProvider`, `MCPServer`, `WorkflowProvider`, `AgentProfile`, and `IngestionPipeline`; validate conformance/certification; roll credentials; publish readiness; and block incompatible or policy-violating provider changes. It must not become a second workflow engine or store provider secrets in status.

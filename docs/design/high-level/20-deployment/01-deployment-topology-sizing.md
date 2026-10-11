@@ -83,6 +83,20 @@ flowchart LR
 
 ## Workload rules
 
+### Planned channel integration packaging
+
+[Input/Output Channel resources](../10-overall/07-input-output-channels.md) are governance metadata,
+not automatic deployments/namespaces. Package Teams entry and CRM-Logistics1 adapters independently
+with unique workload identity, restricted pods, probes, bounded resources and external secret
+references. Oracle remains CRM-owned outside the platform databases; only the CRM connector may
+reach its approved encrypted endpoint or hold its read-only credentials. Add exact orchestrator →
+governance/MCP and MCP → CRM paths, audience/scoped grants and adapter-only Oracle egress when
+implementing the slice. Current manifests and their orchestrator-to-MCP denial remain unchanged.
+Validate real allowed/denied connectivity, encrypted database transport, rotation and rollback
+before admission; successful manifest rendering is not channel security acceptance.
+
+### Common workload requirements
+
 - one service account and workload identity per component;
 - no automatic Kubernetes API token mounts unless a component genuinely calls the API;
 - restricted Pod Security, non-root users, read-only roots, no added capabilities;

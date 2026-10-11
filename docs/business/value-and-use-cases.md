@@ -45,6 +45,26 @@ does not imply that the platform supplies a complete document-management or deci
 | Local AI evaluation | Compare model decisions or grounded answers on representative non-sensitive examples. | Ollama is configuration-ready; development evidence is not a general model-quality guarantee. |
 | Governed agent lifecycle | Exercise budget, approval, cancellation, and evidence decisions using controlled runs. | The current lifecycle is manually driven; autonomous task execution and business-tool adapters are planned. |
 
+## Sales opportunities from CRM data
+
+A planned practical use case lets an authorised employee ask “give me sales opportunities” from
+chat or Teams. **Sales** is the Input Channel; **CRM-Logistics1** is the Output Channel accessed
+through Tool-Sense. The answer returns to the employee's authorised conversation. The read path
+uses approved CRM/Oracle facts, account permissions and owner-reviewed rules, with reasons and
+freshness visible for each opportunity.
+
+| Customer example | Opportunity to review |
+|---|---|
+| ClientA: Silver1, API disabled | Qualify API need and check whether enablement or an eligible package upgrade fits. |
+| ClientB: Gold, all features, growing footprint | Compare measured billable usage with finite licence headroom before suggesting more licences. |
+| ClientC: Platinum, unlimited pool, legacy Windows | Review a supported Linux migration against authoritative terms and migration costs; potential savings are not guaranteed. |
+
+Measure time to produce reviewed leads, factual accuracy, useful opportunities and safe account
+access against a manual baseline. ClientC can be a retention/customer-value opportunity rather
+than a revenue increase. Missing or stale evidence must remain visible. This does not contact
+customers or write CRM records. Channel routing, Oracle tools and Teams integration are planned;
+see the [full channel design and acceptance gates](../design/high-level/10-overall/07-input-output-channels.md).
+
 ## Translate platform goals into measurable value
 
 | Goal | Business measure to agree | Evidence to collect |

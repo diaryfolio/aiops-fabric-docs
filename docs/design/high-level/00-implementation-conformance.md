@@ -10,6 +10,44 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Input and Output Channels (major, design-only)
+
+The [channel design](10-overall/07-input-output-channels.md) introduces planned tenant-scoped
+Input Channels (business requester context), Output Channels (enterprise integration targets),
+versioned routes, authenticated narrowed execution context, and verified entry-session replies.
+The practical target is Sales → CRM-Logistics1 through Tool-Sense, with a read-only Oracle
+connector and evidence-based opportunity rules. Governance is the proposed channel/route metadata
+owner; MCP owns tool bindings; CRM retains its database and business-data ownership.
+
+| Capability | Current state | Missing evidence / implementation |
+|---|---|---|
+| Input/Output Channel and route resources | planned | Schemas, governance administration/resolution, scoped policy and revision/revocation enforcement |
+| Channel-aware delegation and account/field controls | planned | Versioned authenticated context and negative identity/account/field tests; Trust Envelope v1 is insufficient for channel grants |
+| Chat → Tool-Sense → Output routing | planned | Orchestrator/governance/MCP integration, configuration, grants, network rules and grounded-response validation |
+| CRM-Logistics1 / Oracle opportunities | planned | Credential-isolated adapter, owner-approved query mappings/rules and live read-only correctness/isolation evidence |
+| Teams entry and authorised delivery | planned | User mapping, replay protection, private/shared recipient checks and headless equivalence |
+| Agent/workflow/ingestion channel integration | planned | Context propagation, resume/callback reauthorisation and source/ACL/freshness controls |
+
+No runtime route, contract schema, deployment resource, permission or database is changed by this
+documentation revision. Existing executable diagrams and HTTP surfaces below remain the reference
+truth: the orchestrator calls memory/LLM only; orchestrator-to-MCP network access remains denied.
+Do not infer routing from arbitrary request metadata or native MCP support from Tool-Sense naming.
+The pilot must disable CRM conversation persistence until channel/account ACL and retention tests
+exist; current `remember` defaults and memory owner filters are not that implementation.
+
+Source pairing: this design-only revision is assessed against application commit
+`9e561e0df65f9e9f42dd9fc6b5a2b5f0d0adf241` and documentation parent
+`67a377dee4141109073b4aaf8738300ec695e605`. The documentation commit containing this section is
+the paired design revision; no implementation commit is needed until the planned slice changes
+executable assets. Documentation validation evidence is recorded with that revision; none is live
+CRM, Teams or channel acceptance. Existing production gaps remain.
+
+Validation of the design revision: `make unit` passed all 148 tests, including route/conformance
+and balanced-design-diagram checks; `make lint`, base Kustomize rendering and the strict delegated
+documentation build passed. These are source/documentation checks. Live Kubernetes deployment,
+channel policy, Oracle business queries and Teams delivery are not exercised by this design-only
+change and remain acceptance work for the implementation slice.
+
 ## Manual release automation (major)
 
 The application `.github/workflows/release.yml` accepts a plain three-part version and an immutable

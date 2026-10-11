@@ -29,6 +29,8 @@ flowchart LR
 - [Networking and mesh design](20-deployment/02-modular-networking-mesh.md) — replaceable CNI,
   strict workload transport and headless networking management.
 - [Implementation conformance](00-implementation-conformance.md)
+- [Input and Output Channels](10-overall/07-input-output-channels.md) — planned business routing,
+  Tool-Sense module integration, and the Sales → CRM-Logistics1 Oracle opportunity use case.
 - [Release automation and recovery](../../releases/installation.md#manually-build-a-release)
   — draft discovery permissions, release asset selection and recovery without rebuilding artifacts.
 - [Project status and local AI integration plan](01-project-status-and-local-ai-plan.md) — current

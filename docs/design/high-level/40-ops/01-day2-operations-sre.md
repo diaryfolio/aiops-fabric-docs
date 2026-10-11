@@ -94,6 +94,25 @@ Review GPU saturation, batching, KV-cache pressure, database index health, queue
 
 ## Operational readiness gate
 
+### Planned business-channel operations
+
+For the [Sales/CRM channel route](../10-overall/07-input-output-channels.md#failure-deployment-and-operational-requirements),
+assign Sales rule ownership, CRM data/query ownership and platform route/connector on-call. Measure
+resolution, query, generation and delivery latency separately under one bounded request deadline.
+Agree freshness and completeness objectives and cap Oracle scans/concurrency; no numeric production
+SLO is claimed by the design. Monitor channel/route/tool revision, denial, timeout, stale source,
+schema drift, truncation and delivery failure without SQL or CRM payloads in standard telemetry.
+
+Disable the route on suspected leakage, revoke connector access and preserve safe evidence. Roll
+back policy/rule/mapping revisions independently. Back up catalog metadata through governance/MCP
+owners, then revalidate admission and bindings before restoring traffic; CRM owns Oracle recovery.
+Long scans require cancellable durable operations and current authorisation at delivery. Test
+credential rotation, source outage, query cancellation, load limits, evidence completeness and
+route disable/rollback before promotion. These operations are planned; no channel controller,
+production metrics, reliable evidence export or CRM acceptance ships from this design revision.
+
+### Common readiness requirements
+
 No production provider is enabled until it has ownership/on-call, dashboard and alerts, SLO, capacity test, failure-mode test, security review, data-flow record, backup/restore where stateful, credential rotation, and rollback/disable instructions.
 
 Provider readiness is represented by an expiring passport plus evaluation/admission records. The

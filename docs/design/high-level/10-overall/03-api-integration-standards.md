@@ -69,6 +69,17 @@ token directly.
 
 ## Compatibility
 
+The planned [channel contracts](07-input-output-channels.md#proposed-headless-contracts) add
+governance-owned Input/Output Channel and route APIs plus opt-in response/tool context. Public
+channel IDs are untrusted selection hints. Internal grants bind verified tenant/subject, purpose,
+route/revision, action, account/field policy, expiry and budgets using a versioned authenticated
+delegation extension; unsigned metadata is not authorisation. Trust Envelope v1 does not enforce
+these fields today. Typed opportunities include rule/source versions, supporting facts, missing
+inputs, freshness and complete/partial/unavailable coverage. Machine-readable schemas and runtime
+validation must ship in the implementation repository before these APIs are marked implemented.
+Old clients retain their existing path; an explicitly denied/unavailable channel cannot silently
+fall back to memory or a different CRM. Route grants never broaden across a downstream hop.
+
 - Additive optional fields are backward compatible.
 - Removing/renaming fields, changing defaults, or narrowing accepted values requires a new major version.
 - Unknown response fields must be ignored by consumers.

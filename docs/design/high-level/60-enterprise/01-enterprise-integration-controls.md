@@ -40,6 +40,14 @@ implemented by the reference.
 | lifecycle | tenant/provider onboarding, offboarding, export, deletion | idempotent admin APIs and GitOps workflows | complete offboarding and credential/data cleanup evidence |
 | provider admission | expiring passports, capabilities, evaluations, residency, provenance and revocation | provider passport/evaluation APIs plus policy decision | expired/revoked/unevaluated provider cannot receive new traffic |
 | execution evidence | payload-minimized lineage and decision events | append-only evidence API and immutable export | reconstruct route/policy/approval sequence without sensitive payloads |
+| business channels | verified Input membership, governed Output routes, account/field policy and authorised reply delivery | channel/route APIs and authenticated context; isolated enterprise connector | Sales → CRM-Logistics1 headless/chat equivalence; forged channel/account, revoked route, injection and shared-recipient denial |
+
+The [Input/Output Channel design](../10-overall/07-input-output-channels.md) defines this new
+acceptance boundary. Channel APIs, Tool-Sense routing from chat, Oracle business tools and Teams
+entry/delivery are planned. Existing OIDC, MCP registration and provider admission APIs alone do
+not satisfy it. Sales/CRM owners must approve semantic mappings, opportunity rules, freshness and
+per-user account scope; evidence must distinguish a complete empty result from missing coverage.
+The model may explain approved facts but cannot invent entitlements, discounts or numeric savings.
 
 ## Target JSON log schema
 

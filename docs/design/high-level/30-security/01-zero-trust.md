@@ -70,6 +70,31 @@ MCP servers and returned content are untrusted. Controls include exact HTTPS hos
 
 ## AI-specific threats
 
+### Planned channel and CRM trust boundary
+
+The [channel design](../10-overall/07-input-output-channels.md) adds tenant-bound Input membership,
+Output/action policy and account/field entitlement enforcement. A Sales label, Teams room name or
+bot application token is never proof of human membership or CRM access. Verify sender mapping and
+transport replay protections at entry; bind grants to current subject, route/revision, purpose,
+expiry and data policy at every hop. Recheck revocations before tool execution, resumed work and
+delivery. Current scoped tokens and Trust Envelope v1 do not implement these channel grants.
+
+The isolated CRM connector holds only read access to owner-approved Oracle views/procedures over
+encrypted, authenticated transport. Apply trusted tenant/account predicates and field restrictions
+before joins, aggregation and model exposure. Reject arbitrary SQL, tool/URL substitution and
+caller-widened account filters; use bound parameters and bounded approved templates. CRM text is
+untrusted data, not executable instructions. Validate response facts against tool evidence.
+
+Prevent reply exfiltration: bind delivery to the verified sender/session; block restricted results
+in shared conversations with unauthorised recipients or deliver an access-controlled reference.
+Disable CRM memory persistence in the first slice. Negative tests must cover forged channels,
+cross-tenant/account access, cursor scope, SQL/prompt injection, revoked decisions, policy outage,
+unauthorised room participants, forged callbacks/replies, read-to-write escalation and PII canaries.
+Connector-only credentials and live allowed/denied network probes are promotion gates. All controls
+in this subsection remain planned; this documentation change grants no runtime access.
+
+### Common AI threats
+
 - Prompt injection: retrieved/tool content is marked as data, tools are authorized independently of model output, and high-risk actions require deterministic policy or approval.
 - Data exfiltration: outbound providers are chosen by data policy; payload logging is off by default; egress is deny-by-default.
 - Cross-tenant retrieval: tenant predicates, provider-level isolation, negative tests, and post-retrieval policy filters.

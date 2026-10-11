@@ -15,6 +15,13 @@ These schemas are the portable boundary between independently replaceable compon
 
 Schemas are versioned rather than silently changed. Breaking field or semantic changes require a new major contract and migration plan.
 
+The planned [Input/Output Channel contracts](../design/high-level/10-overall/07-input-output-channels.md#proposed-headless-contracts)
+require channel catalog, route/policy, authenticated execution-context and opportunity-result
+schemas before implementation promotion. Those schemas do not ship yet. Target API examples in
+the design are not runtime contracts, and existing `metadata` or Trust Envelope v1 fields cannot
+grant channel/action/account permissions. Implement additive opt-in fields with old-client
+compatibility and explicit denial for unauthorised or unavailable channel routes.
+
 `model-test-request-v1.schema.json` is an additive opt-in administrative contract for installed-model
 decision, embedding and text-chat previews. It accepts a selected model only at `/v1/model-tests`,
 requires `provider.admin`, and never changes saved configuration or memory profiles. Conditional

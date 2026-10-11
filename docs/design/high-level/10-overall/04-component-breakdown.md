@@ -122,6 +122,17 @@ immutable audit sink.
 
 ## Repository module boundary
 
+### Planned channel ownership
+
+The [channel/module responsibility matrix](07-input-output-channels.md#integration-with-the-existing-modules)
+extends existing owners: governance owns channel/route metadata in its current state domain;
+identity owns memberships; edge verifies the Input and reply binding; orchestrator resolves the
+route; Tool-Sense uses the MCP gateway's registered Output connector; the CRM owner owns Oracle
+facts and semantic mappings. Only the connector holds Oracle credentials. No channel-specific
+database or additional Tool-Sense service is introduced. These APIs and runtime calls are planned.
+Memory, ingestion, agents and workflows must preserve channel/source/account policy and recheck
+revocation; their current APIs do not yet provide this complete channel contract.
+
 Runtime implementations remain small, independently deployable Python packages under `src/viewsense_*`; they are not nested inside deployment packaging. The `fabric/<capability>/` directories are the machine-readable installable catalog. Every capability directory contains a `module.json` descriptor and README that declare maturity, owned contracts, implementation paths, Helm selection paths, data ownership, and bundled/external provider choices. `fabric/module.schema.json` defines the descriptor format and the catalog conformance test rejects missing, undocumented, or dangling module entries.
 
 This separation avoids coupling application source layout to Helm or a future operator while ensuring packaging folders are executable metadata rather than placeholders. A `contract-only` catalog entry is deliberately visible but cannot be represented as implemented; Helm and documentation must retain the same maturity statement.
