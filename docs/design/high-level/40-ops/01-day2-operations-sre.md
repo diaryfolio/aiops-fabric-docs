@@ -217,6 +217,9 @@ flowchart LR
 
 ## Local embedding profiles and GUI operation
 
+Open **AI Workspace → Model test lab** for model testing. The **Open test lab** heading button
+appears only within that workspace; Control Plane pages and Test history omit it.
+
 The development console shows actual dependency health separately from repository capability.
 `memory_embeddings` retains model/revision/dimension profiles while the legacy 64-d column remains
 available for rollback. Real writes are atomic with records; queries fail with 409 when an owner's
