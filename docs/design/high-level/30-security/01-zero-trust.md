@@ -33,6 +33,20 @@ token subject is a production integration, not current application behavior.
 
 ## Identity
 
+Design contracts use **Authentication and Identity Provider (AuthN Provider)** and
+**Authorisation Policy Provider (AuthZ Provider)** as separate replaceable capabilities, with an
+Identity Entitlement Adapter for verified roles/current membership. Keycloak and OPA are examples.
+Product-specific claims, administration credentials and policy syntax remain inside adapters;
+framework roles and qualified channel grants remain governance-owned. A successful login never
+substitutes for a resource decision. See the
+[neutral provider contracts](../10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
+Provider changes require reviewed trust/source mappings and explicit verified subject linkage;
+matching usernames or `sub` strings across issuers cannot establish identity. Conforming AuthZ
+providers must preserve deny precedence, complete-grant semantics and obligations. Unsupported
+freshness/assurance, invalid decisions, unknown obligations and mandatory-provider outage deny;
+never fall back to the development issuer or a permissive policy implementation.
+
 Human identity federates to the enterprise IdP using OIDC Authorization Code + PKCE or workload-appropriate OAuth flows. Workloads receive renewable, short-lived identities through SPIFFE/SPIRE, service mesh, or cloud workload identity. Application tokens have exact `aud`, narrow scopes, expiry, unique ID, and issuer. Shared bearer tokens, namespace trust, and long-lived API keys are prohibited.
 
 The development issuer uses client credentials and RS256 plus a generated CA to make these properties testable. It is not an enterprise IdP and must not be promoted. At the edge, the external OIDC verifier pins an HTTPS issuer and JWKS URL, exact audience, supported signature algorithms, required scopes, subject, and configured tenant claim. Keycloak is one compatible IdP, not a mandatory control-plane component. JWKS/IdP unavailability fails authentication closed.
@@ -69,6 +83,52 @@ Evidence APIs accept payload-minimized metadata only. Append-only API semantics 
 MCP servers and returned content are untrusted. Controls include exact HTTPS host allow-lists, signed/approved server descriptors, schema validation, bounded payload/time, side-effect classification, human approval for consequential actions, response content isolation, SSRF/DNS rebinding protection, separate credentials, and immutable invocation audit. A catalog record is not execution approval.
 
 ## AI-specific threats
+
+### Planned channel and CRM trust boundary
+
+The [channel design](../10-overall/07-input-output-channels.md) adds tenant-bound Input membership,
+Output/action policy and account/field entitlement enforcement. A Sales label, Teams room name or
+bot application token is never proof of human membership or CRM access. Verify sender mapping and
+transport replay protections at entry; bind grants to current subject, route/revision, purpose,
+expiry and data policy at every hop. Recheck revocations before tool execution, resumed work and
+delivery. Current scoped tokens and Trust Envelope v1 do not implement these channel grants.
+
+The isolated CRM connector holds only read access to owner-approved Oracle views/procedures over
+encrypted, authenticated transport. Apply trusted tenant/account predicates and field restrictions
+before joins, aggregation and model exposure. Reject arbitrary SQL, tool/URL substitution and
+caller-widened account filters; use bound parameters and bounded approved templates. CRM text is
+untrusted data, not executable instructions. Validate response facts against tool evidence.
+
+Prevent reply exfiltration: bind delivery to the verified sender/session; block restricted results
+in shared conversations with unauthorised recipients or deliver an access-controlled reference.
+Disable CRM memory persistence in the first slice. Negative tests must cover forged channels,
+cross-tenant/account access, cursor scope, SQL/prompt injection, revoked decisions, policy outage,
+unauthorised room participants, forged callbacks/replies, read-to-write escalation and PII canaries.
+Connector-only credentials and live allowed/denied network probes are promotion gates. All controls
+in this subsection remain planned; this documentation change grants no runtime access.
+
+### Common AI threats
+
+The [qualified role/grant model](../10-overall/08-channel-consoles-role-mapping.md#effective-authorisation-and-enforcement)
+requires exact issuer/tenant/client-role-source mapping, Input entry and a complete Output grant
+for the requested route/action/accounts. Broad scopes cannot bypass it, including direct MCP
+calls. Multiple roles must not combine one grant's action with another's account scope. Enforce
+bounded authoritative role freshness, monotonic emergency revocation and independent review for
+privilege expansion; existing POC token-expiry behaviour does not implement those controls.
+
+The [PII/company-boundary design](../10-overall/09-enterprise-ai-governance-egress.md#example-no-pii-may-leave-the-company-boundary)
+requires inspection inside the approved boundary before any external dispatch, plus an endpoint/
+payload-bound decision verified against actual adapter wire data. Inspect prompt/history and
+retrieved/tool data, not just CRM field projections. Apply the same controls to embeddings, tools,
+workflows, retries and telemetry. Unknown/uncertain classification blocks external transfer or
+uses a separately approved local route. Redaction/pseudonyms alone cannot prove anonymisation.
+Source labels impose a floor; role access cannot declassify data or override enterprise ceilings.
+
+Production acceptance adds role-source collision, grant-combination, stale-entitlement and preview
+impersonation denials, actual-wire PII canaries, malformed/expired egress permits, post-translation
+payload changes, policy/detector/evidence failure and direct-egress bypass probes. Payload inspection,
+hard-budget reservations and these runtime checks remain planned; documentation or existing
+NetworkPolicy/HTTPS alone cannot establish containment.
 
 - Prompt injection: retrieved/tool content is marked as data, tools are authorized independently of model output, and high-risk actions require deterministic policy or approval.
 - Data exfiltration: outbound providers are chosen by data policy; payload logging is off by default; egress is deny-by-default.

@@ -40,6 +40,25 @@ implemented by the reference.
 | lifecycle | tenant/provider onboarding, offboarding, export, deletion | idempotent admin APIs and GitOps workflows | complete offboarding and credential/data cleanup evidence |
 | provider admission | expiring passports, capabilities, evaluations, residency, provenance and revocation | provider passport/evaluation APIs plus policy decision | expired/revoked/unevaluated provider cannot receive new traffic |
 | execution evidence | payload-minimized lineage and decision events | append-only evidence API and immutable export | reconstruct route/policy/approval sequence without sensitive payloads |
+| business channels | verified Input membership, governed Output routes, account/field policy and authorised reply delivery | channel/route APIs and authenticated context; isolated enterprise connector | Sales → CRM-Logistics1 headless/chat equivalence; forged channel/account, revoked route, injection and shared-recipient denial |
+| framework role mapping | exact external role source to framework role; Input entry and qualified Output capability/data grants | governance role/mapping/grant APIs, versioned decisions and current IdP entitlements | issuer/client/tenant collision, multi-role scope mixing, stale-role, draft/self-approval and direct-tool deny tests |
+| company-boundary/PII enforcement | inspect before external dispatch and after final wire transformation; deny uncertain transfer | local inspection and payload/destination-bound egress decision with bypass-resistant adapter/network boundary | receiver-observed PII canaries across prompts/history/tools/embeddings/retries/logs; policy/detector outage denies |
+| hard spend controls | atomic reservation before dispatch and measured usage reconciliation | budget-policy/ledger and adapter usage contracts | concurrent exhaustion, duplicate/retry/uncertain-charge and unknown-price handling |
+
+The [Input/Output Channel design](../10-overall/07-input-output-channels.md) defines this new
+acceptance boundary. Channel APIs, Tool-Sense routing from chat, Oracle business tools and Teams
+entry/delivery are planned. Existing OIDC, MCP registration and provider admission APIs alone do
+not satisfy it. Sales/CRM owners must approve semantic mappings, opportunity rules, freshness and
+per-user account scope; evidence must distinguish a complete empty result from missing coverage.
+The model may explain approved facts but cannot invent entitlements, discounts or numeric savings.
+
+ViewSense AI® is the target governance layer between enterprise users/apps and selected AI models/
+services. See [channel consoles/role mapping](../10-overall/08-channel-consoles-role-mapping.md) and
+[AI governance/egress](../10-overall/09-enterprise-ai-governance-egress.md). OpenAPI and canonical
+adapters contain ordinary provider changes within the platform, subject to semantic/quality/data
+policy gates. Full PII containment, qualified runtime authorisation, hard spending and acknowledged
+immutable audit remain planned. Existing scopes, passport APIs and field minimisation are foundations,
+not evidence that these enterprise matrix rows pass.
 
 ## Target JSON log schema
 
@@ -79,14 +98,27 @@ Secrets, tokens, authorization headers, raw prompts/completions, memory content,
 
 ## SSO and identity boundary
 
+Architecture names capabilities, not required products: **AuthN Provider** for authentication/
+identity assertions, **Identity Entitlement Adapter** for current membership and **AuthZ Provider**
+for canonical resource-policy decisions. The selected providers remain replaceable while
+governance owns framework role/channel policy. A combined product must conform separately to
+each capability contract. See the [provider-neutral role design](../10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
 The edge validates external enterprise tokens against configured issuer/JWKS and maps stable subject, tenant, groups, authentication strength, and session risk. Internal services never accept human tokens as workload identity; the edge performs controlled delegation with a short-lived audience token. SCIM may automate user/group provisioning, but authorization remains based on current verified claims and policy. Break-glass identity is separate, time-bound, approval-gated, and always audited.
 
-Keycloak is an approved integration choice, not part of the mandatory core. Use the official
-Keycloak Operator or an existing enterprise service, then configure only issuer/JWKS/audience/claim
-mapping in ViewSense AI®. SPIRE is similarly operated at cluster scope. OPA is suited to a local sidecar
+For example, the reference AuthN integration uses Keycloak's OIDC interface and an independently
+operated instance; its operator/realm/role-mapper details belong in the example integration guide.
+Other providers use their own adapters and the same canonical identity/mapping requirements.
+SPIRE is similarly an example workload-identity product operated at cluster scope. OPA is an
+example AuthZ integration suited to a local sidecar
 for low-latency fail-closed decisions, while a centrally managed external OPA endpoint is appropriate
 only when its availability, mTLS, egress, and policy-bundle lifecycle meet the protected operation's
 SLO.
+
+Acceptance must prove issuer/assertion-source isolation, explicit identity linkage, current
+entitlements and role mapping across two identity adapters, plus equivalent allow/deny/obligation
+semantics across selected policy evaluators. No product name or shared token syntax substitutes
+for these checks; full replaceability remains planned.
 
 ## Suite selection rule
 

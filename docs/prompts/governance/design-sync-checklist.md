@@ -21,8 +21,11 @@ Use this checklist for every PR that touches code, infrastructure, or platform b
 
 ## Traceability
 
+- [ ] Agent edits remain unstaged and uncommitted; the owner performs Git staging, commits and
+  pushes manually. Pending manual commit references are identified in the handoff, not fabricated.
 - [ ] All documentation updates are in `aiops-fabric-docs`, with paired implementation
-  and documentation commits/PRs recorded; no narrative docs were added to `aiops-fabric`.
+  and documentation changes prepared for the owner's manual commits/PRs (or their references
+  recorded when available); no narrative docs were added to `aiops-fabric`.
 - [ ] I listed all code areas changed.
 - [ ] I listed all design docs changed.
 - [ ] I wrote an Architecture Delta summary.

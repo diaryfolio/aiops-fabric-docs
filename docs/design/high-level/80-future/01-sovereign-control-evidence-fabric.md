@@ -4,6 +4,14 @@
 
 ViewSense AI® is a sovereign AI control fabric. It does not compete with model, memory, workflow, or observability products; it owns the portable trust, policy, admission, routing, and evidence layer that keeps those products replaceable.
 
+The [enterprise AI governance design](../10-overall/09-enterprise-ai-governance-egress.md) makes
+this position concrete for enterprise users/apps: canonical provider interfaces plus identity,
+qualified resource policy, guardrails, company-boundary/PII egress, budgets and safe evidence.
+[Framework roles/channel consoles](../10-overall/08-channel-consoles-role-mapping.md) map approved
+IdP roles to Input entry and Output capability/data grants. Runtime payload checks, hard-budget
+reservations, current entitlement enforcement and complete immutable audit remain planned. Do not
+infer them from existing passport/envelope APIs or OpenAPI descriptions.
+
 ```mermaid
 flowchart TB
     Experience["Experience APIs"] --> Control["Sovereign control<br/>policy, admission, routing"]

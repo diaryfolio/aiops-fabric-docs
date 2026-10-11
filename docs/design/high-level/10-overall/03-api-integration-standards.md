@@ -16,6 +16,9 @@
 | durable agent runs | `/v1/agent-runs`, `:resume`, `:cancel`, `/events` | idempotent create, optimistic version and ordered safe events |
 | synchronous ingestion | `POST /v1/documents:ingest` | paragraph chunking and memory writes; no durable job resource yet |
 | development identity | `POST /oauth2/token` | development-only client credentials and Trust Envelope minting |
+| framework/channel authorisation | Governance role/mapping/binding/grant and policy decision APIs | Planned; [headless contracts](08-channel-consoles-role-mapping.md#planned-headless-apis-and-contracts) preserve legacy external-role scope fields |
+| identity and policy provider adapters | Canonical verified-identity, current-entitlement and authorisation decision contracts | Planned [AuthN/AuthZ contracts](08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation); provider-specific protocols/claims remain behind adapters |
+| payload/egress and cost decisions | Versioned inspection, payload-bound permit and budget reservation/reconciliation contracts | Planned; see [governance requirements](09-enterprise-ai-governance-egress.md) |
 | long operations | operation resources plus CloudEvents | planned |
 | health | `/healthz` | must reveal no tenant/provider secrets |
 
@@ -69,6 +72,17 @@ token directly.
 
 ## Compatibility
 
+The planned [channel contracts](07-input-output-channels.md#proposed-headless-contracts) add
+governance-owned Input/Output Channel and route APIs plus opt-in response/tool context. Public
+channel IDs are untrusted selection hints. Internal grants bind verified tenant/subject, purpose,
+route/revision, action, account/field policy, expiry and budgets using a versioned authenticated
+delegation extension; unsigned metadata is not authorisation. Trust Envelope v1 does not enforce
+these fields today. Typed opportunities include rule/source versions, supporting facts, missing
+inputs, freshness and complete/partial/unavailable coverage. Machine-readable schemas and runtime
+validation must ship in the implementation repository before these APIs are marked implemented.
+Old clients retain their existing path; an explicitly denied/unavailable channel cannot silently
+fall back to memory or a different CRM. Route grants never broaden across a downstream hop.
+
 - Additive optional fields are backward compatible.
 - Removing/renaming fields, changing defaults, or narrowing accepted values requires a new major version.
 - Unknown response fields must be ignored by consumers.
@@ -77,6 +91,15 @@ token directly.
 - A deprecated major version has a published support window and telemetry-backed migration plan.
 
 ## Provider capability discovery
+
+[Canonical adapter and model-switch requirements](09-enterprise-ai-governance-egress.md#canonical-interfaces-and-provider-transformations)
+distinguish OpenAPI (HTTP contract description) from the supported OpenAI-compatible inference
+subset. Provider transformations preserve approved data/identity boundaries, capabilities, safe
+errors and usage semantics. Inspect the assembled context and the final translated wire payload;
+an adapter transformation must not invalidate a privacy/egress decision. A provider switch must
+pass the same consumer contract plus semantic/quality/residency/cost gates. Embedding changes
+require profile migration. These full guarantees are planned; syntax compatibility alone is not
+replaceability or governance enforcement.
 
 Each adapter must declare model/context limits, streaming, tool calling, structured output, embedding dimensions, memory filters, export/import, and residency attributes. Routing evaluates required capabilities before cost or latency. Silent feature emulation is prohibited when it changes safety or correctness.
 

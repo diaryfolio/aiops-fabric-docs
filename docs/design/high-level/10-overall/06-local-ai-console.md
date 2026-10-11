@@ -219,7 +219,10 @@ identity, model quality and public slow-chat deadline gaps remain production gat
 
 The landing page becomes **Platform overview**, with a persistent environment/tenant context and
 suite selector. Primary navigation: **Overview & suites**, **AI & models**, **Identity & access**,
-**Certificates**, **Observability**. The AI area retains capability drill-down and the model test
+**Input Channels**, **Output Channels**, **Certificates**, **Observability**. Input/Output
+workspaces and the new Identity role/mapping tabs are planned in the
+[channel console design](08-channel-consoles-role-mapping.md#console-pages); existing workspaces
+retain their current maturity. The AI area retains capability drill-down and the model test
 lab. Identity presents configured IdPs, verified identity and role policy; IdP user/MFA management
 links to its own administrative surface. Certificates shows inventory, expiry, controller readiness
 and explicit renewal. Observability shows API reachability, session test evidence and certificate
@@ -238,6 +241,23 @@ realm import. It is independently operable from the harness/GUI. Production uses
 Keycloak Operator and a HA database; the embedded POC database is not a production deployment.
 Navigation uses shareable URLs (`?page=overview|ai|identity|certificates|observability`) so each
 management area can be bookmarked while keeping the frontend a detachable API client.
+
+Planned `?page=input-channels` and `?page=output-channels` pages manage channel metadata and
+role bindings/grants through governance APIs. Identity adds Framework roles, Identity mappings and
+separate Authentication/Authorisation provider views. The selected identity system owns user/group
+assignments; Keycloak is an example POC adapter. Input Entry roles controls context admission; Input
+Output access is a derived view of the Output grant, with its authoritative editor on Output.
+CRM-Logistics1 Role grants maps **Sales CRM Logistics1** to the explicit **Read-only — Sales
+opportunities** profile, assigned-account scope and allowed Sales route. Metadata admins cannot
+grant themselves business capabilities; previews never execute tools. Draft/review/activation,
+revision conflicts and disabled/unavailable states are backend-enforced.
+
+Output Data/egress policy shows approved company boundaries, PII handling and model destinations;
+Observability shows safe route/usage/evidence state. Display configuration separately from observed
+enforcement evidence. A UI checkbox cannot establish PII containment or cost enforcement. See the
+[governance and egress contract](09-enterprise-ai-governance-egress.md). All new APIs/pages must
+work headlessly, use delegated user identity and preserve session/CSRF protection; the fixed-tenant
+development or release-preview identity cannot substitute for enterprise role administration.
 
 The Networking workspace (`?page=networking`) uses the gateway networking APIs for CNI/mesh
 selection plans, allowed service paths and timestamped enforcement evidence. It shows the actual

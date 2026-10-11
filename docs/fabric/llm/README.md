@@ -17,3 +17,17 @@ The OpenAI adapter is selected with `profiles/openai.yaml`. Only that pod receiv
 `openai-credentials` Secret; it accepts the internal mTLS/scoped-token contract, fixes the configured
 model server-side, minimizes outbound fields, and normalizes upstream errors without returning
 credential-bearing diagnostics.
+
+## Planned canonical routing and egress governance
+
+[Enterprise AI governance](../../design/high-level/10-overall/09-enterprise-ai-governance-egress.md)
+requires policy checks on assembled prompts/history/CRM/RAG data before external dispatch, then
+validation of the actual translated wire payload and approved provider/model endpoint inside the
+adapter. Unknown/uncertain PII disposition blocks external transfer or uses an approved local route.
+Existing adapter field minimisation is not a PII detector or a payload-bound egress decision.
+
+OpenAPI describes the canonical HTTP interface; the OpenAI-compatible subset is one inference
+protocol. Provider adapters translate native APIs and normalise safe responses/errors/usage.
+Model swaps keep ordinary client contracts but require capability, semantic/quality, residency,
+privacy and cost acceptance. Embedding changes require profile migration. Full dynamic admission/
+routing, inspection/egress permits, atomic budgets and complete audit evidence remain planned.

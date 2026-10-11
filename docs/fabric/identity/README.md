@@ -14,3 +14,18 @@ The identity module defines external enterprise federation and internal workload
 Keycloak is an optional OIDC provider, not part of the ViewSense AI® trust core. A future SPIRE
 integration is a cluster-scoped managed dependency, not an application sidecar bundled into every pod. See
 `deploy/integrations/keycloak.md` and `deploy/integrations/spire.md`.
+
+## Planned framework role mapping
+
+[Channel consoles and role mapping](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md)
+distinguishes IdP user/group assignment from governance-owned framework roles and channel grants.
+Verify a pinned provider/trust-source/audience/tenant assertion namespace, map exact external roles to framework
+roles, then require Input entry and qualified Output action/account/field grants. Existing
+`role_scopes` maps external names to broad API scopes; it is not this resource policy. New verified
+role extraction, provenance, bounded entitlement freshness and emergency revocation remain planned.
+The selected AuthN Provider and Identity Entitlement Adapter implement canonical verified identity/
+current entitlement contracts. The AuthZ Provider separately evaluates framework resource policy;
+governance retains role/channel catalog ownership. Product credentials and claim/administration
+translations stay in adapters. Keycloak is an AuthN example only; another conforming provider needs
+no console/CRM changes after reviewed trust, subject linkage and mapping migration. Both identity
+and policy providers must pass the [neutral contract and replacement gates](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).

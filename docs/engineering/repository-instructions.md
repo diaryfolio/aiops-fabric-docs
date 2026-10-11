@@ -3,6 +3,19 @@
 These instructions apply to every human or AI-assisted change in `aiops-fabric`
 and its companion documentation repository, `aiops-fabric-docs`.
 
+## Manual Git ownership
+
+AI agents must not stage, commit, amend commits, or push changes through Git or any equivalent
+tool/API. Leave edits unstaged and uncommitted for the repository owner to review and perform
+these operations manually. Requests to implement, fix, document, or validate work do not authorise
+Git writes. Do not ask to commit/push as a routine completion step.
+
+The paired-commit/PR and release rules below describe the owner's manual publication workflow.
+Agents prepare synchronized edits and report changed files, validation, and available baseline
+references. The owner records the paired commits/PRs after committing manually; pending manual
+commits alone do not make an otherwise synchronized working-tree change fail design sync.
+Do not create placeholder commits to satisfy traceability requirements.
+
 ## Documentation ownership
 
 All maintained documentation belongs in **`aiops-fabric-docs/docs/`**: business and
@@ -19,8 +32,9 @@ Paths beginning with `docs/` in the design-sync rules below are relative to
 `aiops-fabric-docs`. Implementation paths such as `src/`, `contracts/`, `deploy/`,
 and `fabric/*.json` are relative to `aiops-fabric`. Keep sibling checkouts for local
 design/code validation, or set `DOCS_REPO` when invoking implementation Make targets.
-Coordinate related changes across both repositories and record the paired commits
-or pull requests before merging a change that affects implementation claims.
+Coordinate related changes across both repositories. Prepare the paired-change handoff for the
+owner to record manual commits or pull requests before merging a change that affects implementation
+claims; agents must not perform those Git writes.
 
 Keep documentation free of calendar dates in headings, prose, and fixed examples. Use descriptive
 section titles; identify documentation releases and evidence baselines by explicit versions or
@@ -63,6 +77,11 @@ In the same coordinated change across the two repositories:
 
 ## Architecture rules
 
+- Name replaceable integration boundaries by capability/provider role and canonical contract,
+  such as AuthN Provider, Identity Entitlement Adapter and AuthZ Provider. Keep product-specific
+  protocols, claims, SDKs and administration inside adapters and example operating guides.
+  Product names such as Keycloak and OPA are reference implementations, not required design
+  dependencies. A combined product must still conform separately to each capability contract.
 - Use `ViewSense AI®` for the human-facing product name in prose, generated documentation,
   API titles, and operator messages. Preserve established ASCII protocol and deployment identifiers
   such as `X-ViewSense-Tenant`, `viewsense-dev`, `VS_*`, package names, image names, and URLs.

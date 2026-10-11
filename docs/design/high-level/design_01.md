@@ -45,6 +45,38 @@ has a longer bounded preview budget for the installed Qwen model. No new hop or 
 
 ## System boundaries
 
+ViewSense AI® is the target enterprise AI governance layer between enterprise users/apps and
+approved local/external models and services: identity, resource grants, guardrails, policy,
+admission, audit and cost controls operate around versioned capability contracts. The
+[enterprise AI governance design](10-overall/09-enterprise-ai-governance-egress.md) specifies
+company-boundary/PII protection before dispatch, final adapter wire-payload enforcement, cost
+reservation and safe evidence. OpenAPI describes canonical HTTP contracts; provider adapters
+translate vendor APIs. Model changes usually stay within policy/adapter configuration, subject
+to semantic, quality, data-residency and cost gates. Full runtime enforcement remains planned.
+
+Input and Output Channels are first-class **target** business routing resources. An Input Channel
+such as Sales binds verified business membership and purpose; an Output Channel such as
+CRM-Logistics1 identifies the enterprise integration accessed through Tool-Sense/MCP. Responses
+return through a verified entry-session reply binding. Governance owns channel/route metadata;
+the MCP registry owns connector bindings; CRM owns Oracle facts. This adds planned route-policy,
+delegation and connector boundaries, without creating a new service/database per channel.
+Channel routing, Teams and Oracle integration are not implemented. See the
+[channel design and practical Sales flow](10-overall/07-input-output-channels.md).
+
+The [channel consoles and role mapping](10-overall/08-channel-consoles-role-mapping.md) attach
+framework roles to Input entry and qualified Output capabilities. The selected identity system assigns external roles;
+governance owns explicit external-to-framework mappings, Input bindings, Output grants and atomic
+policy revisions. CRM action/data restrictions live on the Output grant; Input displays effective
+access. General API scopes do not grant CRM permissions. The separate pages/APIs remain planned.
+
+Authentication and Identity Providers (**AuthN Providers**) and Authorisation Policy Providers
+(**AuthZ Providers**) are separate replaceable capabilities. Identity/entitlement adapters expose
+verified canonical assertions; policy adapters evaluate canonical resource decisions against
+governance-owned framework policy. A product may implement both contracts, but selecting an
+identity product does not confer framework policy ownership. Keycloak is an AuthN example; OPA
+is an AuthZ example. Provider-specific role claims, administration and policy syntax stay behind
+adapters. See the [neutral contracts and swap gates](10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
 Documentation ownership is a repository boundary: `aiops-fabric` owns executable
 implementation, deployment resources, runtime catalogs, and machine-readable schemas;
 `aiops-fabric-docs` owns every narrative guide, architecture/design document,
@@ -117,6 +149,9 @@ sequenceDiagram
 11. [Enterprise integration and control matrix](60-enterprise/01-enterprise-integration-controls.md)
 12. [Agent runtime, ingestion, and workflow design](70-agentic/01-agent-runtime-ingestion-workflows.md)
 13. [Sovereign control and evidence fabric](80-future/01-sovereign-control-evidence-fabric.md)
+14. [Input and Output Channels](10-overall/07-input-output-channels.md)
+15. [Channel consoles and role mapping](10-overall/08-channel-consoles-role-mapping.md)
+16. [Enterprise AI governance and data egress](10-overall/09-enterprise-ai-governance-egress.md)
 
 ## Implemented reference slice
 
@@ -173,6 +208,9 @@ flowchart LR
 | Knowledge / memory gateway | `/v1/memories`, `/v1/memories/search`, `/v1/memories:reembed` | Implemented; lifecycle/export/delete and production migration jobs remain gaps |
 | Ingestion / ingestion service | `/v1/documents:ingest` | Implemented paragraph ingestion; parsing/OCR/durable job APIs remain gaps |
 | Tools / MCP gateway | `/v1/servers/{name}`, `/v1/tools/call` | Implemented registry write and custom invocation; list/delete/native MCP transport remain gaps |
+| Business channels / governance, edge and Tool-Sense | Versioned Input/Output Channel and route APIs; opt-in channel-aware response/tool contracts | Planned; no channel administration, chat-to-tool routing, Teams or CRM/Oracle adapter ships |
+| Framework authorisation / governance and edge | Framework roles, IdP mappings, Input bindings, Output grants, policy preview/decision and effective-access APIs | Planned; existing external-role-to-scope mapping is not channel/resource authorisation |
+| Payload/cost governance / capability gateways and adapters | Versioned inspection/egress decisions, budget reservation/reconciliation and safe evidence | Planned; existing adapter isolation/admission APIs do not implement PII containment or hard spend enforcement |
 | Agents / agent runtime | `/v1/agent-runs`, run read/resume/cancel/events | Implemented durable lifecycle; autonomous workers remain gaps |
 | Workflow execution / selected workflow provider | Versioned provider workflow/run APIs | Planned adapter; no GUI-owned workflow executor |
 | Provider governance / governance | passport read/write, evaluations, `:admit` | Implemented; enforcement on runtime routes remains partial |

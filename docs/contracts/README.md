@@ -15,6 +15,30 @@ These schemas are the portable boundary between independently replaceable compon
 
 Schemas are versioned rather than silently changed. Breaking field or semantic changes require a new major contract and migration plan.
 
+The planned [Input/Output Channel contracts](../design/high-level/10-overall/07-input-output-channels.md#proposed-headless-contracts)
+require channel catalog, route/policy, authenticated execution-context and opportunity-result
+schemas before implementation promotion. Those schemas do not ship yet. Target API examples in
+the design are not runtime contracts, and existing `metadata` or Trust Envelope v1 fields cannot
+grant channel/action/account permissions. Implement additive opt-in fields with old-client
+compatibility and explicit denial for unauthorised or unavailable channel routes.
+
+The [console/role uplift](../design/high-level/10-overall/08-channel-consoles-role-mapping.md#planned-headless-apis-and-contracts)
+also requires framework-role, qualified IdP-mapping, Input-binding, capability-profile, Output-grant,
+atomic policy-revision, decision and effective-access schemas. Preserve v1 provider configuration
+and legacy external `roles`/scope fields; add separately verified framework-role provenance.
+[Enterprise egress governance](../design/high-level/10-overall/09-enterprise-ai-governance-egress.md)
+requires inspection/egress-permit and budget-reservation/usage contracts tied to actual payload,
+destination and policy revisions. These machine-readable assets are planned, not present in this
+documentation repository or implemented by existing OpenAPI. Adapters must pass canonical and
+semantic/capability tests; OpenAPI and OpenAI-compatible protocol syntax are distinct concepts.
+
+[Neutral AuthN/AuthZ provider contracts](../design/high-level/10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
+require verified identity assertions, namespaced role/entitlement observations, current membership/
+revocation and canonical resource decisions with obligations. Product claim paths, user/role APIs
+and policy syntax are adapter configuration, not framework schemas. These contract families and
+replaceability evidence remain planned; the current OIDC provider schema and OPA admission boundary
+are narrower foundations. Keep existing protocol fields compatible while adding neutral envelopes.
+
 `model-test-request-v1.schema.json` is an additive opt-in administrative contract for installed-model
 decision, embedding and text-chat previews. It accepts a selected model only at `/v1/model-tests`,
 requires `provider.admin`, and never changes saved configuration or memory profiles. Conditional

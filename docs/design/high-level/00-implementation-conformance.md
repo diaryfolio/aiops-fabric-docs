@@ -10,6 +10,107 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## Product-neutral identity and policy providers (major, design-only)
+
+The [AuthN/AuthZ contract design](10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation)
+separates Authentication and Identity Provider, Identity Entitlement Adapter and Authorisation
+Policy Provider capabilities. Governance continues to own framework roles, mappings, channel
+grants and policy revisions. Canonical identity/entitlement assertions and resource decisions
+isolate provider claim layouts, administration APIs and policy syntax from console/CRM code.
+Keycloak and OPA are implementation examples, not mandatory dependencies. Existing POC evidence
+below remains product-specific evidence, not proof of provider-neutral replacement acceptance.
+
+These normalised adapter contracts, console provider views, identity-linkage migration and
+two-adapter conformance gates are planned. Current generic OIDC verification and the governance
+OPA admission boundary are foundations, not the complete channel AuthN/AuthZ contract. No
+runtime schema, API, trust configuration, provider, grant, deployment or data owner changes in
+this documentation revision. Source baselines are application `58243f5` and docs `d42ad05`;
+changes remain in the working tree for the owner's manual paired-change handoff.
+
+Validation: all 148 unit/design/catalog/security tests passed; `make lint`, base Kustomize
+rendering, the strict delegated documentation build and whitespace checks passed. No provider
+configuration changed. Provider replacement, live entitlement revocation and canonical decision
+conformance tests remain implementation acceptance work.
+
+## Channel consoles, framework roles and AI egress governance (major, design-only)
+
+The [console/role design](10-overall/08-channel-consoles-role-mapping.md) adds planned Input/Output
+workspaces, Identity role/mapping tabs, exact IdP-to-framework mapping, Input entry bindings and
+qualified Output capability grants. CRM restrictions belong to the Output grant; the Input page
+displays derived access. Governance owns role/policy resources, while the selected identity system owns external
+user/group role assignments. The existing OIDC verifier maps recognised external roles directly
+to broad platform scopes; `/v1/auth/roles` is static configuration, not a framework role catalog.
+
+The [enterprise AI governance design](10-overall/09-enterprise-ai-governance-egress.md) defines the
+layer's role between enterprise users/apps and approved models/services. It requires policy before
+external dispatch, assembled-context PII inspection, final wire-payload/endpoint validation,
+provider-neutral contracts/adapters, safe model swaps and budget/evidence controls.
+
+| Capability | Current state | Missing implementation / evidence |
+|---|---|---|
+| Input/Output console and Identity framework-role pages | planned | Headless APIs, forms, scoped mutations, safe preview, atomic draft/review/activation and UI tests |
+| Qualified external mapping and channel/resource grants | planned | Schemas, verified role-source extraction separate from legacy `role_scopes`, tenant/resource enforcement and direct-tool negative tests |
+| Current role freshness/revocation | planned | Authoritative role refresh/feed, configured 60-second pilot assertion-age bound, monotonic deny epoch and mid-run/delivery tests; existing POC changes wait for token reissue/expiry |
+| Canonical provider API foundation | implemented subset | FastAPI OpenAPI and mock/OpenAI/Ollama translations exist; full capability discovery, snapshots, semantic replaceability and provider conformance remain gaps |
+| Company-boundary and PII egress enforcement | planned | Local inspection/minimisation, payload-bound decision and final adapter enforcement, bypass prevention and actual-wire canary tests across all outbound capabilities |
+| Runtime admission, guardrail and channel policy enforcement | planned extension | Governance admission APIs exist but runtime model/tool routes do not enforce this full policy chain |
+| Hard cost limits | planned | Governance budget ledger/reservations, trusted usage/pricing reconciliation, concurrency/retry/idempotency and uncertain-call evidence |
+| Production auditability | partial foundation | Safe append-only evidence API exists; complete acknowledged dispatch/outcome delivery and independent immutable export remain gaps |
+
+This revision changes narrative design and navigation only: no executable schema, route, scope,
+manifest, grant, provider configuration, Keycloak assignment, deployment or database changes.
+No PII containment, hard-spend or model-equivalence guarantee is claimed from documentation.
+A local-only Sales pilot is the implementation starting point until external egress gates pass.
+
+Source pairing: application baseline `9e561e0df65f9e9f42dd9fc6b5a2b5f0d0adf241`, documentation
+parent `7d3be8481785741f5ae6db62ff5c0034be7a63d0`; the documentation commit containing this
+section is the paired design revision. Runtime, identity-provider role freshness, PII and console
+acceptance remain pending; no new application commit is required for this design-only revision.
+
+Design-revision validation: all 148 unit/design/catalog/security tests passed; `make lint`, base
+Kustomize rendering, strict delegated documentation build and whitespace checks passed. New
+designs are included in published navigation and balanced Mermaid checks. Runtime deployment,
+external identity role mutation, wire-level PII tests, hard-cost enforcement and new-page browser QA are
+not claimed by these source checks and remain implementation acceptance work.
+
+## Input and Output Channels (major, design-only)
+
+The [channel design](10-overall/07-input-output-channels.md) introduces planned tenant-scoped
+Input Channels (business requester context), Output Channels (enterprise integration targets),
+versioned routes, authenticated narrowed execution context, and verified entry-session replies.
+The practical target is Sales → CRM-Logistics1 through Tool-Sense, with a read-only Oracle
+connector and evidence-based opportunity rules. Governance is the proposed channel/route metadata
+owner; MCP owns tool bindings; CRM retains its database and business-data ownership.
+
+| Capability | Current state | Missing evidence / implementation |
+|---|---|---|
+| Input/Output Channel and route resources | planned | Schemas, governance administration/resolution, scoped policy and revision/revocation enforcement |
+| Channel-aware delegation and account/field controls | planned | Versioned authenticated context and negative identity/account/field tests; Trust Envelope v1 is insufficient for channel grants |
+| Chat → Tool-Sense → Output routing | planned | Orchestrator/governance/MCP integration, configuration, grants, network rules and grounded-response validation |
+| CRM-Logistics1 / Oracle opportunities | planned | Credential-isolated adapter, owner-approved query mappings/rules and live read-only correctness/isolation evidence |
+| Teams entry and authorised delivery | planned | User mapping, replay protection, private/shared recipient checks and headless equivalence |
+| Agent/workflow/ingestion channel integration | planned | Context propagation, resume/callback reauthorisation and source/ACL/freshness controls |
+
+No runtime route, contract schema, deployment resource, permission or database is changed by this
+documentation revision. Existing executable diagrams and HTTP surfaces below remain the reference
+truth: the orchestrator calls memory/LLM only; orchestrator-to-MCP network access remains denied.
+Do not infer routing from arbitrary request metadata or native MCP support from Tool-Sense naming.
+The pilot must disable CRM conversation persistence until channel/account ACL and retention tests
+exist; current `remember` defaults and memory owner filters are not that implementation.
+
+Source pairing: this design-only revision is assessed against application commit
+`9e561e0df65f9e9f42dd9fc6b5a2b5f0d0adf241` and documentation parent
+`67a377dee4141109073b4aaf8738300ec695e605`. The documentation commit containing this section is
+the paired design revision; no implementation commit is needed until the planned slice changes
+executable assets. Documentation validation evidence is recorded with that revision; none is live
+CRM, Teams or channel acceptance. Existing production gaps remain.
+
+Validation of the design revision: `make unit` passed all 148 tests, including route/conformance
+and balanced-design-diagram checks; `make lint`, base Kustomize rendering and the strict delegated
+documentation build passed. These are source/documentation checks. Live Kubernetes deployment,
+channel policy, Oracle business queries and Teams delivery are not exercised by this design-only
+change and remain acceptance work for the implementation slice.
+
 ## Manual release automation (major)
 
 The application `.github/workflows/release.yml` accepts a plain three-part version and an immutable

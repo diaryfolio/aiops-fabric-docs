@@ -87,6 +87,25 @@ sequenceDiagram
 
 ## Target failure rules
 
+### Planned channel request path
+
+The [Input/Output Channel flow](07-input-output-channels.md#practical-sales-flow) adds verified
+business context at the edge, governance route resolution, and bounded orchestrator-to-MCP tool
+execution. For Sales, the CRM-Logistics1 connector queries its owner's Oracle views and returns
+authorised evidence-backed opportunities; the final answer returns to the initiating verified
+chat/API session. These calls are planned and require new explicit grants/network rules. Channel
+selection is a policy decision, never a prompt-selected tenant, URL or tool. No current solid
+edge above changes, and the existing orchestrator-to-MCP deny policy remains in force.
+
+Resolve the [qualified role/grant decision](08-channel-consoles-role-mapping.md) before retrieval/
+tool execution. Before each model/provider call, inspect the assembled authorised context and apply
+[company-boundary/PII, cost and egress policy](09-enterprise-ai-governance-egress.md). The credential
+adapter validates the final translated wire payload/endpoint, preventing transformations from
+bypassing the decision. Runtime role/egress/cost enforcement edges remain planned; the existing
+memory/LLM-only path does not enforce this new chain.
+
+### Common dependency rules
+
 The reference clients enforce bounded timeouts and do not silently fall back across providers.
 Shared retry, jitter, circuit-breaker, and end-to-end deadline-budget behavior is not yet shipped.
 
