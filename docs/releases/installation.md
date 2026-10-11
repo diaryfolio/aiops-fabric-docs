@@ -27,6 +27,12 @@ Each bundle includes `images.tar` containing the application, PostgreSQL and pgv
 Generated credentials are never packaged. The application API contract versions remain
 independent of the distribution version.
 
+GitHub also supplies **Source code (zip)** and **Source code (tar.gz)** archives of the tagged
+repository. These contain source files, tests, build scripts and agent guidance such as
+`CLAUDE.md` and `AGENTS.md`; they are not the installation bundles. Download a named
+`viewsense-<version>-linux-<architecture>.tar.gz` asset for installation. The container image
+itself contains readable Python application source; container packaging does not hide that code.
+
 ## Prerequisites
 
 - Kubernetes 1.28 or newer with ready nodes of the selected architecture, working DNS and
@@ -238,8 +244,11 @@ generated version changes.
 
 One-time configuration in `diaryfolio/aiops-fabric`:
 
-1. Enable GitHub Actions for the repository. The upload job requests `contents: write` for
-   application tags and releases; validation/build jobs have `contents: read`.
+1. Enable GitHub Actions for the repository. The request and upload jobs request `contents: write`:
+   the request job needs push access to see unpublished drafts but makes only read calls; the
+   upload job creates application tags and releases. Build jobs have `contents: read`.
+   GitHub provides these jobs' `GITHUB_TOKEN` automatically and passes it as `GH_TOKEN`;
+   no additional application token or secret is required.
 2. Add an Actions repository secret named `RELEASE_DOCS_TOKEN`. Use a fine-grained token restricted
    to `diaryfolio/aiops-fabric-docs`, with **Contents: Read and write**. It checks out the pinned docs
    and creates the matching docs tag. The application `GITHUB_TOKEN` cannot access/tag a separate
@@ -260,6 +269,10 @@ The separate upload job verifies archive checksums, safely extracts bundles and 
 internal contents and exact clean source commits. It then creates matching `v<version>` tags in
 both repositories and attaches five downloads to a **draft** application GitHub Release. Review
 the draft in the application repository's **Releases** tab, then publish it explicitly.
+Draft discovery uses the authenticated release list matched by `tag_name`, including pagination;
+final verification fetches the release by ID. GitHub's `releases/tags/<tag>` endpoint finds
+published releases and can return HTTP 404 for an existing draft. Multiple matching releases
+require manual review rather than choosing one or creating another.
 The workflow does not deploy to a Kubernetes cluster or establish CNI/model-quality
 acceptance; the [namespace acceptance procedure](#acceptance-and-inspection) remains required.
 
@@ -271,6 +284,28 @@ and a published release is never changed. A fresh rebuild may have different arc
 use it to replace an incomplete draft's existing downloads. If the retained artifact has expired,
 review recovery manually or choose a new version. Partial paired tag creation can be retried only
 with the same source commits.
+
+If the upload command returned a draft URL and then failed with a tag-lookup HTTP 404, first
+inspect that draft: its attachments may already be complete. Rerunning an old Actions job uses
+the old source and does not pick up an uploader fix. To verify or resume the original downloads,
+use the corrected uploader with the original retained artifact, not a rebuild. From the corrected
+application checkout, with GitHub CLI authenticated and the original version tags fetched in
+both repositories, choose a fresh destination and run:
+
+```sh
+gh run download <original-run-id> --repo diaryfolio/aiops-fabric \
+  --name release-1.0.1 --dir /tmp/viewsense-release-recovery
+python3 scripts/release/ci.py extract --repo diaryfolio/aiops-fabric \
+  --assets /tmp/viewsense-release-recovery
+python3 scripts/release/github.py --repo diaryfolio/aiops-fabric \
+  --assets /tmp/viewsense-release-recovery --resume-draft
+```
+
+Keep the trigger version matching the downloaded artifact. The uploader checks both original
+tags against the bundle's source commits, verifies existing attachments byte for byte, adds
+only missing identical files and leaves publication manual. Never move a version tag to the
+corrected uploader commit. A new corrected workflow run can skip a completed draft without
+building again, but cannot retroactively change the failed run's result.
 
 This automation requires repository setup and its first remote Actions run; local validation
 does not claim that GitHub has created a release. It preserves the prepared local 1.0.1 bundles.

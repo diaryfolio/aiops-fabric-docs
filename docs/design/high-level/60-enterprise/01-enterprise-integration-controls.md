@@ -117,8 +117,10 @@ OTLP exporters, sampling, delivery acknowledgement, and fail-closed audit delive
 
 ## Current reference status
 
-The follow-up release workflow separates read-only validation/build from contents-write draft
-upload, pins the documentation commit, verifies hashes/source bindings, and uses a distinct token
+The follow-up release workflow separates draft discovery and read-only builds from draft upload.
+Discovery and upload use application contents-write tokens so GitHub exposes drafts; discovery
+performs no writes. Drafts are found by tag in a paginated list and verified by release ID.
+The workflow pins the documentation commit, verifies hashes/source bindings, and uses a distinct token
 scoped to the docs repository for its matching tag. Reviewed `main` trigger changes request a
 release; existing tags and published assets are preserved. Failed-job retries reuse retained
 artifacts, and real GitHub execution remains environment-dependent. These checks do not satisfy

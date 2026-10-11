@@ -36,6 +36,10 @@ change. It pins docs, runs validation before building both architectures, verifi
 source/checksums and never moves existing version tags. A failed upload job can reuse its retained
 build artifact and add only missing matching draft attachments; publication remains explicit.
 Completed versions are skipped and unrelated commits do not retrigger an unchanged enabled file.
+Draft discovery uses the authenticated release list and verification uses a release ID. A draft
+creation URL followed by a published-tag HTTP 404 can indicate failed verification after successful
+upload; inspect the existing draft before retrying. Rerunning an old Actions run uses its original
+source, so an uploader correction must be run against the retained artifacts using corrected code.
 Repository token/policy configuration and remote-run evidence are prerequisites. This workflow
 does not deploy or prove live CNI/model quality; use the
 [trigger and recovery guide](../../../releases/installation.md#automate-a-release-with-the-trigger-file).

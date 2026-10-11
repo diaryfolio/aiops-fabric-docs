@@ -45,6 +45,8 @@ development keys, issuer, mock providers, `imagePullPolicy: Never`, or single-re
 
 The optional release trigger workflow builds both architectures from exact paired commits,
 checks the existing reference/profile/docs contracts and uploads a checksummed GitHub draft.
+The request job detects completed drafts through an authenticated release list before building;
+the uploader verifies drafts by release ID rather than the published-release tag endpoint.
 Its plain version controls staged chart/application/global-image metadata without changing the
 source chart. It creates no cluster resources and does not replace live namespace/CNI acceptance.
 Only `main` trigger changes or a manual `main` run can release; see the

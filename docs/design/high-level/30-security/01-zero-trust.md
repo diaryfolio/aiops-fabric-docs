@@ -200,8 +200,11 @@ not only TCP connect. No prompt/body logs or automatic model-write retries are i
 
 The release workflow consumes only reviewed `main` source and an immutable docs commit, with
 strict trigger validation and commit-pinned actions. It has no pull-request release event and
-rejects other branches/repositories. Application build jobs use read-only `GITHUB_TOKEN`; only the
-upload job requests contents-write to create application tags and a release draft. A separate
+rejects other branches/repositories. Application build jobs use read-only `GITHUB_TOKEN`. The
+request job requests contents-write because GitHub lists drafts only for identities with push
+access; its API calls only read releases. The upload job also requests contents-write to create
+application tags and a release draft. Draft lookup is authenticated and paginated, and final
+verification uses the release ID. Duplicate matches fail before a new draft is created. A separate
 `RELEASE_DOCS_TOKEN` is scoped to Contents read/write on the docs repository for private checkout
 and its matching tag. Checkout credentials are not persisted; tokens are never release assets.
 Both source bindings and checksums are checked before tags or draft writes. Existing tag conflicts,

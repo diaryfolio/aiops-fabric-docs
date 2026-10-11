@@ -15,8 +15,9 @@ This map describes repository capability, not the configuration or health of a l
 The application `release-trigger.json` contains an enabled boolean, plain three-part version and
 an immutable documentation commit. `.github/workflows/release.yml` runs only in the canonical
 application repository on a trigger-file push to `main` or a manual `main` dispatch. It preserves
-operator branch ownership and does not automatically edit sources. Read-only validation/build
-jobs run existing tests, profiles, Kustomize and docs checks, then package both node architectures.
+operator branch ownership and does not automatically edit sources. The request job uses an
+application contents-write token to list drafts; it performs no release or tag writes. Read-only
+build jobs run existing tests, profiles, Kustomize and docs checks, then package both node architectures.
 The requested version is applied to a temporary chart copy and image/archive metadata.
 
 A separate contents-write upload job verifies outer archives and extracted bundle checksums and
@@ -26,6 +27,17 @@ persisted. Actions are pinned to commit SHAs. Completed drafts and published ver
 existing tags cannot move and retries add only missing byte-matching draft attachments. Draft
 publication remains an explicit operator step. Retained build artifacts support failed-job retry
 for 14 days; a new build cannot overwrite an existing attachment with different bytes.
+
+Draft discovery uses the authenticated, paginated release list matched by `tag_name`; final
+verification uses the release ID. The published-release tag endpoint cannot verify a draft.
+Duplicate matches and API failures stop processing before creating another draft. Regression
+tests cover draft creation/verification, pagination, completed-version detection and safe retries.
+Remote execution of this correction remains unverified; the reported upload run created a draft
+but its former final tag lookup returned HTTP 404.
+
+Correction validation: 136 tests passed both locally and through `make unit`, including 31
+release CI tests. `make lint`, actionlint, base Kustomize rendering and the strict documentation
+build passed. No release was rebuilt, retried or published during this correction.
 
 The workflow does not deploy, switch traffic, generate SBOM/signatures or prove Kubernetes CNI,
 model quality or production admission. Configuration and a real remote Actions run remain required;
