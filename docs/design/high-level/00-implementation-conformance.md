@@ -10,36 +10,43 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
-## TrueForge adoption and gated decommission (major, design-only)
+## TrueForge adoption and clean-state decommission (major)
 
-The selected direction is to retain `aiops-fabric` and its documentation, adopt TrueForge for agent
-execution, and retire overlapping components only after the [migration gates](03-trueforge-adoption-decommission.md).
-The earlier source assessment's separate `keepview_harness` repository proposal is superseded.
-All existing services, routes, stores and network denials documented below remain unchanged.
+The owner selected `aiops-fabric` as the retained implementation and explicitly authorized an
+empty development rebuild **without backups**. This supersedes the earlier preserve-and-migrate
+sequence for the three named development/evaluation namespaces only. No production or unrelated
+namespace is covered. The source assessment remains a historical baseline; this section defines
+the current implementation.
 
-| Capability / disposition | State | Missing implementation / evidence |
+**TrueForge remains strictly unmodified upstream.** Official chart/image releases are pinned;
+all identity bridges, model transport, routing, topology and customer policy live in the fabric.
+No source/chart patch, injected runtime hook, fork or customized TrueForge image is permitted.
+
+| Capability / disposition | State | Evidence / boundary |
 |---|---|---|
-| TrueForge selected as replaceable runtime | design decision | No executable fabric integration, image/profile selection or compatibility qualification |
-| `viewsense-dev` + `trueforge-dev` namespace pair | planned | Opt-in profile, independent releases, trust/Secret references, scoped cross-namespace policy and live probes |
-| Multi-namespace topology and mesh generation | planned | Existing v1 model has one namespace; versioned endpoint identity/namespace schema and compatible generators required |
-| Gateway runtime adapter and real-subject delegation | planned | Stock OIDC `default` tenant and shared-service-user limitations unresolved; idempotency/session/authorization tests required |
-| Governed inference and native MCP integration | planned | Streaming/tool round trip, governed MCP server transport, fresh per-call authority/admission/budget/evidence and bypass denial |
-| Distinct runtime server/controller workload identities | planned | Upstream chart shares a service account/TLS configuration; controller disabled initially; qualified extension required |
-| No-retention business execution through TrueForge | planned | Standard runtime persists transcripts/context; storage/artifact/backup acceptance required before live business facts |
-| Legacy orchestrator / agent kernel shutdown | planned, not started | All affected consumers migrated/deprecated; run drain, export/restore, rollback and package dependency gates |
-| Legacy source or persistent-data deletion | not performed | Source cleanup follows shutdown; PVC/backups/archive disposition is a separate owner decision |
+| Independent namespace pair | implemented development profile | `scripts/runtime/render.py` and `deploy.sh`: `viewsense-dev` + `trueforge-dev`; official Helm release `trueforge`; controller disabled |
+| Unmodified runtime | pinned official artifacts | Chart `0.3.0`, image `0.3.0-ebbf6c0` pinned by digest; supported chart values only; no upstream checkout changes |
+| Namespace-qualified network topology | implemented v2 CNI generator | Endpoint namespace/workload/service-account metadata, exact namespace+pod peers, default deny and scoped DNS; mesh v2 integration remains planned |
+| Identity bridge | implemented synthetic cell | Fabric mTLS token issuer + public-key TLS discovery; stock runtime OIDC; distinct issuer-qualified subjects; bootstrap admin separated from gateway |
+| Runtime adapter | implemented synthetic fixture only | Authenticated `POST /v1/runtime-check`, empty extra-forbidden body, fixed tenant/fixture/model, no arbitrary prompt, no legacy fallback |
+| Model transport | implemented synthetic fixture only | Loopback fabric sidecar configured through supported chart values; mTLS/scoped JWT to fabric LLM gateway and mock SSE provider; real model/tool protocol qualification remains planned |
+| Legacy orchestration and manual kernel | retired | Source, schema, workload, datastore, credentials/grants and packaging references removed; no replacement manual checkpoint API is claimed |
+| Legacy response contract | explicitly retired | Authenticated `POST /v1/responses` returns HTTP 410; `/v1/agent-runs` service removed; this is an authorized fresh-state breaking change |
+| Previous namespace data | deleted without backup | Old dev and blue/green evaluation namespaces removed with UID preconditions; fresh dev namespace recreated; no data migration or restore claim |
+| Business execution / native MCP / shared sessions | disabled or planned | No end-to-end PII, hard budget, immutable evidence, idempotent creation, no-retention or delivery acceptance; existing governed registry API remains separate |
+| Production operations | planned | HA, rotation/reload, SSO entitlement refresh, restore, mesh v2 and offline paired release packaging require qualification |
 
-The [namespace design](20-deployment/03-trueforge-namespace-integration.md) and
-[migration runbook](40-ops/02-trueforge-migration-runbook.md) specify target edges, ownership,
-failure behavior and removal records. M00–M08 are planned, not completed tasks. The first executable
-slice is synthetic-only deployment/integration qualification, preserving the legacy reference.
+The [clean-state record](40-ops/03-clean-state-rebuild.md) documents exact scope, commands,
+validation and remaining gaps. Current verification passed all **231** tests, lint, Helm/Kustomize,
+strict three-version documentation publication and live synthetic turn/authentication/subject
+isolation plus allowed/denied CNI probes; all selected workloads/stores are ready. The [adoption backlog](03-trueforge-adoption-decommission.md)
+continues to govern future business enablement. M00/M01 and limited synthetic M02 have executable
+foundations; M03–M06 are not complete. Authorized development retirement of D01–D03 does not imply
+that the replacement has achieved business feature parity.
 
-Source evidence remains application `87a1efc8b2c07f64163135d497091b9175051247`, documentation
-`33628125fe73202bad1eb88eb769d276f512f309`, and examined TrueForge
-`e3fed89fc99df9fe5b8335d9ae59c525c068d7dd`; working-tree documentation adds this design. No runtime
-contract/schema, grant, manifest, database owner or provider maturity is changed. Documentation
-validation and unavailable runtime checks are reported in the handoff; existing historical live
-evidence does not validate the proposed topology.
+The remaining historical sections below describe their stated release/source baselines. Where
+they mention running legacy services, old release namespaces or preserved data, this section and
+the clean-state record supersede those current-deployment claims.
 
 ## Channel policy consoles and canonical identity assertions (major)
 
@@ -366,14 +373,15 @@ future design allows one.
 
 ```mermaid
 flowchart LR
-    Client["Test/API client"] -->|"mTLS + api.invoke"| Gateway["gateway"]
-    Gateway -->|"orchestrate.invoke"| Orchestrator["orchestrator"]
-    Orchestrator -->|"memory.read/write"| MemoryGateway["memory-gateway"]
+    Client["Test/API client"] -->|"mTLS + runtime.verify"| Gateway["gateway"]
+    Gateway -->|"runtime.invoke · fixed fixture"| TrueForge["trueforge-dev · official TrueForge"]
+    TrueForge --> Bridge["fabric loopback transport"]
+    MemoryGateway["memory-gateway"]
     MemoryGateway -->|"provider.invoke"| PGMemory["memory-postgres"]
     PGMemory --> MemoryDB[("memory-db / pgvector")]
     MemoryGateway -. "selected Helm profile" .-> Mem0["memory-mem0 adapter"]
     Mem0 -. "Mem0 API" .-> Mem0Product["Mem0 OSS or Platform"]
-    Orchestrator -->|"llm.invoke"| LLMGateway["llm-gateway"]
+    Bridge -->|"llm.invoke"| LLMGateway["llm-gateway"]
     LLMGateway -->|"provider.invoke"| MockLLM["mock-llm"]
     LLMGateway -. "OpenAI overlay" .-> OpenAIAdapter["openai-adapter"]
     OpenAIAdapter -. "HTTPS + provider key" .-> OpenAI["OpenAI API"]
@@ -388,11 +396,11 @@ flowchart LR
     MCPGateway -->|"ViewSense AI® tool-provider API"| MockMCP["mock-mcp"]
     TestClient --> Governance["governance"]
     Governance --> GovernanceDB[("governance-db")]
-    TestClient --> Agent["agent-runtime"]
-    Agent --> AgentDB[("agent-db")]
 
     Identity["development identity"]
-    Gateway & Orchestrator & MemoryGateway & LLMGateway & Ingestion & MCPGateway --> Identity
+    Gateway & Bridge & MemoryGateway & LLMGateway & Ingestion & MCPGateway --> Identity
+    TrueForge -->|"TLS discovery/JWKS"| Identity
+    TrueForge --> RuntimeDB[("runtime TLS PostgreSQL / Redis")]
 ```
 
 All solid internal ViewSense AI® service-to-service calls above use TLS with a client certificate plus
@@ -447,8 +455,7 @@ shipped.
 | Service | Implemented routes | State owner |
 |---|---|---|
 | identity | `POST /oauth2/token` | development client file and signing key |
-| gateway | `POST /v1/responses` | none |
-| orchestrator | `POST /v1/responses` | none |
+| gateway | `POST /v1/responses` (retired, HTTP 410), `POST /v1/runtime-check` (fixed synthetic fixture only) | none |
 | llm-gateway | `POST /v1/chat/completions` | static route configuration |
 | mock-llm, openai-adapter | `POST /v1/chat/completions` | adapter configuration/credential only |
 | ollama-adapter | `POST /v1/chat/completions`, `POST /v1/decisions`, `POST /v1/embeddings`, `GET /v1/provider-status`, `PUT /v1/configuration` (opt-in development administration) | model configuration; no memory |
@@ -458,7 +465,6 @@ shipped.
 | mock-mcp | `POST /v1/tools/call` | none |
 | governance | `PUT /v1/provider-passports/{name}`, `GET /v1/provider-passports/{name}`, `POST /v1/provider-passports/{name}/evaluations`, `POST /v1/provider-passports/{name}:admit`, `POST /v1/evidence-events`, `GET /v1/evidence-events` | governance PostgreSQL |
 | ingestion | `POST /v1/documents:ingest` | no durable job state; writes chunks through memory API |
-| agent-runtime | `POST /v1/agent-runs`, `GET /v1/agent-runs/{run_id}`, `POST /v1/agent-runs/{run_id}:resume`, `POST /v1/agent-runs/{run_id}:cancel`, `GET /v1/agent-runs/{run_id}/events` | agent PostgreSQL |
 
 ## Alignment decisions
 

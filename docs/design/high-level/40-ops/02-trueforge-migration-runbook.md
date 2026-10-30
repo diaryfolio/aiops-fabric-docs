@@ -2,7 +2,11 @@
 
 ## Status and ownership
 
-This is the planned operating procedure for the [adoption/decommission plan](../03-trueforge-adoption-decommission.md) and [namespace design](../20-deployment/03-trueforge-namespace-integration.md). It is **not an instruction to run against an existing cluster now**. Executable deployment/decommission commands and their acceptance evidence do not ship in this documentation slice.
+This is the general operating procedure for the [adoption/decommission plan](../03-trueforge-adoption-decommission.md)
+and [namespace design](../20-deployment/03-trueforge-namespace-integration.md). The separately
+[authorized clean-state rebuild](03-clean-state-rebuild.md) has executable deployment and
+qualification commands and supersedes backup/preservation requirements only for the named
+old development/evaluation namespaces. Future production migrations still require these gates.
 
 The platform operator owns context/namespace/release changes; application owners own public contracts and client migration; governance/security owners own policy/identity/egress; data owners own memory/CRM/archive retention; the repository owner performs manual Git publication. A single person may hold several roles in development, but independent policy review rules remain in effect.
 
@@ -83,7 +87,7 @@ Never remove the shared registry, governance or memory store under the legacy ag
 
 ## Release, observability and recovery acceptance
 
-Each migrated distribution records both independently pinned releases, images and the chart extension/render-transformation digest; runtime SDK/UI compatibility; topology/trust fingerprints; contract/policy revisions; required certificates/Secret names; and owner-specific backup versions. Include both namespace inventories in offline packaging. Do not mutate published historical release snapshots to describe the new topology.
+Each migrated distribution records both independently pinned releases, images and the fabric adapter/configuration digest; runtime SDK/UI compatibility; topology/trust fingerprints; contract/policy revisions; required certificates/Secret names; and owner-specific backup versions. Include both namespace inventories in offline packaging. Do not mutate published historical release snapshots to describe the new topology.
 
 Monitor metadata-only request/trace/run/turn correlation, policy/admission denies, budgets and uncertain charges, tool outcomes, token use, active/draining work, stream reconnects, storage growth, evidence export backlog, identity expiry, database/Redis health and controller liveness when enabled. Set SLOs and alert ownership from representative measurements. Raw prompts, tool payloads and customer facts remain excluded from baseline logs, dashboards and evidence.
 

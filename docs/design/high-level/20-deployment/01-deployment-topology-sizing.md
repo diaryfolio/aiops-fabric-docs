@@ -9,15 +9,14 @@ flowchart TB
     subgraph Namespace["viewsense-dev reference namespace"]
       subgraph Stateless["Deployments"]
         Edge["gateway"]
-        Control["orchestrator + gateways"]
+        Control["fabric gateways"]
         Providers["mock/provider adapters"]
-        Admin["governance + ingestion + agent runtime"]
+        Admin["governance + ingestion"]
       end
       subgraph Stateful["Single-replica development StatefulSets"]
         MemoryDB[("memory-db")]
         RegistryDB[("registry-db")]
         GovernanceDB[("governance-db")]
-        AgentDB[("agent-db")]
       end
       Policy["default-deny + explicit NetworkPolicy"]
       Secrets["generated development PKI/credentials"]
@@ -29,17 +28,16 @@ flowchart TB
 
 ## Namespace and cluster patterns
 
-The [TrueForge namespace integration design](03-trueforge-namespace-integration.md) adds a planned,
-opt-in two-namespace profile: existing fabric in `viewsense-dev`, private runtime/state in
-`trueforge-dev`. Separate releases, per-workload trust, owner-only databases and narrowly scoped
-cross-namespace APIs are required. The existing single-namespace base and release installer remain
-unchanged. Do not treat the target namespace names as already deployed or reset existing state to
-adopt them. The [decommission register](../03-trueforge-adoption-decommission.md) governs eventual
-orchestrator/agent removal and distinguishes code shutdown from data disposal.
+The [TrueForge namespace integration design](03-trueforge-namespace-integration.md) is implemented
+as the development namespace-pair profile: fresh fabric in `viewsense-dev`, official private
+runtime/state in `trueforge-dev`. The owner explicitly authorized the old development/evaluation
+reset without backups. Legacy orchestration/manual kernel source and agent storage are removed.
+The [operation record](../40-ops/03-clean-state-rebuild.md) documents the boundaries and actual
+qualification. Production multi-cell and offline paired packaging remain future work.
 
 | Profile | Isolation | Suitable for |
 |---|---|---|
-| development | one `viewsense-dev` namespace, single replicas | contract and integration testing |
+| development | `viewsense-dev` + `trueforge-dev`, single replicas | synthetic runtime and retained fabric integration testing |
 | standard | separate edge/control/provider/data namespaces | normal enterprise production |
 | regulated | dedicated provider/data cluster or tenant cell | strict residency and blast-radius controls |
 | GPU scale | control cluster plus one or more inference clusters | large model fleets and independent capacity |

@@ -7,8 +7,10 @@ runtime inventory. Live evidence below applies to the isolated development stack
 The [TrueForge adoption and decommission plan](03-trueforge-adoption-decommission.md) is the selected
 next integration direction. Retain `aiops-fabric` and its local adapters; qualify TrueForge as the
 execution runtime, beginning with a synthetic two-namespace profile. No separate `keepview_harness`
-application or wholesale repository retirement is required. The capability table and live local
-evidence below remain the current baseline; new runtime connectivity and service removal are planned.
+application or wholesale repository retirement is required. The local-AI capability table and evidence below retain their original scope. The
+[clean-state rebuild](40-ops/03-clean-state-rebuild.md) now supplies an independent namespace pair
+and fixed synthetic TrueForge turn, retires the legacy orchestrator/manual kernel and returns
+HTTP 410 from the former response route. Business execution remains disabled.
 
 ## Enterprise harness for local AI
 
@@ -20,7 +22,7 @@ Installed-model dropdowns also support decision, embedding and chat previews bef
 Save as default. Known incompatible choices remain visible and disabled. Previewing does not
 modify memory profiles; saving a new embedding model requires owner backfill for existing records.
 
-The edge AI endpoint already existed at `POST /v1/responses`. A mock remains the base regression
+The historical edge AI endpoint was `POST /v1/responses`; it is now explicitly retired (HTTP 410). A mock remains the base regression
 provider; OpenAI is optional. The new local console is a separate development entrypoint with its
 own PKI, fixed tenant and pgvector volume. It does not replace enterprise SSO or a production
 administrative control plane.

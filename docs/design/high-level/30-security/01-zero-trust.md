@@ -4,26 +4,33 @@
 
 Compromise of one component must not grant implicit access to another component, another tenant, provider credentials, or a different data plane. Controls are layered: network reachability, workload TLS identity, audience/scoped authorization, tenant/data policy, provider egress policy, and audit.
 
-### TrueForge namespace boundary (planned)
+### TrueForge namespace boundary (synthetic development profile)
 
 The [adoption decision](../03-trueforge-adoption-decommission.md) keeps fabric governance and
 credential adapters authoritative while TrueForge executes agent turns in a separate namespace.
 The [connection matrix](../20-deployment/03-trueforge-namespace-integration.md#connection-and-authorization-matrix)
 requires exact workload identities, both-sided default-deny rules, audience/scoped delegation,
 fresh subject/data policy and owner-only state services. Namespace membership and a valid client
-certificate alone confer no operation authority. The existing single-namespace policies do not
-implement this design.
+certificate alone confer no operation authority. The fabric-owned topology-v2 renderer implements both-sided CNI rules for the development pair.
+Mesh-v2 identity and production enforcement remain separate qualification work.
 
-Stock TrueForge OIDC maps to internal tenant `default`; the target requires an independently
-qualified real-subject/tenant bridge. The examined chart shares server/controller service-account
-and TLS configuration, so distinct identities need an explicit tested extension before controller
-activation. Production cannot use its static controller API key as a substitute for scoped
+Stock TrueForge OIDC maps to internal tenant `default`. The development bridge binds one fixed
+synthetic tenant per namespace pair and issuer-qualified runtime subjects; shared multi-customer
+execution and production entitlement/dispatch delegation remain disabled. The examined chart shares server/controller service-account
+and TLS configuration, so the controller remains disabled until supported upstream configuration supplies distinct identities.
+All identity adaptations stay in the fabric tier; upstream patches are prohibited. Production cannot use its static controller API key as a substitute for scoped
 workload authorization. The controller is disabled for the initial pilot.
 
 Enforce policy on root, child, compaction, tool and retry paths; previews never become execution
 tokens. Keep vendor/CRM credentials outside runtime state. Live no-retention facts remain blocked
 until transcript/artifact/backup behavior is qualified. Decommissioning cannot fall back to a
 legacy path that ignores the active grant/egress policy, and does not authorize PVC/archive disposal.
+
+The owner separately authorized deletion of the three old development/evaluation namespaces
+without backups. This exception is recorded in the [clean-state operation](../40-ops/03-clean-state-rebuild.md)
+and does not authorize future customer data deletion. Short-lived static PKI, unbound certificate/
+JWT identity and single-replica stores remain development limitations. No-retention, hard budgets,
+immutable export and final business authorization are not supplied by this synthetic bridge.
 
 ```mermaid
 flowchart LR
@@ -76,8 +83,8 @@ independent immutable export and production database TLS remain outstanding.
 | Boundary | Authentication | Authorization | Containment |
 |---|---|---|---|
 | client → edge | enterprise OIDC and optional client mTLS | tenant/user RBAC, ABAC, quota | ingress/WAF and no direct internal exposure |
-| edge → orchestrator | workload mTLS + audience token | `orchestrate.invoke` | explicit NetworkPolicy |
-| orchestrator → gateway | workload mTLS + audience token | capability-specific scope | no provider credential in orchestrator |
+| edge → TrueForge | workload mTLS + native OIDC JWT | `runtime.invoke` issued by fabric | exact cross-namespace NetworkPolicy; fixed synthetic fixture only |
+| fabric model transport → LLM gateway | workload mTLS + audience token | `llm.invoke` | no vendor credential in TrueForge; fixed fixture only |
 | gateway → provider | workload mTLS + provider audience | `provider.invoke`, provider policy | dedicated provider network/namespace |
 | OpenAI adapter → OpenAI | server-held API key + HTTPS | provider project/model limits | adapter-only Secret and constrained public egress |
 | provider → database | database identity and TLS | owner schema/user only | only owning provider can reach store |

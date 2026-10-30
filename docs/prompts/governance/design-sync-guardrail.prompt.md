@@ -32,6 +32,14 @@ manual commits alone do not make synchronized working-tree changes fail design s
 
 ## Hard Rules
 
+- **TrueForge is strictly unmodified upstream.** Never edit its source, generated files, runtime
+  internals or chart templates; never maintain a local fork, patch, monkey-patch, vendored copy
+  or customized TrueForge image. Consume pinned official artifacts using supported APIs/SDKs
+  and documented configuration/Helm values. All custom identity, policy, customer behavior,
+  connectors, proxies and deployment integration belongs in `aiops-fabric`. If a required
+  boundary is unavailable, keep the affected feature disabled and adapt the fabric tier;
+  do not bypass this condition. Upgrades must require no replay of local TrueForge changes.
+
 - Never merge major implementation changes without matching updates to high-level design docs.
 - If architecture assumptions changed, update the affected `design_0x.md` files and document rationale.
 - If unsure whether a change is major, treat it as major.

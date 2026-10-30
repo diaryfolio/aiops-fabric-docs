@@ -1,11 +1,14 @@
-# Core API and Orchestration Module
+# Core API and Runtime Integration Module
 
-The core module contains the external response API and bounded request orchestrator. The current
-response path composes identity, memory, and LLM APIs and owns none of their provider data or
-credentials. MCP remains a separately callable gateway until an authorized agent/tool worker ships.
+The core module retains the authenticated edge and fabric-owned runtime adapter. TrueForge runs
+as an independent official release; no upstream customization is permitted. Identity, governance,
+provider credentials and long-term memory remain separate fabric boundaries.
 
-- Runtime: `viewsense_gateway` and `viewsense_orchestrator`
-- Public reference contract: `POST /v1/responses`
-- Helm controls: `modules.gateway` and `modules.orchestrator`
+- Runtime: `viewsense_gateway` and `viewsense_runtime.gateway`.
+- `POST /v1/responses`: retired, authenticated HTTP 410.
+- `POST /v1/runtime-check`: fixed synthetic fixture only, `runtime.verify`, empty request body.
+- Helm control: `modules.gateway`; upstream release deployment is independent.
 
-Long-running agent and business processes do not belong in request handlers; they use the agent/workflow contracts.
+The legacy bounded orchestrator and manual agent kernel are removed. Business execution, public
+session contracts, idempotent creation, native governed tools and retention guarantees remain gated.
+See the [clean-state rebuild](../../design/high-level/40-ops/03-clean-state-rebuild.md).

@@ -2,13 +2,36 @@
 
 ## Decision and scope
 
-Retain **`aiops-fabric` as the implementation repository** and **`aiops-fabric-docs` as the documentation repository**. TrueForge becomes the selected replaceable agent execution runtime. The retained fabric supplies enterprise identity, policy, governed model/tool/memory capabilities, customer integrations and operational evidence. `keepview_harness` has no role in this architecture and is not a migration destination. Do not rename the repositories or remove that unused checkout as part of this documentation change.
+Retain **`aiops-fabric` as the implementation repository** and **`aiops-fabric-docs` as the documentation repository**. TrueForge becomes the selected replaceable agent execution runtime. The retained fabric supplies enterprise identity, policy, governed model/tool/memory capabilities, customer integrations and operational evidence. `keepview_harness` has no role in this architecture and is not a migration destination. Do not rename the repositories or remove that unused checkout as part of the implementation reset.
 
-This is a **major, design-only change**. No service has been decommissioned, no namespace created, no traffic moved and no customer data migrated. The existing reference continues to run its documented paths. Every migration milestone below is **planned** until executable implementation and acceptance evidence are recorded in [Implementation Conformance](00-implementation-conformance.md).
+This is a **major implementation and design change**. The authorized development reset below
+retires overlapping execution and installs the separate official runtime. Business feature parity
+and production migration gates remain incomplete; [Implementation Conformance](00-implementation-conformance.md)
+distinguishes executable synthetic behavior from future enablement.
 
 This decision supersedes the separate-project proposal in the [source assessment](02-trueforge-keepview-assessment.md). The source findings remain applicable. Reuse is substantial, but a percentage of production completion cannot be inferred from module count: enforcement, recovery and customer acceptance remain necessary.
 
+## Authorized clean-state implementation
+
+The owner explicitly authorized deletion of development/evaluation state without backups and
+selected a fresh rebuild. For this operation, the existing `viewsense-dev`,
+`viewsense-release-1-0-1-blue` and `viewsense-release-1-0-1-green` namespaces were deleted;
+`viewsense-dev` was recreated beside `trueforge-dev`. D01/D02 legacy runtime source and D03
+agent storage/configuration are retired. The public response route is explicitly deprecated
+with authenticated HTTP 410, rather than silently changing its payload or retention semantics.
+No historical manual-run checkpoint API is emulated. Existing external callers must migrate.
+
+This is a development reset exception to the preservation gates below, not a production migration
+or proof of feature parity. There is no backup or data-restore rollback for the discarded state.
+The [operation record](40-ops/03-clean-state-rebuild.md) is authoritative for completed actions;
+the remaining backlog continues to gate business execution. All customization stays in fabric.
+
 ## Target architecture
+
+**Strict condition:** TrueForge remains unmodified upstream. All custom behavior and deployment
+integration is owned by `aiops-fabric`, using supported APIs/SDKs and documented values. Do not
+patch or fork its application/chart, vendor internals or build a customized TrueForge image.
+Unsupported features stay disabled. Upgrades must not require replaying upstream changes.
 
 ```mermaid
 flowchart LR
@@ -31,7 +54,7 @@ Deployment placement and exact permitted connections are specified in [TrueForge
 
 ## Keep, adapt and decommission register
 
-“Decommission candidate” is a target disposition, not permission to delete the component now. All rows are pending their removal gate. Paths are implementation-relative review locators.
+“Decommission candidate” is a target disposition, not permission to delete the component now. D01–D03 are retired under the authorized development reset above; other dispositions retain their gates. Paths are implementation-relative review locators.
 
 | ID | Existing component/assets | Target disposition | Replacement or retained responsibility | Removal / acceptance gate |
 |---|---|---|---|---|
@@ -75,13 +98,13 @@ Do not remove governance, memory, identity/transport contracts or credential ada
 
 Machine-readable schemas, OpenAPI/event contracts and conformance tests will be authored in `aiops-fabric` in the implementation slice. The names/fields above are design requirements, not new APIs available today. Reuse one canonical schema owner and generate cross-language clients/types.
 
-The production identity bridge is a prerequisite. Stock OIDC in the examined TrueForge baseline places users in internal tenant `default`; a shared fixed service user would collapse employee ownership. First deploy one customer/environment cell per namespace pair, keep real tenant/subjects in verified delegation and establish distinct runtime subjects. A custom authenticator/resolver integration or thin core host must validate this. A reverse proxy forwarding unsigned identity headers, or configuring OIDC alone, is insufficient.
+The production identity bridge is a prerequisite. Stock OIDC in the examined TrueForge baseline places users in internal tenant `default`; a shared fixed service user would collapse employee ownership. First deploy one customer/environment cell per namespace pair, keep real tenant/subjects in verified delegation and establish distinct runtime subjects. A fabric-owned issuer/identity bridge must use supported upstream authentication and verify tenant/subject narrowing before issuing credentials. No custom authenticator is installed inside TrueForge. Unsigned identity headers or a shared employee identity are insufficient.
 
 Existing no-retention business channels cannot enter ordinary durable TrueForge turns with sensitive facts until an approved ephemeral execution/storage path is qualified. Synthetic data may use normal runtime storage under a separate explicit test retention policy. No unattended business scheduling, external model route, arbitrary skill, shared-session delivery or sandbox is enabled by the initial adoption profile.
 
 ## Ordered implementation backlog
 
-Every row begins **planned**. Its implementation change updates the conformance map, contracts, relevant domain documents and evidence; a source file or a healthy pod alone does not close it.
+The table records the general gated migration sequence; the development reset supersedes its legacy preservation ordering. M00/M01 foundations and fixed synthetic M02 are implemented, while business qualification remains planned. Its implementation change updates the conformance map, contracts, relevant domain documents and evidence; a source file or a healthy pod alone does not close it.
 
 | Milestone | Dependencies | Concrete deliverable | Exit evidence |
 |---|---|---|---|
@@ -95,7 +118,7 @@ Every row begins **planned**. Its implementation change updates the conformance 
 | M07: legacy shutdown | M05 plus closure for every affected consumer | Drain/deactivate D01/D02 and old routing only after all consumers migrate; revoke unused credentials/flows | No remaining caller/config/flow dependency, zero active old runs, rollback/restore and archive evidence |
 | M08: source and resource cleanup | M07 | Delete retired source/config/manifests/tests and revise catalogs/release tooling; keep archives per retention | Full unit/lint/profile/package checks, live smoke/denials, no dangling imports/routes/ports/docs; old data deletion remains separately governed |
 
-The first executable change should implement M00/M01 as a **synthetic-only integration profile**, without replacing `/v1/responses`, removing the orchestrator or moving databases. M02–M04 are real implementation work, not configuration already supplied by TrueForge.
+The implemented development slice provides M00/M01 foundations and a fixed synthetic M02 probe. The owner-authorized reset separately retires D01–D03 and the legacy response contract. M02–M04 business semantics remain real implementation work, not configuration already supplied by TrueForge.
 
 ## Decommission rules
 
@@ -118,17 +141,9 @@ Rollback can restore an earlier implementation only if it enforces the current s
 
 ## Design sync and maturity
 
-The runtime, namespace pair, multi-namespace topology schema, authentication bridge, native governed MCP transport, agent-compatible provider protocol, no-retention runtime profile and decommission automation are all **planned**. No current conformance claim is upgraded by this document. Supporting changes to architecture, deployment, security, operations and roadmap link to this decision and preserve the existing implementation inventory.
-
-```text
-Design Sync Report
-- Change Classification: major, design-only
-- Design Docs Updated: adoption/decommission plan, namespace design, migration runbook,
-  architecture/conformance/domain indexes and source-assessment direction
-- Code Areas Updated: none
-- Architecture Delta: retain aiops-fabric; select TrueForge runtime in a separate namespace;
-  plan authenticated capability edges and gated retirement of overlapping components
-- Tests/Evidence: documentation/static validation and limitations recorded in completion handoff
-- Known Production Gaps: every planned milestone and feature-specific acceptance gate above
-- Sync Status: PASS for documented current-versus-target separation; migration is not implemented
-```
+The namespace pair, topology-v2 CNI generator, development OIDC bridge and fixed synthetic runtime
+adapter are implemented. Legacy execution source and the named old namespace data are retired under
+the explicit no-backup reset. Native governed MCP, real model/tool protocols, production identity,
+no-retention execution, hard budget/evidence enforcement and operational recovery remain planned.
+The [operation record](40-ops/03-clean-state-rebuild.md) and conformance map carry implementation
+scope and actual evidence. The coordinated final Design Sync Report covers both repositories.

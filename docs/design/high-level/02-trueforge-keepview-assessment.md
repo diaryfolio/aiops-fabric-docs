@@ -86,7 +86,7 @@ There are two material limitations:
 
 Therefore enforce at every model client's streaming and non-streaming call boundary and at the credential-owning provider adapter. A capability can enrich context or improve user experience, but cannot alone guarantee final-payload governance. Direct and child model calls, summaries, transformations, retry attempts and provider-native serialization all need coverage.
 
-The CLI/server is not currently a generic policy-plugin host. `main.ts` selects authenticators/authorizers and `apis/turns.ts` constructs `VercelAILLM` and `TurnResourceResolver` directly. The core supports custom wiring, but stock server configuration does not expose every core seam. Plan and test a small upstream-compatible integration change if those seams are required; do not claim that a YAML catalog can inject an arbitrary ViewSense AI® capability into the stock server.
+The CLI/server is not currently a generic policy-plugin host. `main.ts` selects authenticators/authorizers and `apis/turns.ts` constructs `VercelAILLM` and `TurnResourceResolver` directly. The core supports custom wiring, but stock server configuration does not expose every core seam. The strict upstream-independence rule requires all adaptations to stay outside TrueForge. Do not inject capabilities or modify its server; qualify supported external boundaries and disable features that cannot be governed there.
 
 ### Tool selectors and approvals need an enterprise ceiling
 
@@ -226,11 +226,11 @@ There are important limits in the candidates:
 | Approach | Benefits | Costs and constraints | Recommended use |
 |---|---|---|---|
 | ViewSense AI® façade plus private hosted TrueForge over HTTP | Reuses most server/API/UI work; smaller upstream coupling | Needs real identity propagation, governed model/MCP endpoints, retention solution and complete bypass controls | Preferred initial integration, limited to a tested cell/profile |
-| Custom host around pinned `trueforge-core` | Direct resolver, model/tool wrappers, tracing and storage control | Must own host lifecycle, routes/auth/persistence integration; core APIs can change | Use when required invariants cannot be met through stock server plus a small extension |
-| Full customer fork of TrueForge | Immediate access to every internal function | Persistent merge burden and customer divergence | Avoid as the product model; keep any temporary patch small, generic and upstreamable |
+| Custom core host / injected runtime extensions | Would couple the fabric to runtime internals | Conflicts with the selected unmodified-runtime integration | Excluded from this architecture |
+| Forks, source/chart patches or customized TrueForge images | Alter upstream behavior | Violates the strict independence condition | Prohibited |
 | Prompt/skill/config-only customization | Fast behavior prototyping | Cannot establish tenancy, data authorization, hard budgets or egress containment | Synthetic demonstrations and approved instruction packs only |
 
-Begin with HTTP composition and a short integration qualification phase. It must prove user/tenant binding, per-dispatch policy context, retention and model/tool enforcement before live customer payloads. If the stock server cannot carry fresh scoped delegation or preserve retention semantics, add a small generic resolver/authentication/storage extension or use a thin custom core host. Do not weaken those requirements to preserve a no-patch claim.
+Begin with HTTP composition and a short integration qualification phase. It must prove user/tenant binding, per-dispatch policy context, retention and model/tool enforcement before live customer payloads. If supported external interfaces cannot preserve scoped authority or retention semantics, keep that feature disabled and design a fabric-owned adaptation. Source/chart patches, injected hooks and customized TrueForge images are prohibited.
 
 This qualification is a concrete engineering decision, not a choice between merely installing the CLI and rewriting all of TrueForge. Much of the UI/SDK/runtime can be reused under either host approach.
 
@@ -338,7 +338,7 @@ TrueForge can contribute chat, tools, local explanation and later multi-step int
 
 | Phase | Deliverable | Exit gate |
 |---|---|---|
-| 0. Baseline and integration qualification | Pin runtime/UI/SDK artifacts, synthetic customer cell, public adapter, identity/retention/dispatch design | Prove identity propagation and every required extension point; choose HTTP composition or thin host based on evidence |
+| 0. Baseline and integration qualification | Pin runtime/UI/SDK artifacts, synthetic customer cell, public adapter, identity/retention/dispatch design | Prove identity propagation and every required extension point; qualify supported HTTP/SDK composition and fabric-owned adapters |
 | 1. Governed local runtime | Exact policy mappings, reviewed snapshots, scoped model/MCP dispatch, safe evidence, bounded calls | Direct API and bypass attempts deny; mandatory dependency outages cause zero unauthorized outbound calls |
 | 2. Read-only Sales connector | Approved canonical facts, deterministic rules, bounded Oracle/API access and authorized reply | Account/field isolation, freshness/completeness and Silver/Gold/Platinum fixtures pass through API and chat |
 | 3. Optional governed memory | Profile-aware embeddings, ingestion lifecycle and source/ACL/retention propagation | Cross-user/tenant denial, profile migration, deletion/tombstones and recovery tests |
@@ -386,7 +386,7 @@ For disconnected operation, include dependency/OCI artifacts, model weights, ski
 
 Keep old runtime databases read-only during any actual migration until retention and export decisions are approved. Do not silently discard memory, policy review evidence or user identities. Preserve semantic IDs where appropriate, explicitly map qualified subjects and schemas, and rehearse export/import/re-embedding and rollback. No migration of customer data is performed by this assessment.
 
-Preserve upstream notices and dependency attribution when redistributing TrueForge; its local license is MIT. Keep customer code and secrets outside the upstream checkout. Avoid extracting large internals as undocumented copied source: use published contracts or a maintained generic patch, with clear ownership and tests.
+Preserve upstream notices and dependency attribution when redistributing TrueForge; its local license is MIT. Keep customer code and secrets outside the upstream checkout. Avoid extracting large internals as undocumented copied source: use published contracts and fabric-owned adapters only. Local upstream patches are prohibited.
 
 No operator, A2A federation, multi-cluster control plane, privacy token vault or complete workflow suite is needed for the first customer slice. Those are valid future design options with their own trust/state/lifecycle requirements, not prerequisites justified by agent-harness adoption.
 
@@ -422,6 +422,11 @@ No operator, A2A federation, multi-cluster control plane, privacy token vault or
 | Reusable behavioral tests | `aiops-fabric/tests/unit/test_channels.py`, `test_playground.py`, `test_security_and_memory.py`, `test_local_ai.py`, `test_networking.py` |
 
 ## Validation and design sync
+
+This section records the original assessment-only baseline. The subsequent
+[clean-state implementation](40-ops/03-clean-state-rebuild.md) supersedes its statements about
+unchanged working trees, unavailable validation and absence of live deployment. TrueForge itself
+remains unmodified.
 
 This assessment adds documentation and navigation only. It does not implement the proposed topology or alter the existing implementation conformance claims. Architecture implementation would be a major change under the [major-change policy](../../prompts/governance/major-change-policy.md); this report itself is a minor analysis/documentation change.
 

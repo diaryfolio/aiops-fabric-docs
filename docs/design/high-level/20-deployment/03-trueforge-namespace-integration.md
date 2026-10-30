@@ -4,7 +4,11 @@
 
 Use **two application namespaces per customer/environment cell**: one for the retained fabric and one for TrueForge. The fabric harness remains in its namespace and calls the private runtime Service across namespaces. It is not necessary to move fabric pods into the TrueForge namespace to connect them.
 
-This is the **planned opt-in migration profile** for the [adoption decision](../03-trueforge-adoption-decommission.md). The existing base remains single-namespace `viewsense-dev`. This document is the explicit design for the additional namespaces allowed by the repository's environment-overlay rule; executable overlays, schema changes, policies and releases have not been added.
+The development namespace pair is executable through fabric-owned `scripts/runtime/deploy.sh`
+and `render.py`. The stock base describes retained fabric resources; the renderer supplies the
+explicit two-namespace profile, private trust/Secret references, TLS databases and topology-v2
+policies. Customer/release variants and mesh-v2 generation remain planned. See the
+[clean-state record](../40-ops/03-clean-state-rebuild.md) for the authorized reset and limitations.
 
 | Profile | Fabric namespace | Runtime namespace | Optional code-execution namespace |
 |---|---|---|---|
@@ -12,7 +16,7 @@ This is the **planned opt-in migration profile** for the [adoption decision](../
 | Dedicated customer/environment | `viewsense-<cell>-<env>` | `trueforge-<cell>-<env>` | `trueforge-sandbox-<cell>-<env>`, optional |
 | Parallel release evaluation | A fresh explicitly named fabric namespace | Its fresh paired runtime namespace | A fresh paired optional sandbox namespace |
 
-Normalize and validate identifiers and total namespace length before rendering. Do not silently truncate two names into the same namespace. Pair names and immutable namespace UIDs in deployment inventory; verify context, customer/environment and ownership before mutation. Existing `viewsense-release-*` installations stay under their current installer contract until a versioned namespace-pair installer is implemented. No existing namespace is renamed or reset.
+Normalize and validate identifiers and total namespace length before rendering. Do not silently truncate two names into the same namespace. Pair names and immutable namespace UIDs in deployment inventory; verify context, customer/environment and ownership before mutation. Existing `viewsense-release-*` installations stay under their current installer contract until a versioned namespace-pair installer is implemented. Ordinary deployments never reset namespaces. The separate owner-authorized development reset is recorded in the operation record.
 
 One pair initially represents one real customer tenant. Internal runtime `default` is only an implementation-local namespace within that isolated cell; it is not an externally selectable tenant. Multiple customer tenants in one runtime remain unqualified until explicit identity/storage/authorization tests pass. Namespaces reduce blast radius; the identity, data and network checks below remain mandatory.
 
@@ -60,7 +64,7 @@ All target edges require implementation acceptance; they are not currently insta
 
 | Placement | Workloads/state | Rules |
 |---|---|---|
-| Fabric namespace | Edge, governance, identity adapters, LLM/MCP capability servers, selected memory/ingestion and credential-owning connectors | Retain existing state owners and compatible APIs; old orchestrator/agent kernel remain until their shutdown gates |
+| Fabric namespace | Edge, governance, identity adapters, LLM/MCP capability servers, selected memory/ingestion and credential-owning connectors | Retain existing state owners and compatible APIs; legacy orchestrator/manual kernel retired in the authorized development reset |
 | Runtime namespace | TrueForge server and optional controller; runtime-only PostgreSQL/Redis endpoints | Fresh state and dedicated credentials; fabric never connects directly to runtime SQL/Redis |
 | Optional sandbox namespace | Selected isolated execution backend and per-session sandboxes | No fabric/database/provider credentials or default access to application namespaces; separately qualify backend and policies |
 | Infrastructure namespaces | Existing ingress, certificate/workload identity, CNI/mesh and telemetry controllers | Independently operated, least-privilege integrations; no CNI/mesh reinstall or cluster-admin UI permission |
@@ -70,7 +74,7 @@ Databases may be external managed services instead of pods, with the same logica
 
 ## Releases, endpoints and packaging
 
-Operate separate Helm releases for the fabric and runtime namespaces, coordinated by one versioned GitOps/deployment inventory in `aiops-fabric`. A conventional subchart inherits its release namespace; a single parent release is not a sufficient namespace-isolation design. Keep upstream chart/image versions pinned and use reviewed values plus a small tested render transformation or generic upstream extension only where required.
+Operate separate Helm releases for the fabric and runtime namespaces, coordinated by one versioned GitOps/deployment inventory in `aiops-fabric`. A conventional subchart inherits its release namespace; a single parent release is not a sufficient namespace-isolation design. Keep official upstream chart/image versions pinned. Use only documented values; all additional adapters, proxies, policies and resources are owned by the fabric release. Never patch upstream source/templates or customize its image.
 
 For the first profile, set the runtime fullname explicitly to `trueforge`, yielding the upstream helper's Service `trueforge-server`. The proposed fabric connection is:
 
@@ -98,7 +102,7 @@ Use ClusterIP Services. The public product entry stays with the fabric edge. The
 | Setting / resource | Planned baseline |
 |---|---|
 | Runtime mode | Hosted, `STANDALONE=false`, PostgreSQL and Redis |
-| Version | Pin examined/qualified chart and image digest; record SDK/core/UI compatibility and render transformation version |
+| Version | Pin examined/qualified chart and image digest; record SDK/UI compatibility and fabric adapter version |
 | Server workload | Start one synthetic development replica; production count follows measured concurrency/SLO and state-service availability |
 | Controller | Disabled for initial interactive pilot. Enable exactly one per runtime database after M06 schedule/machine-identity qualification |
 | Authentication | Verified subject/tenant bridge with explicit trust/audience; no standalone/default-admin authentication or one shared employee identity |
@@ -112,13 +116,13 @@ Use ClusterIP Services. The public product entry stays with the fabric edge. The
 | Retention | Synthetic test profile explicit; live `retention: none` business data blocked until runtime storage/artifact acceptance |
 | Telemetry | Internal collectors; metadata-only correlation; optional external analytics/error destinations disabled unless admitted |
 
-Two upstream chart gaps require explicit handling: the examined server/controller templates use the same `serviceAccountName`, and share chart-level TLS mounts and much configuration. Before enabling the controller, the approved chart extension/render transformation must give it a distinct identity/certificate, expose only its required configuration, and be covered by render/identity tests. A values-file assertion alone does not implement that separation.
+Two upstream chart gaps require explicit handling: the examined server/controller templates use the same `serviceAccountName`, and share chart-level TLS mounts and much configuration. The controller stays disabled while supported upstream settings cannot provide the required distinct identity/certificate and configuration separation. Do not patch or post-render its templates to manufacture support; use a fabric-owned scheduler via supported APIs only after separate qualification, or wait for a suitable upstream release.
 
-For the initial controller-disabled profile, still issue a unique server identity. Stock OIDC does not validate the proposed fabric delegation; select and qualify a small authenticator/resolver integration or a thin pinned core host. Native TLS helpers also do not automatically configure mTLS credentials for all model/MCP outbound transports. Define the approved outbound application/proxy identity path and prove it before enabling the connections; trusting a CA is not client authentication.
+For the initial controller-disabled profile, still issue a unique server identity. Use supported OIDC with a fabric-owned identity issuer/bridge that verifies the real tenant and subject. No code or custom authenticator is injected into TrueForge. Native TLS helpers also do not automatically configure mTLS credentials for all model/MCP outbound transports. Define the approved outbound application/proxy identity path and prove it before enabling the connections; trusting a CA is not client authentication.
 
 ## Connection and authorization matrix
 
-These are the new target edges. Existing internal provider/store/identity flows remain under their owner policies and are revised only when the corresponding component changes. Port/protocol are explicit TCP unless DNS says otherwise. Tokens/scopes below describe required new capability semantics, not currently shipped grants.
+These are the new target edges. Existing internal provider/store/identity flows remain under their owner policies and are revised only when the corresponding component changes. Port/protocol are explicit TCP unless DNS says otherwise. The matrix remains the full target. The executable synthetic profile implements only gateway → runtime, runtime discovery, fabric-sidecar → LLM and owner-store edges; other entries remain gated.
 
 | ID | Source namespace/workload | Destination namespace/workload | Port | Authority and operation | Activation gate |
 |---|---|---|---|---|---|

@@ -24,9 +24,12 @@ narrowed API connections join them; neither namespace reads the other's database
 
 TrueForge will own model/tool iteration, turns, context and streaming mechanics. Fabric retains
 identity/delegation, business grants, governed capability/credential boundaries, memory and evidence.
-The legacy orchestrator and manual agent kernel are decommission candidates only after replacement
-and consumer/state acceptance. Existing request graphs below remain the shipped reference. No
-namespace, runtime integration, deletion or traffic cutover is implemented by this design decision.
+The owner-authorized development clean-state rebuild retires the legacy orchestrator and manual
+agent kernel. The retained gateway connects across namespaces to stock TrueForge using its
+supported APIs and configuration. The current path is a fixed synthetic verification fixture;
+business execution remains gated. See the [implementation record](40-ops/03-clean-state-rebuild.md).
+All customer behavior stays in `aiops-fabric`; local TrueForge source, chart and image changes
+are prohibited.
 
 Application distributions use a versioned Helm chart and architecture-specific offline image
 bundles. Evaluation environments are replaceable release-specific namespaces with isolated state

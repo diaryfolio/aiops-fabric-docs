@@ -14,11 +14,12 @@ The [TrueForge adoption plan](../03-trueforge-adoption-decommission.md) selects 
 online execution loop and turn/checkpoint/approval mechanics. Fabric will integrate it through
 stable contracts and retain independent authorization, budgets, evidence and data boundaries.
 The target autonomous flow below is fulfilled by a governed runtime integration, not a new fabric
-loop implementation. The currently shipped lifecycle kernel remains until its API consumers and
-state are migrated under the decommission register. Ingestion and durable business workflows
+loop implementation. The legacy manual lifecycle kernel is retired in the owner-authorized development reset.
+The current TrueForge route verifies a fixed synthetic turn only; the state machine below is
+retained as historical lifecycle design, not a shipped API or feature-parity claim. Ingestion and durable business workflows
 remain separate capabilities; TrueForge schedules do not replace a general workflow provider.
 
-## Implemented agent lifecycle
+## Retired manual lifecycle design (historical)
 
 ```mermaid
 stateDiagram-v2

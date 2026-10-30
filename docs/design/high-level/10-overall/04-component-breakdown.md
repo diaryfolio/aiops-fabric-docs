@@ -23,6 +23,12 @@ flowchart TB
     Ingestion --> Memory
 ```
 
+The current development rebuild replaces generic orchestration and the manual run kernel with
+an independent unmodified TrueForge release. Those legacy packages/stores are retired; the edge
+provides only a fixed synthetic runtime verification route until business gates pass. See the
+[clean-state record](../40-ops/03-clean-state-rebuild.md); older release component inventories
+below are historical where they name retired services.
+
 ## Edge API
 
 The implemented gateway validates development or external OIDC tokens, derives tenant context,

@@ -6,8 +6,9 @@ conformance map before using a target-state document as an implementation claim.
 The selected next change retains `aiops-fabric` and adopts TrueForge as its execution runtime.
 Start with the [adoption/decommission plan](03-trueforge-adoption-decommission.md), then the
 [namespace design](20-deployment/03-trueforge-namespace-integration.md) and
-[migration runbook](40-ops/02-trueforge-migration-runbook.md). These are planned changes; the current
-reference is retained until replacement gates pass. `keepview_harness` is not required.
+[migration runbook](40-ops/02-trueforge-migration-runbook.md). The namespace pair and fixed synthetic probe are implemented; the owner-authorized clean-state reset
+retires legacy execution. Business/production migration gates remain open. See the
+[operation record](40-ops/03-clean-state-rebuild.md). `keepview_harness` is not required.
 
 All design and product documentation is owned by `aiops-fabric-docs`. The code
 repository's root README and agent instructions point here; module guides,

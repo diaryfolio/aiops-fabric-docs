@@ -77,6 +77,13 @@ In the same coordinated change across the two repositories:
 
 ## Architecture rules
 
+- TrueForge is an independently upgraded, unmodified upstream dependency. Do not edit its
+  checkout, source/generated files, internals or chart templates; do not maintain forks,
+  patches, monkey-patches, vendored internals or customized TrueForge images. Pin official
+  artifacts and use supported external APIs/SDKs and documented configuration/Helm values.
+  All customization belongs in `aiops-fabric`; disable unsupported features until a fabric-side
+  adaptation meets the invariants. Upgrades must never require replaying local upstream changes.
+
 - Name replaceable integration boundaries by capability/provider role and canonical contract,
   such as AuthN Provider, Identity Entitlement Adapter and AuthZ Provider. Keep product-specific
   protocols, claims, SDKs and administration inside adapters and example operating guides.
@@ -90,7 +97,7 @@ In the same coordinated change across the two repositories:
 - Require encrypted transport plus explicit audience/scoped authorization at every internal hop.
 - Derive tenant from verified identity; never trust caller-selected tenant headers.
 - Use deny-by-default network and authorization policy, least privilege, bounded deadlines/retries, and fail-closed security behavior.
-- Keep Kubernetes as the canonical packaging target and confine development resources to `viewsense-dev` unless an environment overlay explicitly defines another namespace.
+- Keep Kubernetes as the canonical packaging target and use the explicitly defined development pair `viewsense-dev` / `trueforge-dev`; other cells require a separate environment overlay.
 - Mark mocks, local issuers, static development PKI, and deterministic embeddings as non-production.
 - Avoid vendor lock-in in logging/metrics/traces. The production target is JSON stdout, propagated W3C trace context, OpenMetrics, and OTLP-compatible telemetry routed through collectors/exporters; record any implementation gap in the conformance map.
 

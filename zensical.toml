@@ -56,6 +56,7 @@ nav = [
     { "Operations baseline" = "design/high-level/10-overall/05-operations-and-roadmap.md" },
     { "Day-2 operations" = "design/high-level/40-ops/01-day2-operations-sre.md" },
     { "TrueForge migration runbook" = "design/high-level/40-ops/02-trueforge-migration-runbook.md" },
+    { "Clean-state TrueForge rebuild" = "design/high-level/40-ops/03-clean-state-rebuild.md" },
     { "Roadmap" = "design/high-level/50-roadmap/01-roadmap-maturity.md" },
   ] },
   { "Products and integrations" = [
