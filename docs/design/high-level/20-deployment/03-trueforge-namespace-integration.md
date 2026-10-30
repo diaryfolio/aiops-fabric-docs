@@ -1,5 +1,7 @@
 # ViewSense AI® TrueForge Namespace Integration
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 ## Deployment decision
 
 Use **two application namespaces per customer/environment cell**: one for the retained fabric and one for TrueForge. The fabric harness remains in its namespace and calls the private runtime Service across namespaces. It is not necessary to move fabric pods into the TrueForge namespace to connect them.
@@ -44,23 +46,25 @@ flowchart TB
     end
     subgraph Runtime["trueforge-dev: runtime ownership"]
         Server["trueforge-server"]
-        Controller["controller, optional initially"]
+        Controller["controller, disabled"]
+        Bridge["fabric loopback fixture transport"]
         Pg[("TrueForge PostgreSQL")]
         Redis[("TrueForge Redis")]
         Server --> Pg
         Server --> Redis
-        Controller --> Pg
-        Controller --> Redis
-        Controller --> Server
+        Controller -.-> Pg
+        Controller -.-> Redis
+        Controller -.-> Server
     end
     Gateway -->|"mTLS + verified delegated authority"| Server
-    Server --> Governance
+    Server -. "future qualified policy path" .-> Governance
     Server --> Identity
-    Server --> LLM
-    Server --> MCP
+    Server --> Bridge
+    Bridge -->|"mTLS + scoped fixture call"| LLM
+    Server -. "future native governed MCP" .-> MCP
 ```
 
-All target edges require implementation acceptance; they are not currently installed. Database arrows represent ownership-domain connections, not cross-service data sharing.
+The gateway/runtime, discovery, fabric transport/LLM and owner-store subset is implemented for the fixed synthetic fixture. Other target edges remain disabled and require separate acceptance. Database arrows represent ownership-domain connections, not cross-service data sharing.
 
 | Placement | Workloads/state | Rules |
 |---|---|---|
@@ -154,7 +158,7 @@ Explicitly deny runtime → governance/memory/registry/legacy-agent databases, r
 
 The current `NetworkTopology` contract has one top-level namespace and flows containing workload names/ports. Its Istio generator derives all principals from that single namespace. Copying the same file to `trueforge-dev`, or adding a DNS name, cannot safely describe the proposed cross-namespace edges.
 
-Implement a versioned topology contract that identifies each endpoint by namespace, workload, service account, protocol and port; binds a customer/environment namespace pair; and records selected Service destinations/trust domain. Preserve v1 behavior for the existing single-namespace profile. Generate both portable CNI policies and selected mesh principal policies from one canonical multi-namespace model. Version the schema, API status/plan, UI, fingerprints and tests together; do not hand-maintain divergent copies of the allowed graph.
+The implemented `RuntimeTopology` v2 identifies endpoints by namespace/workload/service account and directed flows by protocol/port. The fabric renderer binds the development pair and emits both-sided CNI rules. The retained v1 management/mesh contract is narrower and is not deployed over this profile. Namespace-pair mesh policies, management API/UI integration, trust-domain/Service modeling and their evidence fingerprints remain planned; extend the canonical v2 model and tests together rather than creating divergent graphs.
 
 For NetworkPolicy peers, namespace and pod selectors must occur in the **same peer item** to intersect them. The following is a documentation-only peer fragment for N01, not an installed policy:
 
@@ -191,7 +195,7 @@ The public [sandbox guide](https://trueforge.dev/sandbox) documents Daytona. The
 3. Provision runtime-local identity, trust, state services and secret references. Render/apply the independent runtime release with controller and optional features disabled.
 4. Run synthetic health/store checks and both positive/negative DNS, pod-IP and Service probes, including unknown/same-namespace identity denials. Record chart/profile/topology/image fingerprints.
 5. Implement M02's identity/adapter and only its approved cross-namespace edges. Qualify transport/client identity, owner/session/resume/turn permissions and invalid delegation without real data.
-6. Implement M03/M04 capability/retention/evidence controls and their exact callbacks. Existing legacy routes stay unchanged until route-specific cutover.
+6. Implement M03/M04 capability/retention/evidence controls and their exact callbacks. The old response route is explicitly retired; future public business routes require their own contracts and acceptance.
 7. Run bounded M05 pilot, then follow the migration runbook for drain/cutover. Adding a working runtime never automatically shuts down existing fabric services.
 
 No production capacity or availability guarantee is inferred from these namespace choices. Define and measure request/turn concurrency, token throughput, queue/drain budgets, database/Redis availability, storage growth, p95/p99 latency and recovery targets. A disconnected controller or Redis loss must have an explicit tested user-visible outcome.

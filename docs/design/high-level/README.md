@@ -1,5 +1,7 @@
 # ViewSense AI® High-Level Design
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 This directory is the canonical architecture set for ViewSense AI®. Read the index, then the executable
 conformance map before using a target-state document as an implementation claim.
 

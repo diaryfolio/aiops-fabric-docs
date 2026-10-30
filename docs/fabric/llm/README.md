@@ -1,5 +1,7 @@
 # LLM Gateway Module
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 The LLM gateway provides the stable OpenAI-compatible inference boundary. Callers never receive
 provider URLs or credentials. The deterministic mock and credential-isolated OpenAI adapter are
 executable. The Ollama adapter adds local decisions, real embeddings and optional text chat; vLLM
@@ -31,3 +33,8 @@ protocol. Provider adapters translate native APIs and normalise safe responses/e
 Model swaps keep ordinary client contracts but require capability, semantic/quality, residency,
 privacy and cost acceptance. Embedding changes require profile migration. Full dynamic admission/
 routing, inspection/egress permits, atomic budgets and complete audit evidence remain planned.
+
+The old development OpenAI overlay, provider-switch Make targets and duplicated model-default file
+are removed. Keep vendor credential isolation and the retained Helm adapter profile; real
+model/streaming/tool use in the namespace-pair runtime requires separate qualification. Do not
+change the fixed synthetic route by applying a historical single-namespace base or overlay.

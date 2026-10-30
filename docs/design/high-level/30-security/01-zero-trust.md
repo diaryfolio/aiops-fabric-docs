@@ -32,7 +32,7 @@ and does not authorize future customer data deletion. Short-lived static PKI, un
 JWT identity and single-replica stores remain development limitations. No-retention, hard budgets,
 immutable export and final business authorization are not supplied by this synthetic bridge.
 
-The optional [standalone GUI preview](../40-ops/03-clean-state-rebuild.md#open-the-native-trueforge-gui)
+The optional [standalone GUI preview](../../../deploy/trueforge-access.md)
 is a separate localhost-only development tool using official upstream no-login mode. Its HTTP
 loopback listener and disposable SQLite data are not an enterprise route or a Kubernetes security
 exception. It receives no fabric credentials or host-directory mounts and must not be exposed
@@ -237,7 +237,7 @@ See the [release simulation guide](../../../releases/parallel-environments.md).
 - policy/identity unavailability fails closed for protected operations.
 - OIDC wrong issuer/audience/algorithm, missing tenant/scope, stale key, and JWKS outage;
 - OPA timeout/malformed/deny and SPIFFE ID/SVID rotation or spoof failures;
-- agent approval with `agent.run` only, stale version replay, invalid state transition, and budget exhaustion.
+- future runtime approval authority, stale action/policy replay, unauthorized resume/cancel and budget exhaustion; the retired manual-agent scopes/API are not an acceptance path.
 - OpenAI key absent/revoked, upstream 401/429/timeout/malformed response, caller model override,
   upstream URL/redirect manipulation, direct non-adapter egress, and credential absence from all
   gateway/orchestrator pod specifications and logs.

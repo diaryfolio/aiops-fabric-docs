@@ -133,7 +133,7 @@ Neither syntax alone proves equivalent semantics, quality or policy enforcement.
 
 | Boundary | Canonical interface | Adapter responsibility |
 |---|---|---|
-| Enterprise request | ViewSense AI® `/v1/responses` with verified channel context | Stable response/errors/correlation; reject caller-selected provider credentials/URLs |
+| Enterprise request | Future versioned fabric session API with verified channel context (unimplemented) | Stable response/errors/correlation; reject caller-selected provider credentials/URLs |
 | Generation | Supported `/v1/chat/completions` subset plus explicit capabilities | Translate messages/options into vendor-native API, choose server-approved model, normalise output/usage/errors |
 | Embeddings | Versioned text/batch and embedding-profile contract | Translate API, validate count/dimension/profile, enforce no truncation; vector space changes require migration |
 | Memory | Canonical record/search contract | Provider schema and isolation mapping; source/ACL/classification/freshness remain visible |

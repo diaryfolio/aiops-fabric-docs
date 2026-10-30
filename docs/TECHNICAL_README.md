@@ -1,66 +1,59 @@
 # ViewSense AI® Technical Guide
 
-ViewSense AI® is a portable, enterprise-controlled AI backbone. It gives applications one governed API while allowing LLM runtimes, memory products, vector stores, workflow engines, and MCP servers to run locally or in approved clouds and to be replaced independently.
+The retained `aiops-fabric` tier owns identity, policy, provider credentials, memory, integrations
+and evidence. Official unmodified TrueForge supplies the selected execution runtime. All customer
+customization stays in fabric through supported APIs/SDKs and documented values; no source/chart
+patch, fork, vendored internals or customized upstream image is permitted.
 
-For the business overview, return to the [main README](index.md).
+## Open TrueForge
 
-The architecture documentation is maintained in `aiops-fabric-docs`. The separate
-`aiops-fabric` implementation repository contains an executable Kubernetes reference
-slice. The reference proves the main boundaries without requiring a GPU or external AI account:
+From the implementation checkout, run `make trueforge-ui`, then open
+**[http://localhost:8791](http://localhost:8791)**. This is a separate native standalone preview,
+with no browser certificate/login and temporary SQLite/configuration data discarded on stop.
+Use `make trueforge-ui-status` or `make trueforge-ui-stop` to inspect or remove it.
+[Open TrueForge](deploy/trueforge-access.md) is the canonical access/troubleshooting guide.
 
-- edge API and request orchestrator;
-- OpenAI-compatible LLM gateway with a deterministic mock and a credential-isolated OpenAI adapter;
-- vendor-neutral memory gateway with a PostgreSQL/pgvector provider;
-- a zero-trust Mem0 OSS/Platform adapter behind that same memory contract;
-- MCP registry and invocation gateway with a test provider;
-- a persistent bounded agent runtime with idempotent creation, checkpoints, approval, cancellation,
-  optimistic concurrency, budgets, and ordered event history;
-- short-lived, audience-bound workload tokens plus mutual TLS on every internal API hop;
-- optional external OIDC/Keycloak verification at the edge and OPA provider-admission decisions;
-- deny-by-default Kubernetes network policies and separate data stores;
-- cryptographically bound Trust Envelope delegation plus provider passport, evaluation-admission, and safe evidence APIs.
+The optional fabric management console is a different application on port 8787. Hosted TrueForge
+in Kubernetes remains protected by mTLS/OIDC; its port 8790 is not a configured browser login.
 
-The mock LLM and deterministic embedding are test adapters, not production AI models. The OpenAI
-adapter provides a real optional cloud path without exposing its key outside the provider pod.
-The Ollama adapter ships decisions, real embeddings and optional non-streaming chat. vLLM and Azure
-OpenAI adapters remain planned; callers retain the same capability boundaries. Mem0 has an executable adapter boundary.
-
-## Architecture
+## Current architecture
 
 ```mermaid
 flowchart LR
-    C["Enterprise client"] -->|"mTLS + tenant token"| G["Edge API"]
-    G -->|"aud: orchestrator"| O["Orchestrator"]
-    O -->|"memory API"| MG["Memory gateway"]
-    O -->|"OpenAI-compatible API"| LG["LLM gateway"]
-    T["Admin/test client"] -->|"registry + tool-provider API"| XG["MCP gateway"]
-    AR["Durable agent API"] --> AGDB[("Agent PostgreSQL")]
-    A["Platform governance client"] -->|"passport / evaluation / evidence APIs"| V["Governance API"]
-    MG --> MP["Memory provider adapter"]
-    LG --> LP["Mock or OpenAI adapter"]
-    XG --> XP["ViewSense AI® mock tool provider"]
-    LG -. "selected adapter" .-> Local["Ollama adapter / local runtime"]
-    XG -. "planned protocol adapter" .-> NativeMCP["MCP Streamable HTTP server"]
-    MP --> PGV[("PostgreSQL + pgvector")]
-    XG --> PGR[("Registry PostgreSQL")]
-    V --> PG[("Governance PostgreSQL")]
-    I["Enterprise IdP / workload issuer"] -.-> G & O & MG & LG & XG & V & MP & LP & XP
+    Client["Authenticated synthetic client"] --> Fabric["viewsense-dev · fabric gateway"]
+    Fabric -->|"mTLS + native OIDC JWT"| Runtime["trueforge-dev · official runtime"]
+    Runtime --> Bridge["fabric loopback fixture transport"]
+    Bridge --> LLM["LLM gateway → mock SSE provider"]
+    Runtime --> State[("runtime PostgreSQL + Redis")]
+    APIs["Independent API clients"] --> Gov["Governance / channel policy"]
+    APIs --> Memory["Memory / ingestion"]
+    APIs --> Tools["MCP registry / mock provider"]
+    Browser["localhost:8791"] --> Preview["separate native UI · temporary SQLite"]
 ```
 
-Solid arrows are implemented. Dashed arrows are planned. No service reads another service's
-database. Provider-specific behavior remains behind adapters.
+The hosted adapter accepts only the fixed synthetic `/v1/runtime-check` fixture. The retired
+`/v1/responses` returns authenticated HTTP 410; manual agent-run endpoints/storage are removed.
+Runtime transcripts do not replace governed memory or safe evidence. No service reads another
+service's database or receives another adapter's provider credentials.
 
-The integration model has four modes: `bundled` for a portable ViewSense AI® reference component,
-`adapter` for a ViewSense AI® API boundary in front of a selected product, `managed-dependency` for a
-cluster/platform service operated separately, and `external` for an enterprise or cloud endpoint.
-The machine-readable list and exact readiness are in [fabric/PRODUCTS.md](fabric/PRODUCTS.md).
+## Retained capabilities
 
-## Run locally with Kubernetes
+- Development mTLS/scoped JWT/Trust Envelope, product-neutral OIDC verification and local SSO examples.
+- Channel policy drafts, independent review/publication, AuthZ pilot, provider passports/admission and safe evidence APIs.
+- LLM boundary with deterministic mock SSE; credential-owning OpenAI and Ollama adapters retain their narrower protocol contracts.
+- Memory gateway, PostgreSQL/pgvector profiles and bounded backfill; Mem0 adapter boundary.
+- Synchronous ingestion, MCP registry/provider API, certificate metadata and networking management contracts.
+- Optional detachable management console, source/Helm catalogs, release and documentation publishing tooling.
 
-Prerequisites: Docker, `kubectl`, `k3d`, and a current Kubernetes context that points to the intended development cluster.
+These are different capability and maturity scopes. The runtime pair is not production business
+execution. Native governed MCP, real model/tool compatibility, fresh per-call authority, PII,
+atomic budgets, immutable evidence, no-retention execution, idempotency/recovery, HA/restore,
+mesh-v2 and integrated browser identity remain qualification gates. See
+[Implementation Conformance](design/high-level/00-implementation-conformance.md).
 
-Use the [ViewSense AI® quick start](QUICKSTART.md) for first installation, normal daily startup,
-cluster recovery, secure OpenAI configuration, port-forwards, testing, and shutdown.
+## Build and deploy
+
+Follow the [quick start](QUICKSTART.md), then:
 
 ```bash
 make unit
@@ -70,35 +63,12 @@ make k8s-deploy
 make k8s-test
 ```
 
-The deployment script builds `viewsense-core:dev`, imports it into k3d, creates short-lived development credentials, and applies resources only to `viewsense-dev`. Generated keys and credentials live under `.viewsense/` and are ignored by Git.
+The development renderer explicitly targets `viewsense-dev` / `trueforge-dev` on `k3d-cks`, pins
+official runtime artifacts and generates private trust/resources under ignored `.viewsense/rebuild`.
+The fabric chart/Compose foundations remain independent packaging choices. They do not implicitly
+install TrueForge or supply production providers. The obsolete single-namespace overlay and mesh
+POC installers are removed; use current profile tooling and owner-managed integration qualification.
 
-`make k8s-deploy` is an installation/update action, not an everyday cluster-start command. On an
-installed suite, `make openai-enable` changes only provider configuration; use
-`make openai-enable-fresh` when a full rebuild is also required.
-
-Docker Compose is retained as a quick developer harness:
-
-```bash
-make compose-up
-make compose-test
-```
-
-## Important production boundary
-
-The in-repository identity issuer, static development CA, mock LLM, mock MCP server, deterministic
-embeddings, and single-replica databases exist to make contracts testable. Production installations
-must operate enterprise OIDC, automated workload identity/certificate issuance (for example
-SPIFFE/SPIRE or a service mesh), an external secrets manager, a real embedding service, and
-production-grade model/MCP providers. Selecting a Helm profile does not install cluster-scoped
-Keycloak, SPIRE, n8n, or OpenTelemetry operators; it configures the ViewSense AI® side of those
-boundaries. OPA is the exception and can be deployed as the governance pod's local sidecar.
-
-Start with [the architecture index](design/high-level/design_01.md) and [the deployment design](design/high-level/20-deployment/01-deployment-topology-sizing.md).
-Use the [implementation conformance map](design/high-level/00-implementation-conformance.md)
-for the exact routes, runtime edges, state owners, and maturity of each integration.
-
-Copy-paste validation commands, including memory and governance APIs plus negative authorization checks, are in [tests/README.md](tests/README.md).
-That guide also contains the hidden-key OpenAI setup and a real curl prompt proving that retrieved
-ViewSense AI® memory grounds the model response.
-
-All contributors and coding agents must follow the design-sync rules in [CLAUDE.md](engineering/repository-instructions.md).
+See the [test guide](tests/README.md), [product/module catalog](fabric/README.md),
+[architecture](design/high-level/design_01.md), [namespace design](design/high-level/20-deployment/03-trueforge-namespace-integration.md)
+and [cleanup record](design/high-level/40-ops/04-cleanup-record.md).

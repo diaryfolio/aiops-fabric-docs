@@ -1,5 +1,7 @@
 # Independent TrueForge Runtime Integration
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 The retained fabric uses an official, unmodified TrueForge release in `trueforge-dev` beside
 `viewsense-dev`. All customization stays in fabric-owned adapters and documented upstream
 configuration. Source/chart patches, forks and customized upstream images are prohibited.

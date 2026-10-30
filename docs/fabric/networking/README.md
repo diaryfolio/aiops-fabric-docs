@@ -1,15 +1,16 @@
-# ViewSense AI® networking module
+# ViewSense AI® Networking Module
 
-Networking is an operator-owned provider boundary. Kubernetes CNI/NetworkPolicy controls packet
-reachability; the optional mesh controls workload transport identity; application TLS/JWT and tenant
-checks remain in the APIs. The reference installs Cilium and Istio ambient independently. Replace a
-provider by satisfying the same topology and runtime acceptance contract, not by editing application
-code. Suite/network plans are reviewable API output and do not apply cluster-admin operations.
+The current development namespace pair uses the fabric-owned topology-v2 schema/generator and
+actual CNI enforcement. CNI packet reachability, mesh transport identity and application mTLS/JWT
+remain separate replaceable controls. The selected cluster retains its existing CNI; legacy
+single-namespace Cilium/Istio POC installers are removed.
 
-The source of truth is `deploy/networking/allowed-flows.json`. Strict Istio policy generation and the
-Helm profile use the same graph; tests reject drift. The independent `viewsense-network` cluster
-keeps existing POC PVCs separate. Timestamped acceptance evidence is exposed through the headless
-networking API and the detachable Networking page; stale or missing evidence is never live health.
+Runtime topology generation lives in `viewsense_common.runtime_topology` and `scripts/runtime/render.py`.
+`make k8s-test` verifies the allowed/denied paths. The retained v1 management API/planner, provider
+catalog and pinned configuration assets remain foundations; they do not overwrite v2 or supply
+namespace-pair mesh acceptance. Mesh-v2 deployment/recovery is planned. Operator plans and stale
+historical evidence never imply live health or authorization.
 
-See the [networking design](../../design/high-level/20-deployment/02-modular-networking-mesh.md)
-and [operator guide](../../deploy/integrations/networking.md) for install, acceptance and replacement.
+See the [operator guide](../../deploy/integrations/networking.md),
+[networking design](../../design/high-level/20-deployment/02-modular-networking-mesh.md), and
+[Open TrueForge](../../deploy/trueforge-access.md) for the independent native GUI preview.

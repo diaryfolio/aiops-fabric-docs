@@ -151,16 +151,7 @@ because it is a stateless local policy decision point with a narrow loopback API
 managed selection requires credentials, CA trust, explicit egress, conformance tests, version
 pinning, upgrade/rollback ownership, and a provider passport before production routing.
 
-The `openai` Helm profile deploys only the ViewSense AI® `openai-adapter`; it does not create or manage
-an OpenAI account. Its local default model is read from `config/models.env` and currently resolves
-to `gpt-5.6-luna`. The model is non-secret, but the development overlay stores it beside the API key
-in the provider Secret so the adapter receives one provider configuration. The model remains
-server-controlled. In production the API-key Secret must be supplied by the platform secret
-controller, while the model is a Helm value. The development
-overlay permits public IPv4 HTTPS while excluding private, loopback, link-local, and reserved
-ranges. Production must replace that broad rule with an egress proxy or CNI FQDN policy restricted
-to `api.openai.com`, plus DNS/proxy failure tests. `make openai-disable` restores the mock route and
-deletes the development credential Secret and adapter resources.
+The retained OpenAI adapter takes an explicitly deployed server-controlled model from its Helm/environment configuration. The old single-namespace provider-switch launchers/default file are removed; hosted real-model enablement remains gated by protocol, identity, PII, budget, evidence and retention acceptance. Rollback uses a qualified profile or disables the affected route; it does not reapply the obsolete base.
 
 ```mermaid
 flowchart LR
@@ -195,7 +186,12 @@ Provider descriptors include locality, residency, classification ceiling, capabi
 
 ## Development workflow in this repository
 
-`scripts/k8s-deploy-dev.sh` builds the image, imports it to the active k3d cluster, creates generated Secrets, applies `deploy/kubernetes/base`, and waits for rollout in `viewsense-dev`. It is an installation/update operation, not a routine cluster-start command. An existing stopped cluster resumes with `k3d cluster start cks`, after which Kubernetes restores its workloads and retained volumes. The base includes an independently addressed governance API and database with explicit NetworkPolicy. On an installed suite, `make openai-enable` prompts without echo, reads the non-secret model from `config/models.env`, creates the provider Secret, and applies `deploy/kubernetes/overlays/openai` without rebuilding images; `make openai-enable-fresh` performs the full deployment first. `make openai-model-update` patches only the validated model field and restarts the adapter without reading or replacing its API key. `scripts/k8s-test.sh` runs a namespaced smoke Job that validates provider admission and evidence alongside the core AI path, then pairs reachable and denied in-pod mTLS HTTP data-transfer probes to prove the local CNI enforces two representative NetworkPolicy boundaries. The scripts validate their fixed namespace before mutation. The operator-oriented lifecycle and recovery commands are maintained in the top-level `QUICKSTART.md`.
+`scripts/k8s-deploy-dev.sh` delegates to `scripts/runtime/deploy.sh`: it checks context, renders
+namespace-qualified boundaries/private resources, builds the fabric image and installs the pinned
+official TrueForge release in the paired namespace. `make k8s-test` qualifies the retained APIs,
+fixed runtime turn and real allowed/denied paths. Static base manifests remain fabric packaging
+inputs; applying them directly is not the namespace-pair workflow. See [Quick start](../../../QUICKSTART.md)
+and [Open TrueForge](../../../deploy/trueforge-access.md).
 
 ## Production gaps from the reference
 

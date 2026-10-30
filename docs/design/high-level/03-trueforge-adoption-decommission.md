@@ -84,7 +84,7 @@ Do not remove governance, memory, identity/transport contracts or credential ada
 
 | Boundary | Required work before cutover |
 |---|---|
-| Public `/v1/responses` | Inventory clients and exact schemas; retain current behavior until a route-specific compatibility suite passes. TrueForge `/api/v1/sessions` and turns are internal runtime APIs, not an automatic wire replacement |
+| Retired public `/v1/responses` | Authenticated HTTP 410 in the authorized reset. A future versioned public session contract requires its own qualification; native runtime sessions/turns are not an automatic wire replacement |
 | `user_id` / memory owner | Resolve requested owner under verified subject/account policy; never preserve the legacy owner-selection gap |
 | `remember` / retrieval | Either implement equivalent governed behavior or reject unsupported requests before dispatch. No silent ignoring, automatic transcript-to-memory copying or unapproved retention |
 | `/v1/agent-runs` | Document each legacy action against runtime semantics. Unsupported manual checkpoint/state actions require a versioned migration/deprecation, not invented successful responses |

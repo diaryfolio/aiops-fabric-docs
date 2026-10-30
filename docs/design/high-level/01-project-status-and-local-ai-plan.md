@@ -1,5 +1,7 @@
 # ViewSense AI® Project Status and Local AI Integration Plan
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 Includes the local AI console changes after baseline `0001b14`.
 The [implementation conformance map](00-implementation-conformance.md) is the canonical route and
 runtime inventory. Live evidence below applies to the isolated development stack, not production.
@@ -83,7 +85,7 @@ The public response path can use the Ollama chat adapter through the existing LL
 operator selects a chat model, configures credentials/trust/egress and completes its conformance
 checks. The current public gateway/orchestrator budgets (50/55 seconds) also need alignment
 before certifying minute-long Qwen requests; the longer console preview budget does not change
-that route. The cloud setup remains in the [quick start](../../QUICKSTART.md#enable-openai-securely).
+that route. The cloud setup remains in the [LLM adapter guide](../../fabric/llm/README.md).
 
 ## Embedding compatibility and migration
 

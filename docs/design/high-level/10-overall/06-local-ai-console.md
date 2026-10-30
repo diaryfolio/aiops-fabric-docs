@@ -289,7 +289,6 @@ console-owned; no backend API starts depending on the GUI. Temporary TLS/client 
 on the host, is removed when the launcher stops, and is never returned to JavaScript. An installed
 namespace reset requires reattachment. See the [operator guide](../../../releases/installation.md#attach-the-host-side-release-preview-gui).
 
-The preview also exercises `/v1/responses` through the gateway with the existing `api.invoke`
-grant, a fixed backend model route, and `remember: false`. Its UI calls this a mock LLM response
-and shows Tev1/Ollama as not installed. Deterministic embedding profile labels refer to the memory
-provider; absent capabilities and failed probes do not remain indefinitely checking.
+The source-checkout release preview now offers ingestion, memory writes and search only. The
+retired gateway-response test facade/button is removed. Use the separate native TrueForge preview
+for upstream UI exploration and `make k8s-test` for hosted fixed-turn qualification.

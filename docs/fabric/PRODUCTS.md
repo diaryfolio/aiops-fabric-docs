@@ -36,12 +36,12 @@ flowchart LR
 | certificates | cert-manager | managed dependency | configuration-ready | dedicated operator, issuer and canary overlay; no private keys exposed through the console |
 | workload identity | static development PKI | bundled | validated | local mTLS certificates for tests only |
 | workload identity | SPIFFE/SPIRE | managed dependency | planned | values and SDS/mesh design only; no SVID consumer ships |
-| agents | built-in bounded runtime | bundled | validated | persistent runs, versions, budgets, approval, cancellation, events |
-| agents | LangGraph-compatible runtime | adapter | planned | stable contract only; no adapter has shipped |
+| agents | official unmodified TrueForge | external | configuration-ready | fixed synthetic hosted integration plus separate native GUI preview; business acceptance remains gated |
+| alternative agent runtime | provider-neutral boundary | adapter | planned | no alternative runtime adapter or legacy manual-run API ships |
 | memory | PostgreSQL + pgvector | bundled | validated | canonical memory API, isolated database, deterministic test embeddings |
 | memory | Mem0 OSS or Platform | adapter | configuration-ready | credential-isolated adapter, tenant/owner pseudonymization, normalization |
 | LLM | deterministic OpenAI-compatible mock | bundled | validated | contract and failure testing only |
-| LLM | OpenAI API | adapter | configuration-ready | credential-isolated adapter, fixed model/endpoint, Helm and development Kustomize profile, manual live memory-grounding test |
+| LLM | OpenAI API | adapter | configuration-ready | credential-isolated adapter, fixed model/endpoint, retained Helm profile and security/protocol tests; namespace-pair real-model enablement remains gated |
 | local decisions/embeddings/chat | Ollama adapter | adapter | configuration-ready | Tev1 decision and EmbeddingGemma real-vector RAG verified in isolated console; optional chat needs model selection; enterprise TLS/egress/identity acceptance remains required |
 | LLM | vLLM or external OpenAI-compatible endpoint | external | planned | requires a ViewSense AI® mTLS/JWT adapter; endpoint values alone are insufficient |
 | ingestion | deterministic paragraph chunker | bundled | validated | synchronous chunking and memory writes |
@@ -61,3 +61,5 @@ The default portable suite is the set of validated bundled products. Optional pr
 `charts/viewsense/profiles/`; `enterprise-suite.yaml` is an integration blueprint, not a claim that
 its upstream platforms are installed. Exact Helm paths and required tests are in
 `product-catalog.json`.
+
+Native GUI access is documented in [Open TrueForge](../deploy/trueforge-access.md); selecting a product does not install it or grant runtime authority.

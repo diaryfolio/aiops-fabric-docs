@@ -1,5 +1,7 @@
 # ViewSense AI® Day-2 Operations and SRE
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 ## Planned TrueForge migration operations
 
 The [migration runbook](02-trueforge-migration-runbook.md) governs baseline/restore inventory,
@@ -127,7 +129,7 @@ trust and sessions, drain requests/work and define a data-safe fallback before o
 
 Each state owner defines RPO/RTO, encryption, retention, legal hold, restore order, and integrity verification. PostgreSQL uses PITR plus regular full backups. Vector records retain enough canonical source/embedding metadata to reindex. MCP catalog backups exclude retrievable secrets. Restore tests run monthly in an isolated environment; regional/cluster failover is exercised quarterly for required tiers.
 
-The agent database is a separate state owner. Restore it before resuming workers, hold all restored
+The selected runtime database is a separate state owner. Restore it through its owner before resuming work; hold all restored
 runs paused until version/idempotency reconciliation completes, and never infer that a side effect
 must be repeated merely because an event is absent. Mem0 backup/export, Keycloak realm recovery,
 SPIRE trust-bundle recovery, OPA bundle rollback, and workflow recovery remain owned by their
@@ -141,15 +143,7 @@ selected product operators and must be tested with the ViewSense AI® conformanc
 - token runaway: cancel request/workflow, enforce tenant stop-loss, quarantine route;
 - model quality/safety regression: pin previous provider/model policy, preserve evaluation evidence, notify owners.
 
-For an OpenAI route, 401/403 indicates credential/configuration failure and pages the route owner;
-429 is a capacity/quota signal and must not cause residency-unsafe fallback; timeout/5xx consumes
-the provider dependency budget. Rollback runs `make openai-disable` in development or promotes the
-previous signed route configuration in production. Rotate/revoke the provider key at OpenAI first,
-then synchronize the secret and restart only the adapter; verify callers and logs never contain it.
-The local OpenAI model default is controlled by `config/models.env` and currently resolves to
-`gpt-5.6-luna`. Changing that default requires replaying representative
-memory-grounding, safety, latency, token-usage, and output-contract evaluations before promotion;
-rollback restores the last admitted model value without changing the stable ViewSense AI® API.
+The retained OpenAI adapter takes an explicitly deployed server-controlled model from its Helm/environment configuration. The old single-namespace provider-switch launchers/default file are removed; hosted real-model enablement remains gated by protocol, identity, PII, budget, evidence and retention acceptance. Rollback uses a qualified profile or disables the affected route; it does not reapply the obsolete base.
 
 ## Capacity and cost
 

@@ -26,17 +26,23 @@ The repository's exact executable scope is maintained separately in the
 For the current project state, missing capabilities, and next steps toward an enterprise harness
 for local AI, read the
 [local AI and embedding integration plan](design/high-level/01-project-status-and-local-ai-plan.md).
-The response API exists. A local development console now connects Ollama decisions and embeddings
+The old response API is retired (HTTP 410); hosted execution is currently a fixed synthetic fixture. A local development console now connects Ollama decisions and embeddings
 to real pgvector retrieval. Run APIs headlessly with `make harness`, optionally attach a
 GUI with `make gui`, or use combined `make console`; see the
 [console design](design/high-level/10-overall/06-local-ai-console.md).
+
+## Open TrueForge
+
+Run `make trueforge-ui` from `aiops-fabric`, then open **[http://localhost:8791](http://localhost:8791)**.
+This is the official native GUI in a separate temporary standalone preview. No browser certificate
+or login is required; configure a model before chatting. It does not show Kubernetes/fabric data.
+See [Open TrueForge](deploy/trueforge-access.md) for start/status/stop, data lifetime and hosted access.
 
 ## Explore ViewSense AI®
 
 1. **Deploy the portable platform**
 
-    Install the Kubernetes development environment, start the services, and configure an optional
-    OpenAI provider. [Open the quick start →](QUICKSTART.md)
+    Install the current fabric/TrueForge namespace pair and run synthetic integration checks. [Open the quick start →](QUICKSTART.md)
 
 2. **Validate real API flows**
 
@@ -94,7 +100,7 @@ specific model, database, identity, workflow, or observability vendor.
 | ✅ Provider gateways | Isolates model, memory, and tool-provider protocols and credentials behind replaceable boundaries. |
 | ✅ Governed memory contract | Provides tenant- and owner-bound create/search APIs without exposing provider databases to callers. |
 | ✅ Provider governance and evidence | Provides provider passports, evaluation admission, and payload-minimized evidence APIs. |
-| ✅ Bounded agent lifecycle | Provides durable runs, budgets, approvals, cancellation, versions, checkpoints, and safe events. |
+| ✅ Runtime integration boundary | Delegates execution to unmodified TrueForge; fabric retains policy, credentials, memory and evidence. Current integration is synthetic-only. |
 | ✅ Vendor-neutral operational output | Provides structured JSON logs and request correlation suitable for enterprise collection. |
 | ✅ Kubernetes packaging | Provides portable manifests, Helm configuration, isolated service accounts, and deny-by-default network policy. |
 
@@ -135,7 +141,6 @@ See the [operating guide](deploy/integrations/keycloak.md) and
 [management GUI design](design/high-level/10-overall/06-local-ai-console.md#platform-management-console-design).
 Product selection generates a deployment plan; automated deployment application remains planned.
 
-Networking is modular: the separate Cilium + Istio ambient reference uses `make networking-up`,
-`make networking-deploy`, and `make networking-test`. See the
-[networking operating guide](deploy/integrations/networking.md) before selecting a cluster.
-The management console's Networking page is a detachable client of the same headless APIs.
+Networking remains modular through retained provider contracts and namespace-qualified policies.
+Use the [current networking guide](deploy/integrations/networking.md); legacy single-namespace POC
+installers are removed. The console's Networking page remains an API client, not a cluster installer.

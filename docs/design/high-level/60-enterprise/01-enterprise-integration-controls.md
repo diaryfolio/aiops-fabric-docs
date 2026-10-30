@@ -7,7 +7,8 @@ the fabric around the selected execution runtime. Its [namespace design](../20-d
 and [migration runbook](../40-ops/02-trueforge-migration-runbook.md) add planned identity, network,
 retention, budget/evidence and decommission gates. None of this matrix becomes production-ready
 merely by installing TrueForge. The source assessment maps each matrix domain to the existing
-foundation and missing acceptance work; the existing implementation inventory remains unchanged.
+foundation and missing acceptance work. The current conformance map and cleanup record describe
+the implemented namespace pair and retired components; installation never closes production gates.
 
 ```mermaid
 flowchart LR
@@ -94,7 +95,7 @@ the event's RFC3339 timestamp generated at runtime.
   "tenant_id": "pseudonymous-tenant-key",
   "principal": "workload-or-user-key",
   "http_method": "POST",
-  "http_path": "/v1/responses",
+  "http_path": "/v1/runtime-check",
   "http_status": 200,
   "duration_ms": 42.1,
   "outcome": "success"
@@ -185,7 +186,7 @@ cutover or a production traffic controller; those matrix acceptance gates remain
 Implemented now: JSON access/runtime logs, `X-Request-ID` correlation, certificate-required TLS,
 audience/scoped tokens, signed Trust Envelope tenant delegation, external OIDC edge verification,
 built-in provider admission plus an OPA decision boundary, append-only safe evidence metadata,
-durable bounded agent state,
+a fixed synthetic external-runtime integration,
 PostgreSQL/pgvector and Mem0 adapter boundaries, restricted pods, network policies, API schemas,
 profile rendering, and positive/negative smoke tests. Configuration-ready but environment-dependent:
 the credential-isolated OpenAI adapter, Keycloak/generic OIDC, OPA sidecar, Mem0, and collector

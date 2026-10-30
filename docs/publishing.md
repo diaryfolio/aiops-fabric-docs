@@ -166,8 +166,9 @@ layout flattens the former `docs/` prefix: architecture lives in `docs/design/`,
 prompts in `docs/prompts/`, and the former root product overview in `docs/index.md`.
 Module, contract, integration, and test guides retain their relative groupings under `docs/`.
 The full implementation instructions are now `docs/engineering/repository-instructions.md`.
-Management-console and synthetic status screenshots are in `docs/artifacts/` with gallery pages.
+Maintained management-console evidence remains under `docs/artifacts/`; obsolete static status previews were removed during architecture cleanup.
 Internal links and navigation were updated for the new layout.
 
-The generated status-preview HTML harness contains executable console implementation and
-remains in the closed-source checkout; only its screenshots and written evidence are documentation.
+The obsolete generated status-preview HTML copy and its synthetic screenshot gallery were removed.
+Use the live console/native GUI and current operating guides; do not publish copied executable UI
+from the implementation checkout as maintained documentation.

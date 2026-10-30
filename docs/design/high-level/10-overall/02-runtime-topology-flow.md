@@ -1,110 +1,74 @@
 # ViewSense AI® Runtime Topology and Flows
 
-## Selected next runtime topology
+## Current runtime topology
 
-The [TrueForge adoption decision](../03-trueforge-adoption-decommission.md) retains fabric services
-and introduces a planned private runtime in `trueforge-dev` beside `viewsense-dev`. The gateway's
-runtime adapter crosses the namespace boundary; the runtime calls governed model/MCP/policy APIs
-under narrowed authority. [Namespace placement and exact edges](../20-deployment/03-trueforge-namespace-integration.md)
-are the target. The diagrams and synchronous path below remain current implementation evidence;
-they are not changed until the new integration and route-specific cutover pass acceptance.
-
-## Planes and trust boundaries
-
-Solid arrows are implemented calls. Dashed arrows are target integrations and require a shipped
-adapter plus conformance evidence.
+The retained fabric lives in `viewsense-dev`; the independent official TrueForge runtime and its
+state live in `trueforge-dev`. The old request orchestrator/manual agent kernel and agent database
+are removed. All adaptation remains in fabric through supported upstream interfaces.
+[Open TrueForge](../../../deploy/trueforge-access.md) describes the separate native GUI preview;
+it is not a browser client for the hosted runtime or its state.
 
 ```mermaid
 flowchart TB
-    subgraph Edge["Edge trust zone"]
-      API["Edge API / policy enforcement point"]
-    end
-    subgraph Control["Control trust zone"]
-      ORC["Request orchestrator"]
-      MCP["MCP gateway and registry"]
-      MEM["Memory gateway"]
-      LLM["LLM gateway"]
-      GOV["Governance"]
-      AGENT["Agent lifecycle"]
-      INGEST["Synchronous ingestion"]
-    end
-    subgraph Providers["Provider trust zones"]
-      MR["Memory adapter"]
-      LR["LLM adapter/runtime"]
-      OA["OpenAI credential adapter"]
-      XR["Native MCP runtime adapter (planned)"]
-    end
-    subgraph Data["Data trust zones"]
-      MD[("Memory store")]
-      XD[("MCP registry store")]
-    end
-    API --> ORC
-    ORC --> MEM & LLM
-    MEM --> MR --> MD
-    LLM --> LR
-    LLM --> OA --> CLOUD["OpenAI API"]
-    INGEST --> MEM
-    MCP -.-> XR
-    MCP --> XD
-    AGENT --> AD[("Agent database")]
-    GOV --> GD[("Governance database")]
+    API["Authenticated edge"] --> TF["Official TrueForge · fixed synthetic turn"]
+    TF --> Bridge["fabric loopback model transport"]
+    Bridge --> LLM["LLM gateway"] --> Mock["mock SSE provider"]
+    TF --> State[("runtime PostgreSQL / Redis")]
+    Clients["Independent API clients"] --> GOV["governance"]
+    Clients --> INGEST["ingestion"] --> MEM["memory gateway/provider"]
+    Clients --> MCP["MCP registry / provider API"]
+    GOV --> GD[("governance database")]
+    MEM --> MD[("memory database")]
+    MCP --> XD[("registry database")]
 ```
 
-Kubernetes NetworkPolicy separates these zones even when they share a cluster. Production may place them in separate namespaces or clusters without changing API contracts.
+Internal edges require encrypted transport, verified identity and explicit authority. Topology-v2
+rules intersect namespace and workload selectors on both sides. Identity/token issuance and public
+JWKS discovery use distinct protected listeners. Native MCP, policy dispatch, real providers and
+business delivery remain gated; the diagram does not imply that those future edges are enabled.
 
-The current orchestrator does not invoke MCP, governance, ingestion, or the agent runtime. Those
-services expose independent APIs. Native MCP transport, autonomous agent-to-tool execution, and
-workflow callbacks are planned.
+## Implemented fixed verification flow
 
-## Implemented synchronous response flow
-
-1. The edge validates the development or external OIDC token, derives `tenant_id`, validates the
-   request model, and rejects caller-supplied tenant overrides. Rate limits, WAF, and enterprise
-   quotas belong to the production API-management integration.
-2. The edge obtains or reuses a short-lived token whose audience is only the orchestrator and whose scope is only `orchestrate.invoke`.
-3. The orchestrator performs bounded memory retrieval, constructs delimited context, and invokes the
-   configured LLM route. General model/tool/cost/residency policy routing is target state.
-4. The memory gateway enforces the tenant-bound provider call and queries the configured provider;
-   provider-specific payloads do not escape the canonical response.
-5. The LLM gateway forwards to one deployment-configured OpenAI-compatible adapter. Dynamic
-   capability routing is not implemented.
-   For OpenAI, it calls an internal ViewSense AI® adapter using mTLS and a tenant-bound
-   `provider.invoke` token. That adapter alone exchanges the server-held API key with the pinned
-   OpenAI HTTPS API; callers cannot select the outbound host or provider model.
-6. The response returns with a request ID, model identifier, and memory-hit count. When `remember` is
-   true, the orchestrator writes the interaction through the memory gateway.
+1. The edge authenticates `runtime.verify`, derives the signed tenant and rejects nonempty bodies.
+2. It creates an inline session through the official runtime API, with a fixed model/instructions
+   and disabled optional execution features. The runtime subject is issuer-qualified.
+3. It creates one fixed synthetic turn and observes the same turn through bounded status reads;
+   no automatic duplicate creation or legacy fallback follows a timeout.
+4. The fabric loopback bridge accepts the exact fixture and recognized upstream clock definition,
+   reconstructs a constant mock request and forwards no other runtime content or tool definitions.
+5. The LLM gateway/mock provider use mTLS and audience/scoped JWT. The result returns with explicit
+   `synthetic: true` and `business_execution: false`. Ordinary runtime storage contains the fixture.
 
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant G as Gateway
-    participant O as Orchestrator
-    participant M as Memory gateway/provider
-    participant L as LLM gateway/adapter
-    C->>G: POST /v1/responses
-    G->>O: mTLS + aud=orchestrator
-    O->>M: search(owner, query)
-    M-->>O: canonical memory items
-    O->>L: bounded chat messages
-    L-->>O: normalized completion
-    opt remember=true
-      O->>M: create memory
-    end
-    O-->>G: output + model + memory_hits
-    G-->>C: response + X-Request-ID
+    participant C as Synthetic client
+    participant G as Fabric gateway
+    participant T as Official TrueForge
+    participant B as Fabric transport
+    participant M as LLM gateway / mock
+    C->>G: POST /v1/runtime-check · {}
+    G->>T: create session + one fixed turn · mTLS/OIDC
+    T->>B: local fixed model request
+    B->>M: mTLS + scoped fixture request
+    M-->>T: mock SSE through transport
+    G->>T: observe existing turn until terminal
+    G-->>C: synthetic result; no business execution
 ```
+
+`POST /v1/responses` is a retirement marker returning authenticated HTTP 410. Memory/remember
+semantics and old manual checkpoints are not silently translated into TrueForge behavior. The
+legacy response and manual lifecycle walkthroughs are removed from current operating guides.
 
 ## Target failure rules
 
 ### Planned channel request path
 
 The [Input/Output Channel flow](07-input-output-channels.md#practical-sales-flow) adds verified
-business context at the edge, governance route resolution, and bounded orchestrator-to-MCP tool
+business context at the edge, governance route resolution, and bounded fabric-governed runtime-to-MCP tool
 execution. For Sales, the CRM-Logistics1 connector queries its owner's Oracle views and returns
 authorised evidence-backed opportunities; the final answer returns to the initiating verified
 chat/API session. These calls are planned and require new explicit grants/network rules. Channel
-selection is a policy decision, never a prompt-selected tenant, URL or tool. No current solid
-edge above changes, and the existing orchestrator-to-MCP deny policy remains in force.
+selection is a policy decision, never a prompt-selected tenant, URL or tool. These edges remain disabled until their explicit profile and operation acceptance pass.
 
 Resolve the [qualified role/grant decision](08-channel-consoles-role-mapping.md) before retrieval/
 tool execution. Before each model/provider call, inspect the assembled authorised context and apply
@@ -143,4 +107,4 @@ reference.
 | workflow provider | durable workflow instances | workflow API (future slice) |
 | identity system | clients, grants, keys | identity administration plane, never runtime APIs |
 
-Direct cross-service SQL, shared writable volumes, and provider SDK calls from the orchestrator are prohibited.
+Direct cross-service SQL, shared writable volumes, and provider SDK calls from the generic runtime or edge are prohibited.

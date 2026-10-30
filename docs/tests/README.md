@@ -1,751 +1,122 @@
 # ViewSense AI® Test and Validation Guide
 
-Run implementation commands from the `aiops-fabric` repository root. Keep the
-`aiops-fabric-docs` checkout beside it, or set `DOCS_REPO` for Make targets; its `docs/`
-is mounted read-only for unit/catalog design checks. Development PKI and credentials are generated under `.viewsense/` and `.env.viewsense`; both are ignored by Git. Never reuse them outside the isolated development environment.
+Run commands from `aiops-fabric`. Keep `aiops-fabric-docs` beside it, or set `DOCS_REPO` for Make
+and `VS_DOCS_DIR` for direct pytest. Current scope and gaps are in
+[Implementation Conformance](../design/high-level/00-implementation-conformance.md).
 
-## 1. Static and unit validation
+## Static, contract and catalog checks
 
 ```bash
-make lint
 make unit
+make lint
 make catalog-check
 make profile-check
-helm lint fabric/charts/viewsense
 kubectl kustomize deploy/kubernetes/base >/dev/null
+make docs-build
 ```
 
-Expected: Ruff succeeds, all Pytest tests pass, every `fabric/*` module descriptor and product
-catalog entry resolves, the default plus all curated Helm profiles render with zero failures, and
-Kustomize renders without an error.
+These validate source, canonical contracts/catalog paths, every fabric Helm profile and current
+documentation links/navigation. Render success does not prove live network or workload identity.
+Fabric chart profiles configure retained capabilities; they do not install the independent hosted
+TrueForge release or qualify production providers automatically.
 
-Inspect what a profile actually creates; a value naming an external product is not proof that the
-upstream operator/product was installed:
+## Native TrueForge GUI
 
 ```bash
-helm template viewsense fabric/charts/viewsense \
-  -f fabric/charts/viewsense/profiles/enterprise-suite.yaml |
-kubectl apply --dry-run=client -f - >/dev/null
+make trueforge-ui
+make trueforge-ui-status
+curl --fail --silent --show-error http://localhost:8791/healthz
 ```
 
-## 2. Docker Compose integration
+Open `http://localhost:8791` and verify the native Settings → Models screen. Inspect the native
+Connectors/Skills/Sandbox/Web search screens without entering production credentials or customer
+content. No model is configured automatically. The preview must publish only `127.0.0.1:8791`;
+its image must match the pinned official digest and its container must remain non-root/read-only.
+See [Open TrueForge](../deploy/trueforge-access.md) for lifecycle and troubleshooting.
+
+Do not stop the preview merely to test cleanup after someone has started using it: its data is
+disposable and stopping/restarting discards it. When finished intentionally, `make trueforge-ui-stop`
+removes the owned preview resources. The hosted Kubernetes data and authentication remain separate.
+
+## Kubernetes deployment and integration
+
+```bash
+kubectl config current-context
+make k8s-deploy
+make k8s-test
+kubectl -n viewsense-dev get deploy,statefulset,pvc
+kubectl -n trueforge-dev get deploy,statefulset,pvc
+```
+
+Select the explicit `k3d-cks` development context first. Expect eleven retained fabric Deployments,
+three fabric StatefulSets (memory, registry, governance), one hosted runtime Deployment with its
+fabric transport sidecar and two runtime StatefulSets (PostgreSQL/Redis). All selected containers
+must be ready. The hosted controller and old manual agent database are absent.
+
+`make k8s-test` creates a restricted temporary qualification pod and temporary bootstrap Secret,
+then removes them in cleanup. It uses the current rendered profile's trust/credentials instead of
+old `.viewsense/pki` files. Test data is synthetic; the script does not back up or reset namespaces.
+The acceptance includes:
+
+- ingestion/chunking, memory, MCP registry/mock invocation and governance/evidence API smoke;
+- explicit HTTP 410 from the retired public response route;
+- supported settings configuration and exactly one fixed hosted model turn;
+- runtime JWT invalid/missing-token and missing-client-certificate denials;
+- rejection of caller-supplied runtime-check payloads and unshared cross-subject session reads;
+- qualification workload denied from fabric and runtime private databases;
+- the same previously allowed workload relabeled untrusted and denied from identity/runtime;
+- gateway → governance and ingestion → identity/memory allowed;
+- gateway/governance → ingestion and ingestion → MCP denied on the enforcing CNI.
+
+Success ends with `ViewSense AI® CNI policy probes passed`. DNS failure, failed TLS trust or an
+absent listener is not policy-denial evidence; positive controls must pass against live services.
+Capture only safe status/digest/count metadata, never tokens, keys, prompts or payloads.
+
+## Retained local capability harness
+
+```bash
+make harness
+# In another terminal:
+make api-test
+```
+
+This checks the separate local decision/embedding/memory/ingestion APIs without a GUI. Optional
+`make gui` attaches the fabric management client; it is not the native TrueForge GUI. The existing
+`test-local-api.py`, `test-local-console.py`, `test-console-roles.py`, `test-channel-console.py` and
+`test-playground.py` operate their documented local profiles. Use their supplied authenticated
+session/CSRF and mTLS helpers rather than copying credentials into command arguments or chat.
+See the [local console design](../design/high-level/10-overall/06-local-ai-console.md) and
+[channel console guide](../fabric/governance/channel-console.md) for prerequisites and scope.
+
+## Retained Compose foundation
 
 ```bash
 make compose-up
 make compose-test
 ```
 
-If local port-forwards already use `9443` or `9444`, select alternate loopback ports; service-to-service
-traffic and the smoke test remain on the private Compose networks:
-
-```bash
-VS_GATEWAY_HOST_PORT=19543 VS_IDENTITY_HOST_PORT=19544 make compose-up
-make compose-test
-```
-
-Expected final line:
-
-```text
-ViewSense AI® end-to-end smoke tests passed
-```
-
-Stop application containers while retaining development database volumes:
-
-```bash
-docker compose --env-file .env.viewsense down --remove-orphans
-```
-
-## 3. Kubernetes deployment and integration
-
-The development scripts refuse to use a namespace other than `viewsense-dev`.
-
-```bash
-kubectl config current-context
-make k8s-deploy
-make k8s-test
-kubectl get pods -n viewsense-dev
-```
-
-Expected: all Deployments and all four StatefulSets (memory, registry, governance, and agent) are
-ready, `viewsense-smoke` completes successfully, required gateway/orchestrator paths connect, and
-the unused gateway-to-ingestion and orchestrator-to-MCP paths are blocked by the cluster CNI.
-
-The recorded local `k3d-cks` run passed application smoke but failed the
-gateway-to-ingestion denial probe. Do not treat that cluster as a passed security environment.
-
-### Headless local API validation
-
-Run `make harness`, leave the GUI stopped, then run `make api-test`. It calls component HTTPS
-APIs directly with an independent fixed-tenant client certificate and audience/scoped JWT, checks
-backend binary decision fields, real embeddings, store/search and owner isolation. It stores a
-synthetic record. Attach `make gui` in another terminal and stop it; repeat `make api-test` to
-prove the browser process is optional. GUI-only attach must preserve development CA, identity
-material, provider configuration and database credentials. Every component's `/openapi.json`
-remains available via mTLS while 8787 is absent. Role-management and telemetry integration gates
-are documented gaps and require their selected provider's API conformance tests.
-
-### Local decision, embedding and RAG console
-
-Run `make console` in one terminal. In another, run the opt-in live test:
-
-```bash
-.venv-console/bin/python scripts/test-local-console.py
-```
-
-It stores one synthetic record and verifies real decisions/embeddings, retrieval, owner isolation,
-session/CSRF denial and payload/credential-free JSON service logs. To test persistence, retain the
-printed owner and memory ID, stop/restart `make console`, then run:
-
-```bash
-.venv-console/bin/python scripts/test-local-console.py --owner OWNER --expect-memory MEMORY_ID
-```
-
-For profile migration, select a different installed embedding profile in Configuration, confirm
-Search returns 409 for an existing owner, run Backfill until remaining is zero, and retry Search.
-Repeating a completed Backfill must report zero completed. Restore the old model/dimensions to
-verify retained old-profile retrieval. Model quality and cluster CNI enforcement are separate gates.
-
-In the test lab, Decision, Embedding and Chat dropdowns list all installed models with capability
-labels; known incompatible entries are disabled. Test model previews the selection without saving
-it. After success, Save as default persists that capability's selection and discovered embedding
-dimensions. Verify reload restores the saved selection and other capability defaults stay unchanged.
-RAG/Search/Ingestion/Backfill must reject an unsaved embedding selection before writing test data.
-
-## 4. Direct memory API validation
-
-The memory gateway is internal and uses both mutual TLS and an audience/scoped bearer token. Start
-all commonly tested APIs in one foreground terminal; `Ctrl+C` stops every forward:
-
-```bash
-make ports
-```
-
-Alternatively, manage them in the background:
-
-```bash
-make ports-start
-make ports-status
-make ports-stop
-```
-
-The manager exposes the public gateway `9443`, identity `9444`, memory `9445`, governance `9446`,
-and agent runtime `9447` on `127.0.0.1` only. Background logs are available with
-`scripts/port-forward-dev.sh logs`.
-
-In a third terminal, load the development credentials without printing them and request a short-lived token:
-
-```bash
-set -a
-source .env.viewsense
-set +a
-
-TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=memory-gateway" \
-    --data-urlencode "scope=memory.read memory.write" \
-    https://localhost:9444/oauth2/token |
-  jq -r '.access_token'
-)"
-
-test -n "${TOKEN}" && test "${TOKEN}" != "null" && echo "Access token obtained"
-```
-
-Write a memory:
-
-```bash
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "owner_id": "api-demo-user",
-    "content": "The ViewSense AI® production region is London.",
-    "metadata": {
-      "source": "manual-api-test",
-      "classification": "internal"
-    }
-  }' \
-  https://localhost:9445/v1/memories |
-jq
-```
-
-Search memory:
-
-```bash
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "owner_id": "api-demo-user",
-    "query": "Where is the production region?",
-    "limit": 5
-  }' \
-  https://localhost:9445/v1/memories/search |
-jq
-```
-
-Expected: the write returns an ID and the search returns the London record in `items`.
-
-## 5. Real OpenAI memory-grounding validation
-
-This optional test incurs OpenAI API usage. Never paste the key into chat, a command argument, a
-values file, or Git. If the adapter and its Secret do not already exist, configure them using the
-hidden terminal prompt (the default model is `gpt-5.6-luna`):
-
-```bash
-make openai-enable
-```
-
-`openai-enable` expects the base suite to be installed, stores the key in the
-`openai-credentials` Kubernetes Secret, and switches only the LLM gateway route. The key is mounted
-only in `openai-adapter`; the gateway, orchestrator, memory services, and client never receive it.
-Use `make openai-enable-fresh` only when an image rebuild and base rollout are also required.
-The local default comes from `config/models.env`. After editing that non-secret file, run
-`make openai-model-update` to patch only the model field and restart only the adapter; the existing
-API key is neither read nor replaced.
-
-Use two terminals for the test. In terminal 1, keep the foreground port-forward process running:
-
-```bash
-make ports
-```
-
-In terminal 2, paste the complete block below from the repository root. It executes in a
-non-interactive Bash process, so `set -u` cannot conflict with VS Code's Zsh `__vsc_preexec` prompt
-hook. It obtains separate least-privilege tokens, creates a unique owner, stores only explicitly
-synthetic public data, calls the public ViewSense AI® API, and validates the grounded response:
-
-```bash
-bash <<'VIEWSENSE_TEST'
-set -euo pipefail
-set +x
-
-set -a
-source .env.viewsense
-set +a
-
-if [[ -z "${VS_SMOKE_CLIENT_SECRET:-}" ]]; then
-  echo "VS_SMOKE_CLIENT_SECRET is missing from .env.viewsense" >&2
-  exit 1
-fi
-
-EXPECTED_MODEL="$(scripts/read-model-config.sh)"
-echo "Obtaining scoped ViewSense AI® tokens..."
-
-MEMORY_TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=memory-gateway" \
-    --data-urlencode "scope=memory.write" \
-    https://localhost:9444/oauth2/token |
-  jq -er '.access_token'
-)"
-
-GATEWAY_TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=gateway" \
-    --data-urlencode "scope=api.invoke" \
-    https://localhost:9444/oauth2/token |
-  jq -er '.access_token'
-)"
-
-echo "Tokens acquired."
-DEMO_USER="openai-public-demo-$(date +%s)"
-
-MEMORY_PAYLOAD="$(
-  jq -n \
-    --arg owner "${DEMO_USER}" \
-    '{
-      owner_id: $owner,
-      content: "Synthetic public demonstration fact: the ViewSense AI® demo constellation is heliotrope-42.",
-      metadata: {
-        source: "openai-live-simulation",
-        classification: "public",
-        purpose: "synthetic-test"
-      }
-    }'
-)"
-
-echo "Writing synthetic memory for ${DEMO_USER}..."
-MEMORY_RESULT="$(
-  curl --silent --show-error --fail-with-body \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --header "Authorization: Bearer ${MEMORY_TOKEN}" \
-    --header "Content-Type: application/json" \
-    --data "${MEMORY_PAYLOAD}" \
-    https://localhost:9445/v1/memories
-)"
-
-printf '%s' "${MEMORY_RESULT}" |
-  jq '{memory_id: (.id // .memory_id), owner_id}'
-
-PROMPT_PAYLOAD="$(
-  jq -n \
-    --arg user "${DEMO_USER}" \
-    '{
-      user_id: $user,
-      input: "What is the ViewSense AI® demo constellation stored in memory? Answer with only its name.",
-      remember: false
-    }'
-)"
-
-echo "Sending memory-grounded request through ViewSense AI® and OpenAI..."
-RESPONSE="$(
-  curl --silent --show-error --fail-with-body \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --header "Authorization: Bearer ${GATEWAY_TOKEN}" \
-    --header "Content-Type: application/json" \
-    --data "${PROMPT_PAYLOAD}" \
-    https://localhost:9443/v1/responses
-)"
-
-OUTPUT_TEXT="$(printf '%s' "${RESPONSE}" | jq -er '.output_text')"
-MEMORY_HITS="$(printf '%s' "${RESPONSE}" | jq -er '.memory_hits')"
-ACTUAL_MODEL="$(printf '%s' "${RESPONSE}" | jq -er '.model')"
-REQUEST_ID="$(printf '%s' "${RESPONSE}" | jq -er '.request_id')"
-
-[[ "${OUTPUT_TEXT}" == *"heliotrope-42"* ]]
-[[ "${MEMORY_HITS}" =~ ^[0-9]+$ && "${MEMORY_HITS}" -ge 1 ]]
-[[ "${ACTUAL_MODEL}" == "${EXPECTED_MODEL}" ]]
-[[ -n "${REQUEST_ID}" ]]
-
-echo "Result:"
-printf '%s' "${RESPONSE}" |
-  jq '{output_text, memory_hits, model, request_id}'
-echo "ViewSense AI® real OpenAI memory-grounding validation passed."
-VIEWSENSE_TEST
-```
-
-Expected: `memory_hits` is at least `1`, `output_text` contains `heliotrope-42`, `model` matches
-`config/models.env`, and the final line reports that validation passed. This proves the answer path
-used the inserted tenant/owner-bound memory; it does not by itself certify production data-residency
-or model quality controls. The synthetic record remains in the local development memory database.
-
-Press `Ctrl+C` in terminal 1 to stop only the forwards. The Kubernetes workloads remain running.
-To also return to the deterministic mock and delete the development OpenAI Secret, run:
-
-```bash
-make openai-disable
-```
-
-## 6. Durable agent API validation
-
-Keep the forwards from section 4 running; the agent runtime is already available on port `9447`.
-
-Request the least-privileged run token and create an idempotent bounded run:
-
-```bash
-AGENT_TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=agent-runtime" \
-    --data-urlencode "scope=agent.run" \
-    https://localhost:9444/oauth2/token | jq -r '.access_token'
-)"
-
-RUN="$(
-  curl --silent --show-error --fail-with-body \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --header "Authorization: Bearer ${AGENT_TOKEN}" \
-    --header "Idempotency-Key: agent-api-demo-0001" \
-    --header "Content-Type: application/json" \
-    --data '{"objective":"Validate a governed change","max_steps":5,"max_tool_calls":2,"max_cost_units":20}' \
-    https://localhost:9447/v1/agent-runs
-)"
-echo "${RUN}" | jq
-RUN_ID="$(echo "${RUN}" | jq -r '.id')"
-```
-
-Repeating the create with the same key returns the same ID with
-`"idempotent_replay":true`. Advance it to a human approval pause:
-
-```bash
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${AGENT_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{"action":"start","expected_version":1}' \
-  "https://localhost:9447/v1/agent-runs/${RUN_ID}:resume" | jq
-
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${AGENT_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{"action":"request_approval","expected_version":2}' \
-  "https://localhost:9447/v1/agent-runs/${RUN_ID}:resume" | jq
-```
-
-An `agent.run` token cannot approve. This must return `403`:
-
-```bash
-curl --silent --output /dev/null --write-out '%{http_code}\n' \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${AGENT_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{"action":"approve","expected_version":3}' \
-  "https://localhost:9447/v1/agent-runs/${RUN_ID}:resume"
-```
-
-Obtain `agent.approve`, approve version 3, then use `agent.run` to checkpoint version 4 and complete
-version 5. Inspect the final ordered event history:
-
-```bash
-APPROVAL_TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=agent-runtime" \
-    --data-urlencode "scope=agent.approve" \
-    https://localhost:9444/oauth2/token | jq -r '.access_token'
-)"
-
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${APPROVAL_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{"action":"approve","expected_version":3,"reason":"change approved"}' \
-  "https://localhost:9447/v1/agent-runs/${RUN_ID}:resume" | jq
-
-for step in 'checkpoint 4' 'complete 5'; do
-  set -- ${step}
-  curl --silent --show-error --fail-with-body \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --header "Authorization: Bearer ${AGENT_TOKEN}" \
-    --header "Content-Type: application/json" \
-    --data "{\"action\":\"$1\",\"expected_version\":$2}" \
-    "https://localhost:9447/v1/agent-runs/${RUN_ID}:resume" | jq
-done
-
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${AGENT_TOKEN}" \
-  "https://localhost:9447/v1/agent-runs/${RUN_ID}/events" | jq
-```
-
-Expected: the terminal state is `completed`; events are sequences 1 through 6. A stale
-`expected_version`, invalid state transition, or exhausted step budget returns `409`.
-
-## 7. Provider governance and evidence API validation
-
-Keep the forwards from section 4 running; governance is already available on port `9446`.
-
-Request an administrator token and register a draft provider passport. A provider cannot submit
-`"status":"admitted"`; only the evaluated admission endpoint can make that transition.
-The example generates an expiry thirty days from execution time.
-
-```bash
-GOVERNANCE_TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=governance" \
-    --data-urlencode "scope=governance.admin" \
-    https://localhost:9444/oauth2/token |
-  jq -r '.access_token'
-)"
-
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${GOVERNANCE_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --request PUT \
-  --data "$(jq -n --arg expires_at "$(python3 -c 'from datetime import datetime, timedelta, timezone; print((datetime.now(timezone.utc) + timedelta(days=30)).isoformat())')" '{
-    "name":"manual-llm",
-    "kind":"llm",
-    "endpoint":"https://llm.enterprise.example/v1",
-    "protocols":{"inference":"openai-compatible-v1"},
-    "capabilities":{"chat":true,"streaming":true},
-    "residencies":["gb"],
-    "data_classifications":["internal"],
-    "owner":"enterprise-ai-platform",
-    "status":"draft",
-    "expires_at":$expires_at
-  }')" \
-  https://localhost:9446/v1/provider-passports/manual-llm |
-jq
-```
-
-Record a passing evaluation and request admission:
-
-```bash
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${GOVERNANCE_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{"suite":"security-baseline","passed":true,"scores":{"pass_rate":1.0},"policy_version":"manual-v1"}' \
-  https://localhost:9446/v1/provider-passports/manual-llm/evaluations |
-jq
-
-curl --silent --show-error --fail-with-body \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${GOVERNANCE_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "required_capabilities":["chat"],
-    "allowed_residencies":["gb"],
-    "data_classification":"internal",
-    "required_evaluation_suites":["security-baseline"],
-    "policy_version":"manual-v1"
-  }' \
-  https://localhost:9446/v1/provider-passports/manual-llm:admit |
-jq
-```
-
-Expected: the admission response contains `"admitted": true`. The end-to-end smoke test also
-writes and reads a payload-minimized evidence event and verifies that tenant spoofing through
-`X-ViewSense-Tenant` is rejected.
-
-## 8. Negative authorization validation
-
-A request without a bearer token must return `401`:
-
-```bash
-curl --silent --output /dev/null --write-out '%{http_code}\n' \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Content-Type: application/json" \
-  --data '{"owner_id":"api-demo-user","query":"London"}' \
-  https://localhost:9445/v1/memories/search
-```
-
-Request a read-only token, then attempt a write. The write must return `403`:
-
-```bash
-READ_TOKEN="$(
-  curl --silent --show-error --fail \
-    --cacert .viewsense/pki/smoke/ca.crt \
-    --cert .viewsense/pki/smoke/tls.crt \
-    --key .viewsense/pki/smoke/tls.key \
-    --user "smoke:${VS_SMOKE_CLIENT_SECRET}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data-urlencode "grant_type=client_credentials" \
-    --data-urlencode "audience=memory-gateway" \
-    --data-urlencode "scope=memory.read" \
-    https://localhost:9444/oauth2/token |
-  jq -r '.access_token'
-)"
-
-curl --silent --output /dev/null --write-out '%{http_code}\n' \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${READ_TOKEN}" \
-  --header "Content-Type: application/json" \
-  --data '{"owner_id":"api-demo-user","content":"must be denied"}' \
-  https://localhost:9445/v1/memories
-```
-
-An otherwise valid token accompanied by an unsigned tenant header must return `400`:
-
-```bash
-curl --silent --output /dev/null --write-out '%{http_code}\n' \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  --header "Authorization: Bearer ${READ_TOKEN}" \
-  --header "X-ViewSense-Tenant: attacker-selected-tenant" \
-  --header "Content-Type: application/json" \
-  --data '{"owner_id":"api-demo-user","query":"London"}' \
-  https://localhost:9445/v1/memories/search
-```
-
-## 9. Mem0, OPA, Keycloak, SPIRE, workflow, and telemetry profiles
-
-These checks separate repository evidence from tests that require the selected enterprise product.
-
-### Mem0 adapter
-
-```bash
-helm template viewsense fabric/charts/viewsense \
-  -f fabric/charts/viewsense/profiles/mem0-oss.yaml >/dev/null
-kubectl -n viewsense-dev create secret generic mem0-credentials \
-  --from-literal=api-key='replace-from-secret-manager' \
-  --dry-run=client -o yaml
-```
-
-Before installation, deploy an authenticated Mem0 OSS REST server over HTTPS in the configured
-`memory-platform` namespace and make its pod labels/port match `mem0.inCluster`. For a remote Mem0
-endpoint disable `inCluster` and set explicit egress CIDRs. Run create/search through the ViewSense AI® memory gateway, not
-directly from applications. The conformance pass must cover missing/wrong API key, upstream timeout,
-malformed response, tenant/owner isolation, limits, metadata, export/restore, and failure without
-fallback. For Mem0 Platform use `mem0-platform-adapter`; the adapter translates `/v1` paths while the
-ViewSense AI® API remains unchanged.
-
-### OPA
-
-```bash
-helm template viewsense fabric/charts/viewsense \
-  -f fabric/charts/viewsense/profiles/enterprise-suite.yaml |
-awk '/name: opa/{found=1} found{print} /name: opa-policy/{exit}'
-```
-
-In a test namespace, prove admission allow and deny, then stop OPA and prove provider admission
-returns `503` rather than bypassing policy. Validate policy-bundle rollback and ensure inputs contain
-metadata only. The supported chart profile embeds OPA beside governance. A remote OPA endpoint is a
-future hardened profile because it also needs workload authentication, CA trust, explicit egress,
-and equivalent outage evidence.
-
-### Keycloak or another OIDC provider
-
-Configure issuer, JWKS URL, audience, tenant claim, and scope claim. Test a valid user/service token,
-then wrong issuer, wrong audience, missing `api.invoke`, missing tenant, disabled user, expired token,
-key rotation, JWKS outage, and a token sent directly to an internal service. Only the valid edge
-request may produce an internal Trust Envelope.
-
-### SPIRE
-
-The profile records planned workload-identity intent but does not install SPIRE, mount its socket,
-or consume SVIDs. After a production overlay implements those pieces, validate:
-
-```bash
-kubectl get pods -A -l app.kubernetes.io/name=spire-server
-kubectl get pods -A -l app.kubernetes.io/name=spire-agent
-kubectl get csidriver
-kubectl -n viewsense-dev get pod -o json |
-jq -r '.items[].spec.serviceAccountName' | sort -u
-```
-
-Each workload must receive only its registered SPIFFE ID. Test SVID rotation, expired/unregistered
-identity denial, trust-bundle rotation, server/agent restart, and direct pod traffic that bypasses the
-SDS proxy/mesh. mTLS identity does not replace audience/scoped authorization.
-
-### Workflows and observability
-
-n8n, Temporal, and Argo selections currently record planned integration intent; installation is not
-a workflow-adapter test. OpenTelemetry selection similarly identifies the expected collector, but
-the configured `otlpEndpoint` is not consumed by current application code. JSON stdout is the
-validated baseline. Send logs through the chosen collector to Elastic/Splunk and prove
-single-line JSON parsing, request correlation, Kubernetes metadata enrichment, redaction, backpressure,
-and that tokens/prompts/memory/tool payloads are absent.
-
-## 10. API schema and JSON logs
-
-Download the live OpenAPI document:
-
-```bash
-curl --silent --show-error --fail \
-  --cacert .viewsense/pki/smoke/ca.crt \
-  --cert .viewsense/pki/smoke/tls.crt \
-  --key .viewsense/pki/smoke/tls.key \
-  https://localhost:9445/openapi.json |
-jq '.info, .paths | keys'
-```
-
-Inspect correlated JSON logs without exposing request bodies:
-
-```bash
-kubectl logs -n viewsense-dev deployment/memory-gateway --tail=20
-kubectl logs -n viewsense-dev deployment/memory-postgres --tail=20
-```
-
-## Scope and safety
-
-- The `smoke` client, local issuer, static CA, mock providers, and deterministic embeddings are development-only.
-- Do not expose identity, memory, model, MCP, or provider services through public ingress.
-- Direct internal API tests use the fixed-tenant `smoke` identity. Unsigned tenant headers are rejected; public and internal tenant context comes from the signed Trust Envelope.
-- The development suite proves two representative CNI denials. Production still requires the full
-  source/destination/port negative matrix, enterprise IdP/workload identity, external secret
-  rotation, backup/restore, HA/failure exercises, and SIEM/OTel evidence.
-
-## Validation evidence matrix
-
-| Capability | Repository-validated | Requires selected environment |
-|---|---|---|
-| built-in agent | unit, Compose, Kubernetes state/approval/idempotency smoke | HA, restore, autonomous worker/tool replay |
-| PostgreSQL/pgvector memory | unit, Compose, Kubernetes create/search | production scale, PITR, re-index |
-| Mem0 | adapter normalization/security unit and Helm profile | live OSS/Platform conformance, backup/export, outage |
-| OPA | fail-closed code path and sidecar profile rendering | live allow/deny/outage and bundle lifecycle |
-| OIDC/Keycloak | verifier boundary and profile rendering | realm/claims, MFA/session/key rotation/outage |
-| SPIRE | planned topology/profile documentation | SVID/SDS consumption plus rotation and spoof/expiry denial |
-| workflows | catalog/profile intent only | adapter contract; no provider is validated yet |
-| JSON logs | runtime and smoke inspection | OTel/Elastic/Splunk routing, alert and backpressure |
-
-## Enterprise management POC
-
-Use the [SSO operating guide](../deploy/integrations/keycloak.md) to start the separate Keycloak pod,
-cert-manager integration, security forwards, API-only harness and optional console.
-`scripts/test-enterprise-poc.py` verifies machine-client OIDC, headless suite plans/model discovery
-and public certificate inventories. `--renew-canary` additionally verifies a real accepted issuance,
-increased ready revision, stale-version denial and protected-root denial. Tokens never print.
-Unit negative tests cover issuer/audience/signature/role/tenant validation, PKCE/nonce/replay,
-launch-key bypass, cross-site browser requests, key-material exclusion and renewal boundaries.
-Browser acceptance uses the operator/viewer/tenant-b POC accounts; it must verify actual API responses,
-read-only mutation denials and cross-tenant RAG isolation, not just rendered navigation.
-
-Optional browser acceptance requires Playwright and an installed Chromium (not an application runtime
-dependency): `python scripts/test-management-browser.py --chromium /path/to/chromium`. It stores one
-synthetic memory, uses only loopback POC accounts and captures the desktop/mobile pages under
-`artifacts/management-console`. The API test uses CA validation; the isolated browser test explicitly
-accepts development certificates for the POC login only.
-
-## Modular networking acceptance
-
-`make networking-test` targets only the private `k3d-viewsense-network` kubeconfig. It checks
-installed provider versions, controller readiness, cross-node allowed/denied Service and pod-IP
-paths, DNS, STRICT mesh identity/plaintext rejection with successful controls, unavailable-service
-behavior, workload/ztunnel recovery, core application smoke and database mTLS identity metadata.
-It publishes failed evidence on incomplete runs; socket connection alone is never acceptance.
-The Networking browser page and viewer plan denial are included in `test-management-browser.py`.
-These new live checks remain pending because execution approval review is timing out. Local
-unit tests cover graph validation, exact policies, stable database identities, headless scopes,
-closed plan input and missing/incomplete/stale/mismatched evidence.
+Compose tests the retained fabric capability processes on private development networks. It does
+not install hosted TrueForge, prove Kubernetes policies or supply native governed MCP. Its PKI and
+volumes are separate from the namespace pair and the temporary standalone GUI. Inspect the current
+Compose configuration before selecting optional profiles; do not copy its credentials into Kubernetes.
+
+## Provider and production acceptance
+
+Unit suites retain security/protocol checks for the OpenAI, Ollama and Mem0 adapters; runtime
+real-model/tool compatibility is not implied. Configure optional products only through their
+retained supported profile and owner-managed credentials after the applicable gates pass.
+The obsolete single-namespace OpenAI overlay installers and networking POC installers are removed.
+The namespace-pair topology-v2 renderer and CNI probes are the current development path; mesh-v2
+and real provider protocol/identity/retention qualification remain future work.
+
+Production acceptance still requires fresh per-dispatch authorization/admission, authoritative
+entitlement refresh, PII wire inspection, hard budget reservation/reconciliation, durable safe
+immutable evidence, no-retention deletion/storage, idempotent start/recovery, cancellation/drain,
+HA/restore, rotation and full negative matrices. Follow the
+[adoption gates](../design/high-level/03-trueforge-adoption-decommission.md) and
+[enterprise controls](../design/high-level/60-enterprise/01-enterprise-integration-controls.md).
+
+Historical curl walkthroughs for `/v1/responses`, manual agent checkpoints and old certificate paths
+are removed. Use published versioned documentation when reviewing a historical release; those
+snapshots are not instructions for the current development pair. See the
+[cleanup record](../design/high-level/40-ops/04-cleanup-record.md).

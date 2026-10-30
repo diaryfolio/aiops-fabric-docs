@@ -15,31 +15,16 @@ online execution loop and turn/checkpoint/approval mechanics. Fabric will integr
 stable contracts and retain independent authorization, budgets, evidence and data boundaries.
 The target autonomous flow below is fulfilled by a governed runtime integration, not a new fabric
 loop implementation. The legacy manual lifecycle kernel is retired in the owner-authorized development reset.
-The current TrueForge route verifies a fixed synthetic turn only; the state machine below is
-retained as historical lifecycle design, not a shipped API or feature-parity claim. Ingestion and durable business workflows
+The current TrueForge route verifies a fixed synthetic turn only; full business feature parity is not claimed. Ingestion and durable business workflows
 remain separate capabilities; TrueForge schedules do not replace a general workflow provider.
 
-## Retired manual lifecycle design (historical)
+## Current runtime boundary
 
-```mermaid
-stateDiagram-v2
-    [*] --> received: create + idempotency key
-    received --> running: start
-    running --> running: checkpoint
-    running --> approval_pending: request_approval
-    approval_pending --> running: approve (agent.approve)
-    approval_pending --> rejected: reject (agent.approve)
-    running --> completed: complete
-    running --> failed: fail
-    received --> cancelled: cancel
-    running --> cancelled: cancel
-    approval_pending --> cancelled: cancel
-```
-
-The shipped runtime is a durable lifecycle kernel operated through explicit API actions. It does not
-call a model, retrieve memory, produce a plan, or invoke MCP. It persists tenant, creator, objective,
-profile, state, optimistic version, step count, configured step/tool/cost ceilings, and safe ordered
-events. Provider credentials and raw long-term memory do not belong in agent state.
+The manual run state machine, checkpoint API/schema and agent database are retired. TrueForge
+owns native sessions/turns; fabric verifies only the fixed synthetic route today. Full business
+execution must use supported upstream interfaces, with policy/identity/credential adapters in
+fabric. No replacement loop or injected runtime extension is permitted. Native GUI access is in
+[Open TrueForge](../../../deploy/trueforge-access.md).
 
 ## Target autonomous worker
 
@@ -60,19 +45,13 @@ flowchart LR
 
 This worker loop is planned; its diagram is an authorization model, not deployed behavior.
 
-### Agent API contract
+### Future public agent contract
 
-- `POST /v1/agent-runs` creates an idempotent run and returns a run resource.
-- `GET /v1/agent-runs/{run_id}` reads current state.
-- `POST /v1/agent-runs/{run_id}:resume` applies an authorized lifecycle transition.
-- `POST /v1/agent-runs/{run_id}:cancel` moves a non-terminal run to cancelled.
-- `GET /v1/agent-runs/{run_id}/events` returns ordered versioned state events; SSE is a compatible
-  future transport.
-
-Implementations such as a built-in state machine or LangGraph remain behind this contract. Durable state is mandatory for background runs and approval pauses. Side effects use idempotency keys and are recorded before/after execution to prevent replay after recovery.
-
-The side-effect rule is a target invariant; the current lifecycle kernel does not execute side
-effects.
+Define a versioned fabric public session/run contract only when a customer route needs it. Bind
+identifiers and idempotency to verified tenant/actor/action, authorize history/resume/cancel and
+reconcile uncertain starts before retrying. Use the official runtime API internally; do not revive
+retired `/v1/agent-runs` operations or fabricate compatibility with manual checkpoints. Durable
+state for approval/background execution belongs to its selected runtime/workflow owner.
 
 ### Target guardrails
 
@@ -85,12 +64,10 @@ effects.
 - output/evidence evaluation before committing memory or side effects;
 - complete model-route, policy-decision, approval, and MCP invocation audit.
 
-The bundled reference now persists tenant-bound state transitions and approval actors in an ordered
-run-event table and exposes them through the Agent API. The separate governance API implements the
-payload-minimized Evidence Event v1 boundary. Exporting every agent event transactionally to that
-evidence boundary, SSE streaming, autonomous plan/tool workers, and side-effect replay protection
-remain next slices. Prompts, completions, memory, arguments, results, credentials, and personal data
-are excluded from baseline events.
+The separate governance API remains the payload-minimized Evidence Event boundary. Transactional
+runtime export, immutable independent sinks, streaming/recovery and side-effect replay protection
+remain qualification work. Raw prompts, memory, arguments, results, credentials and personal data
+are excluded from baseline evidence.
 
 ## Target governed ingestion pipeline
 
