@@ -160,7 +160,7 @@ sequenceDiagram
     Bridge->>Mock: mTLS + scoped constant mock request
     Mock-->>Runtime: fixture SSE through bridge
     Edge->>Runtime: observe same turn
-    Edge-->>Client: synthetic result; business_execution false
+    Edge-->>Client: synthetic result, business_execution false
 ```
 
 ## Design set

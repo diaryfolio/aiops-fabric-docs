@@ -52,7 +52,7 @@ sequenceDiagram
     B->>M: mTLS + scoped fixture request
     M-->>T: mock SSE through transport
     G->>T: observe existing turn until terminal
-    G-->>C: synthetic result; no business execution
+    G-->>C: synthetic result, no business execution
 ```
 
 `POST /v1/responses` is a retirement marker returning authenticated HTTP 410. Memory/remember
