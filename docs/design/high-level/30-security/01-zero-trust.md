@@ -4,6 +4,41 @@
 
 Compromise of one component must not grant implicit access to another component, another tenant, provider credentials, or a different data plane. Controls are layered: network reachability, workload TLS identity, audience/scoped authorization, tenant/data policy, provider egress policy, and audit.
 
+### TrueForge namespace boundary (synthetic development profile)
+
+The [adoption decision](../03-trueforge-adoption-decommission.md) keeps fabric governance and
+credential adapters authoritative while TrueForge executes agent turns in a separate namespace.
+The [connection matrix](../20-deployment/03-trueforge-namespace-integration.md#connection-and-authorization-matrix)
+requires exact workload identities, both-sided default-deny rules, audience/scoped delegation,
+fresh subject/data policy and owner-only state services. Namespace membership and a valid client
+certificate alone confer no operation authority. The fabric-owned topology-v2 renderer implements both-sided CNI rules for the development pair.
+Mesh-v2 identity and production enforcement remain separate qualification work.
+
+Stock TrueForge OIDC maps to internal tenant `default`. The development bridge binds one fixed
+synthetic tenant per namespace pair and issuer-qualified runtime subjects; shared multi-customer
+execution and production entitlement/dispatch delegation remain disabled. The examined chart shares server/controller service-account
+and TLS configuration, so the controller remains disabled until supported upstream configuration supplies distinct identities.
+All identity adaptations stay in the fabric tier; upstream patches are prohibited. Production cannot use its static controller API key as a substitute for scoped
+workload authorization. The controller is disabled for the initial pilot.
+
+Enforce policy on root, child, compaction, tool and retry paths; previews never become execution
+tokens. Keep vendor/CRM credentials outside runtime state. Live no-retention facts remain blocked
+until transcript/artifact/backup behavior is qualified. Decommissioning cannot fall back to a
+legacy path that ignores the active grant/egress policy, and does not authorize PVC/archive disposal.
+
+The owner separately authorized deletion of the three old development/evaluation namespaces
+without backups. This exception is recorded in the [clean-state operation](../40-ops/03-clean-state-rebuild.md)
+and does not authorize future customer data deletion. Short-lived static PKI, unbound certificate/
+JWT identity and single-replica stores remain development limitations. No-retention, hard budgets,
+immutable export and final business authorization are not supplied by this synthetic bridge.
+
+The optional [standalone GUI preview](../../../deploy/trueforge-access.md)
+is a separate localhost-only development tool using official upstream no-login mode. Its HTTP
+loopback listener and disposable SQLite data are not an enterprise route or a Kubernetes security
+exception. It receives no fabric credentials or host-directory mounts and must not be exposed
+remotely. Its Docker bridge is not an egress-policy implementation. Integrated browser identity,
+TLS termination and production user/tenant authorization remain unqualified.
+
 ```mermaid
 flowchart LR
     Request["Request"] --> Net["NetworkPolicy reachability"]
@@ -22,8 +57,9 @@ token subject is a production integration, not current application behavior.
 ## Channel control-plane enforcement
 
 Console workspace admission uses server-bound Admin/Operations/Sales/SIEM profiles. Non-admin
-profiles deny every mutation, model test and admin-only read before downstream dispatch. Separate
-local credentials select separate fixed-tenant workload clients with read-only component grants.
+profiles deny configuration mutations, model tests and admin-only reads before downstream dispatch;
+scoped playground POSTs are explicitly permitted. Separate
+local credentials select separate fixed-tenant workload clients with profile-specific component grants.
 The browser receives no credential or authority from selecting an identity or changing a page URL.
 For SSO, only operator-approved mappings yield canonical `console.role.*` scopes; arbitrary role
 claims fail closed for the console. The edge applies workspace ceilings to these scopes and named
@@ -54,8 +90,8 @@ independent immutable export and production database TLS remain outstanding.
 | Boundary | Authentication | Authorization | Containment |
 |---|---|---|---|
 | client → edge | enterprise OIDC and optional client mTLS | tenant/user RBAC, ABAC, quota | ingress/WAF and no direct internal exposure |
-| edge → orchestrator | workload mTLS + audience token | `orchestrate.invoke` | explicit NetworkPolicy |
-| orchestrator → gateway | workload mTLS + audience token | capability-specific scope | no provider credential in orchestrator |
+| edge → TrueForge | workload mTLS + native OIDC JWT | `runtime.invoke` issued by fabric | exact cross-namespace NetworkPolicy; fixed synthetic fixture only |
+| fabric model transport → LLM gateway | workload mTLS + audience token | `llm.invoke` | no vendor credential in TrueForge; fixed fixture only |
 | gateway → provider | workload mTLS + provider audience | `provider.invoke`, provider policy | dedicated provider network/namespace |
 | OpenAI adapter → OpenAI | server-held API key + HTTPS | provider project/model limits | adapter-only Secret and constrained public egress |
 | provider → database | database identity and TLS | owner schema/user only | only owning provider can reach store |
@@ -201,7 +237,7 @@ See the [release simulation guide](../../../releases/parallel-environments.md).
 - policy/identity unavailability fails closed for protected operations.
 - OIDC wrong issuer/audience/algorithm, missing tenant/scope, stale key, and JWKS outage;
 - OPA timeout/malformed/deny and SPIFFE ID/SVID rotation or spoof failures;
-- agent approval with `agent.run` only, stale version replay, invalid state transition, and budget exhaustion.
+- future runtime approval authority, stale action/policy replay, unauthorized resume/cancel and budget exhaustion; the retired manual-agent scopes/API are not an acceptance path.
 - OpenAI key absent/revoked, upstream 401/429/timeout/malformed response, caller model override,
   upstream URL/redirect manipulation, direct non-adapter egress, and credential absence from all
   gateway/orchestrator pod specifications and logs.
@@ -317,3 +353,7 @@ identity/delegation and renewable workload credentials remain separate work.
 The release response preview uses the smoke client's existing gateway audience and `api.invoke`
 scope. The browser cannot substitute a model, tenant, upstream or persistence flag; the console
 sets `remember: false` and preserves the existing downstream trust envelope. No grant is added.
+
+## Playground execution boundary
+
+Sales/SIEM now use the end-user playground and cannot read administrative channel catalogs. Only `playground.use` admits chat through the edge. Governance accepts role context only from the verified edge presenter and checks its operator-owned tenant/role/model policy. It durably records safe decision metadata before generation; policy/evidence outage denies. External/unknown destinations always deny. The internal generation adapter requires a gateway token, `playground.generate`, an exact approved model and the fixed message layout. Optional Internal AI assessment never grants permission. No business tool or CRM entitlement is implied. See the [playground policy design](../10-overall/10-user-playground-policy-engine.md).

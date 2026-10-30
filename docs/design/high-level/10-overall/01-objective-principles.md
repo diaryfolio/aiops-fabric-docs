@@ -20,6 +20,10 @@ flowchart LR
 
 - **API first:** a capability is usable only through a versioned, documented contract. API first includes HTTP/JSON, SSE, MCP Streamable HTTP, and CloudEvents; it does not mean REST is forced onto streaming or event use cases.
 - **Replace through contracts:** callers depend on capability contracts, never vendor SDKs. Adapters absorb vendor authentication, schemas, errors, and feature discovery.
+- **Unmodified upstream runtime:** TrueForge remains independently maintained and upgraded. All
+  customization lives in `aiops-fabric` through supported APIs, SDKs and documented configuration.
+  No local source/chart patches, forks, vendored internals, monkey-patches or customized TrueForge
+  images are permitted. Unsupported features stay disabled until a fabric-side adaptation qualifies.
 - **Zero implicit trust:** network location does not grant access. Transport identity and application authorization are both required on every hop.
 - **One owner per datum:** a service can own a schema/database, but cannot expose it to peers. Replication and analytics use explicit events or export APIs.
 - **Tenant is derived identity:** external tenant headers are ignored. The edge derives tenant context from a verified identity and delegates it only to authorized workloads.

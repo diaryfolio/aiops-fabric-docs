@@ -1,34 +1,31 @@
-# ViewSense AI® Component and Ownership Model
+# ViewSense AI® Component Breakdown and Ownership
+
+Retain fabric policy, identity, capability/credential and data owners around an independently
+upgraded official TrueForge runtime. The legacy orchestrator/manual kernel is retired. All custom
+behavior belongs in fabric; no upstream source/chart/image changes are permitted. See
+[Open TrueForge](../../../deploy/trueforge-access.md) for native GUI access and the
+[conformance map](../00-implementation-conformance.md) for exact current scope.
 
 ```mermaid
-flowchart TB
-    Edge["Edge: authenticate + validate + delegate"] --> Control["Control: orchestrate + select configured gateways"]
-    Control --> LLM["LLM boundary"]
-    Control --> Memory["Memory boundary"]
-    Admin["Admin/test clients"] --> MCP["MCP registry + tool-provider boundary"]
-    Admin --> Governance["Governance + evidence"]
-    Admin --> Agent["Agent lifecycle"]
-    Admin --> Ingestion["Synchronous ingestion"]
-    Memory --> MemoryOwner[("Memory provider owns records/vectors")]
-    MCP --> RegistryOwner[("MCP gateway owns registry")]
-    Governance --> GovernanceOwner[("Governance owns passports/evidence")]
-    Agent --> AgentOwner[("Agent runtime owns run state")]
-    Ingestion --> Memory
+flowchart LR
+    Edge["Fabric edge / runtime adapter"] --> TF["Official TrueForge"]
+    TF --> Transport["Fabric fixture transport"] --> LLM["LLM boundary"]
+    APIs["Capability API clients"] --> Memory["Memory / ingestion"]
+    APIs --> MCP["MCP registry / provider API"]
+    APIs --> Gov["Governance / channel policy"]
+    Memory --> MemoryOwner[("memory owner")]
+    MCP --> RegistryOwner[("registry owner")]
+    Gov --> GovernanceOwner[("governance owner")]
+    TF --> RuntimeOwner[("runtime SQL / Redis")]
 ```
 
-## Edge API
+## Edge API and runtime adapter
 
-The implemented gateway validates development or external OIDC tokens, derives tenant context,
-validates the public request schema, and delegates to the orchestrator. Enterprise rate limits,
-quotas, WAF, and broad API compatibility are responsibilities of the target API-management layer.
-The gateway does not select provider URLs, hold provider credentials, or implement agent loops.
-
-## Request orchestrator
-
-The implemented orchestrator retrieves owner-bound memory, delimits it as context, invokes the LLM
-gateway, optionally writes the interaction, and assembles the response. Policy-based routing,
-approved tool calls, and cost/residency decisions are target extensions. Long-running durable
-business processes belong behind a workflow-provider API, not inside request handlers.
+The edge validates workload/external identity, derives tenant context and enforces route scope.
+It exposes fabric management/policy APIs and a fixed synthetic `/v1/runtime-check`. It neither
+runs an agent loop nor holds provider credentials. General business sessions, public identifiers,
+idempotency/recovery, authorized delivery and enterprise API-management controls remain gated.
+The retired public response endpoint returns HTTP 410.
 
 ## LLM gateway
 
@@ -41,7 +38,7 @@ to the owning adapter, not the LLM gateway. The gateway stores no conversation m
 The bundled OpenAI adapter translates the internal mTLS/scoped-token request into an OpenAI Bearer
 request. It owns the API key, exact upstream URL, configured model, outbound field minimization,
 timeout, and safe error translation. It owns no memory: retrieved memory reaches it only as bounded
-request context assembled by the orchestrator.
+request context assembled by approved fabric clients.
 
 ## Memory gateway and providers
 
@@ -74,13 +71,12 @@ Durable workflow engines (Temporal, Argo Workflows, n8n, or an enterprise produc
 
 ## Agent runtime and ingestion
 
-The bundled online agent runtime is a persistent bounded state machine. It implements idempotent run
-creation, optimistic versions, step/cost/tool budgets, checkpoint, approval/rejection, cancellation,
-terminal states, and ordered event history in its own PostgreSQL database. It owns run/checkpoint
-state but no provider data. Automatic plan/model/tool workers and external workflow adapters are not
-yet implemented. The ingestion service owns synchronous ingestion request handling and deterministic
-chunking;
-parsing, enrichment, embeddings, and vector persistence remain replaceable stages.
+Official unmodified TrueForge owns sessions, turns and execution mechanics. The fabric runtime
+adapter and loopback transport currently support the fixed synthetic verification path only.
+There is no bundled manual state machine or agent database. Full agentic business semantics,
+secure tools, public session/idempotency contracts and retention remain separate integration gates.
+Synchronous ingestion remains a fabric-owned memory client; durable ingestion/workflow engines
+remain independent future capabilities.
 
 ## Identity and policy
 
@@ -114,7 +110,7 @@ immutable audit sink.
 |---|---|---|
 | LLM provider | deterministic mock; OpenAI credential adapter | Ollama adapter now; vLLM and Azure OpenAI planned |
 | memory provider | PostgreSQL + pgvector; Mem0 adapter | Qdrant adapter, managed vector service |
-| agent runtime | persistent bounded state machine | LangGraph-compatible adapter |
+| agent runtime | external official TrueForge, fixed synthetic integration | alternative engines only through qualified external contracts |
 | MCP provider | ViewSense AI® echo tool provider | planned native/certified enterprise MCP adapter |
 | identity | local RSA token issuer | enterprise IdP + workload identity |
 | governance/evidence | owned PostgreSQL reference | external policy and immutable evidence sinks |
@@ -126,7 +122,7 @@ immutable audit sink.
 
 The [channel/module responsibility matrix](07-input-output-channels.md#integration-with-the-existing-modules)
 extends existing owners: governance owns channel/route metadata in its current state domain;
-identity owns memberships; edge verifies the Input and reply binding; orchestrator resolves the
+identity owns memberships; edge verifies the Input and reply binding; fabric runtime adapter resolves the
 route; Tool-Sense uses the MCP gateway's registered Output connector; the CRM owner owns Oracle
 facts and semantic mappings. Only the connector holds Oracle credentials. No channel-specific
 database or additional Tool-Sense service is introduced. These APIs and runtime calls are planned.
@@ -150,7 +146,7 @@ Planned enterprise enforcement uses policy/inspection/budget decisions before di
 wire-payload checks inside credential-owning adapters. Governance owns budget-policy/reservation
 metadata; adapters provide trusted usage. Any reversible privacy token mapping remains inside an
 isolated privacy provider, requiring its own state/lifecycle design before implementation. No
-generic gateway or orchestrator receives that provider's secrets. See
+generic gateway or generic runtime receives that provider's secrets. See
 [enterprise governance and egress](09-enterprise-ai-governance-egress.md).
 
 Runtime implementations remain small, independently deployable Python packages under `src/viewsense_*`; they are not nested inside deployment packaging. The `fabric/<capability>/` directories are the machine-readable installable catalog. Every capability directory contains a `module.json` descriptor and README that declare maturity, owned contracts, implementation paths, Helm selection paths, data ownership, and bundled/external provider choices. `fabric/module.schema.json` defines the descriptor format and the catalog conformance test rejects missing, undocumented, or dangling module entries.

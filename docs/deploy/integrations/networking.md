@@ -1,113 +1,67 @@
-# ViewSense AI® networking and mesh operating guide
+# ViewSense AI® Networking Operations
 
-The reference is a separate two-node `viewsense-network` k3d cluster. It uses supported pinned
-Kubernetes, Cilium and Istio ambient versions from `deploy/networking/providers/versions.json`.
-The existing `cks` cluster and its PVCs remain separate. The private kubeconfig is
-`.viewsense/networking/kubeconfig`; tools never change the default context.
+The current development profile connects `viewsense-dev` and `trueforge-dev` through fabric-owned
+namespace-qualified topology-v2 policies. The selected cluster keeps its existing enforcing CNI.
+No installer swaps the CNI, installs a mesh or changes unrelated system namespaces.
+For native GUI access use [Open TrueForge](../trueforge-access.md); opening the GUI does not deploy
+networking or grant cluster access.
 
-```bash
-make networking-up       # independent CNI + mesh releases; system namespaces only
-make networking-deploy   # application base, strict identity policies, ambient enrollment
-make networking-test     # actual cross-node data transfer, denials, recovery and application smoke
-```
-
-The application namespace remains `viewsense-dev` with restricted Pod Security. Databases have
-separate ServiceAccounts. Cilium enforces portable NetworkPolicy; Istio enforces STRICT peer identity
-and exact ServiceAccount/port permissions from `deploy/networking/allowed-flows.json`. No application
-JWT/tenant check is removed. The ambient CNI and ztunnel are privileged cluster tools; the application
-pods have no new privileged init container or sidecar. Operator installation is explicit and is not
-triggered by opening the GUI.
-
-Cilium retains kube-proxy and uses `cni.exclusive:false` and `socketLB.hostNamespaceOnly:true` for
-Istio coexistence. Docker nodes share a VM kernel but need independent BPF mounts and pin state. Do not bind a shared `/sys/fs/bpf` directory across nodes. Non-k3d clusters use an approved
-CNI profile; do not copy Docker filesystem assumptions to production blindly.
-
-## Headless management and detachable UI
-
-Networking APIs at the gateway:
-
-- `GET /v1/networking/providers`, `/v1/networking/topology`, `/v1/networking/status`: `platform.inspect`.
-- `POST /v1/networking/plans`: `platform.plan`, body `{"cni":"cilium","mesh":"istio-ambient"}`.
-
-The optional console adds `?page=networking` and forwards these APIs. It never runs kubectl or holds
-cluster-admin credentials. A plan returns `applied:false`; reviewed provider deployment remains
-operator/GitOps-owned. To view the independent cluster's evidence in the local SSO gateway, restart
-`make sso-harness` with:
+## Current deployment and verification
 
 ```bash
-VS_NETWORKING_CONTEXT=k3d-viewsense-network \
-VS_NETWORKING_CNI=cilium VS_NETWORKING_MESH=istio-ambient make sso-harness
+kubectl config current-context
+make k8s-deploy
+make k8s-test
+kubectl -n viewsense-dev get networkpolicy
+kubectl -n trueforge-dev get networkpolicy
 ```
 
-The gateway's operator-owned default evidence file is `.viewsense/networking/verification.json`.
-The enrollment tool mounts a public `networking-evidence` ConfigMap read-only at the application
-gateway and configures `VS_NETWORKING_EVIDENCE_FILE`. The acceptance tool updates that ConfigMap;
-projected-volume refresh is asynchronous. Helm uses `products.networking.context` and
-`products.networking.evidenceConfigMap` for the same boundary. Evidence identifies
-its actual cluster, versions, topology/provider-profile hashes and check time. Ten minutes later it is stale, not live
-health. Missing/mismatched/failed evidence is never presented as an enforced cluster. Native provider
-APIs remain available via Kubernetes; Hubble exposes TLS-protected flow metadata and ztunnel exposes transport telemetry.
-Cilium plaintext Prometheus exposure is disabled in the provider profile pending an authenticated collector. Production collectors, durable dashboards and on-call alerting are separately owned.
+Use the explicit `k3d-cks` profile. `scripts/runtime/render.py` and
+`viewsense_common.runtime_topology` generate default deny, scoped DNS and both ingress/egress
+rules from namespace/workload endpoints and directed ports. The private rendered graph is under
+`.viewsense/rebuild/topology.json`. Expected service accounts are recorded, but CNI pod selectors
+alone do not authenticate a service account; application mTLS/JWT remain required.
 
-## Verification and operations
+Qualification must show allowed traffic and denial against known live listeners. The runtime test
+checks database access denial and relabels the same previously allowed pod as untrusted. The fabric
+policy script also checks allowed gateway → governance and ingestion → identity/memory, with
+forbidden ingress/tool paths denied. DNS failure or wrong TLS trust is a failed probe, not success.
+See the [test guide](../../tests/README.md) for exact acceptance.
 
-Acceptance fixtures contain synthetic echo traffic only and remain in `viewsense-dev`. Unmeshed
-fixtures prove CNI filtering separately from STRICT mesh authentication. Checks distinguish DNS,
-trust and infrastructure failures from denied data transfer. They pair denied paths with an allowed
-control path, test both Services and pod IPs across nodes, reject an unapproved mesh identity and an
-unencrypted peer, then recover a workload and the ztunnel DaemonSet. The application smoke still uses
-its own TLS and JWTs; its connectivity probes transfer HTTP health bytes instead of assuming a TCP
-handshake proves authorization. Review the JSON result; a failed check or incomplete run is failed
-acceptance. Latency numbers include kubectl orchestration and are not production p95/p99 SLOs.
+## Retained provider and management contracts
 
-For diagnosis (explicit private kubeconfig):
+The neutral provider catalog, pinned values, v1 single-namespace topology/mesh planner and
+headless networking API remain. They support inspection, digest-bound evidence, reviewable plans
+and future provider replacement. They do not apply cluster-admin operations or overwrite topology-v2.
+The optional console Networking page is a client of those APIs; a plan is not enforcement evidence.
 
-```bash
-kubectl --kubeconfig .viewsense/networking/kubeconfig -n kube-system get pods
-kubectl --kubeconfig .viewsense/networking/kubeconfig -n istio-system get pods
-kubectl --kubeconfig .viewsense/networking/kubeconfig -n viewsense-dev get peerauthentication,authorizationpolicy
-```
+Cilium and Istio ambient remain external, independently operated choices. The fabric chart retains
+single-namespace mesh configuration for separately qualified foundation profiles. Namespace-pair
+mesh-v2 identity, enrollment, recovery and live acceptance are planned; v1 rules cannot certify the
+TrueForge pair. Provider replacement needs exact namespace/workload/operation authority, live
+positive/negative tests, approved rollback and evidence matched to topology/configuration digests.
+Never expose arbitrary URL fetch or privileged installer execution through management APIs.
 
-`make k8s-deploy` updates application images and the portable base. On the networking cluster rerun
-`apply-networking-mesh.py` to restore gateway evidence configuration and mesh policies after base updates. Database accounts
-are already distinct in the portable base, so redeployment preserves their identities.
-Upstream CNI/mesh upgrades are separate Helm operations; stage a supported pinned profile and rerun
-acceptance. The installer refuses a mismatched existing Kubernetes version. Installers have bounded
-waits and preserve failed resources for inspection; they do not silently delete a cluster or CA.
+## Retired POC tools
 
-## Replacement and production gates
+The old `networking-up`, `networking-deploy` and `networking-test` targets and their single-namespace
+bootstrap/application-mesh/test scripts are removed. They targeted a separate `viewsense-network`
+POC and did not implement the current namespace pair. Historical evidence and published versioned
+docs remain historical; they are not current deployment instructions.
+The cleanup deletes repository assets only; it does not delete any separate cluster or its data.
 
-For an approved replacement CNI, create a new cluster, validate its NetworkPolicy/DNS/Service behavior,
-restore databases through their documented backups, and cut over after tenant/security acceptance.
-Never uninstall the active CNI or hot-swap it under existing PVC workloads. The external-networkpolicy
-plan is a compatibility contract, not an installer for every CNI. Other meshes need a topology policy
-adapter and the same strict peer/identity/recovery acceptance; none is claimed automatically validated.
+Keep the [networking design](../../design/high-level/20-deployment/02-modular-networking-mesh.md),
+[namespace contract](../../design/high-level/20-deployment/03-trueforge-namespace-integration.md)
+and [cleanup record](../../design/high-level/40-ops/04-cleanup-record.md) alongside provider changes.
 
-To detach Istio after reviewing application TLS coverage, remove namespace/pod ambient enrollment,
-verify application smoke and CNI denies, then remove only the mesh policy/release resources. Keep CNI
-policy and application authorization. Do not uninstall ztunnel while enrolled workloads depend on it.
-Persistent data migration from `cks`, production ingress/egress gateways, multi-zone HA, capacity/load
-benchmarks, approved mesh CA, trust rotation and durable telemetry remain deployment acceptance work.
-No L7 model/tool retries are enabled: app TLS is opaque and replaying writes or inference can duplicate
-side effects. Mesh transport identity is Istio-issued; SPIRE integration remains a separate provider.
+## Enforcement failure diagnosis
 
-Primary references: [Cilium/Istio coexistence](https://docs.cilium.io/en/stable/network/servicemesh/istio/),
-[Cilium k3s install](https://docs.cilium.io/en/stable/installation/k3s/),
-[Istio ambient install](https://istio.io/latest/docs/ambient/install/helm/),
-[ambient policy](https://istio.io/latest/docs/ambient/usage/networkpolicy/),
-[Istio releases](https://istio.io/latest/docs/releases/supported-releases/).
-
-The neutral flow graph covers the canonical base suite. Additional Ollama/OpenAI/Mem0, identity
-provider and policy integrations require extending the graph with their exact ServiceAccount/port
-permissions and approved external egress, then rerunning acceptance. Choosing a product suite
-does not implicitly grant those network paths. Do not weaken default-deny to enable a new provider.
-Mesh-issued ephemeral certificates remain Istio-owned and are not yet included in the certificate
-inventory. The current source/profile changes need live acceptance and running API/GUI processes
-must restart to load their networking routes. See the conformance record for the execution blocker.
-
-Provider values are JSON Helm values files under `deploy/networking/providers`, read without a
-vendor SDK or extra YAML dependency. Acceptance compares installed Helm values and actual image/
-node versions with the selected profile. Changing the profile invalidates prior evidence even if
-the allowed-flow graph stays unchanged. `make networking-up` must reconcile updated provider
-values before deployment/acceptance. This checks the declared Helm configuration and observed
-traffic; production must additionally detect direct controller/resource drift continuously.
+If a forbidden transfer succeeds, keep the check failed. Compare Service and direct pod-IP paths,
+record node placement and inspect the affected node's policy-controller hooks. A healthy listener
+or a correct manifest does not prove filtering. During cleanup, an empty worker policy chain allowed
+same-node ingestion → MCP; the owner-approved worker restart restored hooks and the full denial
+suite passed. See the [recovery record](../../design/high-level/40-ops/04-cleanup-record.md#approved-worker-recovery-and-verified-results).
+A shared-node restart can interrupt unrelated workloads and needs its owner's maintenance approval;
+it is not automated by deployment or tests. Verify affected workloads and rerun complete acceptance.
+Do not add permissive rules, move the test to hide the failing placement or report a retry as proof
+that the underlying reliability issue is solved. Production needs ongoing per-node enforcement checks.

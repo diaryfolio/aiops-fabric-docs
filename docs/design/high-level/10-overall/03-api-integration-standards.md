@@ -4,7 +4,8 @@
 
 | Capability | Canonical interface | Notes |
 |---|---|---|
-| public AI response | `/v1/responses` HTTP/JSON | SSE is planned |
+| runtime verification | `POST /v1/runtime-check` with `{}` | authenticated fixed synthetic fixture only |
+| retired public response | `/v1/responses` | authenticated HTTP 410; no legacy fallback |
 | model inference | OpenAI-compatible `/v1/chat/completions` subset | one configured adapter; capability discovery is planned |
 | local decisions | `/v1/decisions` | authenticated Ollama adapter; state + named questions; model probabilities are not authorization |
 | embeddings | `/v1/embeddings` | authenticated adapter; ordered vectors with model-digest profile and dimension validation |
@@ -27,14 +28,12 @@ consumer-driven tests for every service, SSE, and CloudEvents are target gates, 
 The exact current route inventory is in
 [Implementation Conformance](../00-implementation-conformance.md#implemented-http-surface).
 
-The bundled OpenAI adapter implements the internal non-streaming chat-completions subset used by
-the orchestrator. It accepts only text `system`, `user`, and `assistant` messages, discards
-unrecognized outbound fields, selects the configured model server-side, and pins the upstream base
-URL to `https://api.openai.com/v1`. This is an additive provider implementation; the public
-`/v1/responses` contract is unchanged. The OpenAI profile defaults to server-controlled
-`gpt-5.6-luna` from `config/models.env`; model changes are audited deployment configuration and
-require representative quality, latency, safety, and cost evaluation rather than a caller-selected
-field.
+The retained OpenAI adapter implements a non-streaming text-chat subset. It owns the vendor key,
+configured model and exact outbound endpoint, and discards unsupported fields. Its Helm profile
+remains available for separately qualified adapter use; it is not an agent tool/streaming runtime
+adapter or permission to switch the hosted fixture route. The old single-namespace Kustomize
+provider-switch scripts/default file are removed. Select model configuration through the retained
+profile and evaluate capability, quality, privacy, residency, latency and cost before admission.
 
 ## Request context: implemented versus target
 
@@ -47,7 +46,7 @@ flowchart LR
     RequestID --> Handler["Service handler"]
     Trace["W3C traceparent"] -. "captured inbound; full propagation planned" .-> Handler
     Deadline["End-to-end deadline"] -. "planned standard" .-> Handler
-    Idempotency["Idempotency-Key"] -. "implemented for agent create only" .-> Handler
+    Idempotency["Idempotency-Key"] -. "planned public runtime contract" .-> Handler
 ```
 
 - `Authorization: Bearer …` with exact audience and least-required scope;
@@ -59,13 +58,14 @@ flowchart LR
 - absolute deadline or remaining timeout budget.
 
 The current slice implements token audience/scope, certificate-required TLS, signed tenant delegation, request ID,
-provider passport/evaluation admission, optional OPA decisions, safe evidence APIs, and persistent
-idempotency/version checks for agent runs. The agent events resource currently returns ordered JSON;
-SSE and CloudEvents export are later compatible transports. SPIFFE identity binding, full trace propagation, and standardized
+provider passport/evaluation admission, optional OPA decisions and safe evidence APIs. The fixed
+runtime adapter observes one created turn without retrying execution; durable public idempotency,
+resume/cancel and event contracts remain unimplemented after manual-kernel retirement. SPIFFE identity binding, full trace propagation, and standardized
 idempotency across every API remain next steps. The unsigned
 `X-ViewSense-Tenant` header is rejected; it is not a compatibility mechanism.
 
-External OIDC is terminated only at the edge. The verifier pins HTTPS issuer, JWKS, audience,
+External human OIDC is verified at the fabric edge. The hosted runtime separately validates
+fabric-issued runtime JWT through its stock OIDC/JWKS integration. The verifier pins HTTPS issuer, JWKS, audience,
 algorithms, required scopes, subject, and configured tenant claim. The edge then exchanges that
 identity for an audience-specific internal token; internal services never accept the external human
 token directly.

@@ -1,13 +1,21 @@
-# Durable Agent Runtime Module
+# Independent TrueForge Runtime Integration
 
-The bundled `viewsense_agent_runtime` is a PostgreSQL-backed bounded state machine. It provides
-idempotent run creation, optimistic versioning, checkpoints, approval/rejection, step budgets,
-cancellation, terminal states, and ordered safe events through Agent Run v1.
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
 
-It deliberately does not put an LLM loop inside an HTTP request. Future workers claim durable runs
-and use only the LLM, memory, MCP, workflow, governance, and policy APIs. LangGraph and other engines
-remain replaceable adapters behind the same run contract. Agent steps never gain permissions from
-model output.
+The retained fabric uses an official, unmodified TrueForge release in `trueforge-dev` beside
+`viewsense-dev`. All customization stays in fabric-owned adapters and documented upstream
+configuration. Source/chart patches, forks and customized upstream images are prohibited.
 
-The default Helm, Compose, and Kubernetes development profiles install the runtime and its owned
-database and execute its approval lifecycle in the smoke suite.
+The owner-authorized clean-state rebuild removes the legacy manual state machine, its run schema,
+database and lifecycle API. No manual checkpoint compatibility or business feature parity is claimed.
+
+The implemented route `POST /v1/runtime-check` requires `runtime.verify` and accepts `{}` only.
+It creates one fixed synthetic TrueForge session/turn using the mock model transport. No arbitrary
+customer prompt, native MCP, sandbox, schedules, subagents or shared-session business execution
+is enabled. The runtime owns sessions/turns; governed memory and evidence remain separate owners.
+
+Use `make k8s-deploy` and `make k8s-test` for the namespace-pair profile and live qualification.
+The standalone fabric chart and Compose retain fabric capabilities; selecting `trueforge` in the
+catalog does not install an upstream runtime release automatically. See the
+[operation record](../../design/high-level/40-ops/03-clean-state-rebuild.md) and
+[remaining adoption gates](../../design/high-level/03-trueforge-adoption-decommission.md).

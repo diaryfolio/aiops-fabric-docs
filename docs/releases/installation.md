@@ -5,6 +5,12 @@ installation and contract testing with the bundled mock model and tool provider.
 does not imply production readiness. The default suite uses a development issuer, short-lived
 static mTLS certificates, deterministic embeddings and four single-replica databases.
 
+For the current source-checkout fabric/TrueForge namespace pair, use [Quick start](../QUICKSTART.md).
+For the native upstream GUI, use [Open TrueForge](../deploy/trueforge-access.md) and port 8791.
+The historical fabric bundles below are not namespace-pair TrueForge distributions. Published
+release snapshots retain their original source/behavior; the current helper omits retired response
+and manual-agent UI operations. These instructions do not recreate the deleted blue/green cells.
+
 ## Distribution decision
 
 Publish architecture-specific bundles as GitHub Release assets, accompanied by a portable
@@ -116,9 +122,8 @@ make release-console RELEASE_BUNDLE=dist/releases/viewsense-1.0.1-linux-arm64 \
 ```
 
 The GUI opens at `http://127.0.0.1:8797`. It displays the exact context, namespace and release,
-checks twelve live service health endpoints over mTLS, and supports a mock LLM response test,
-synthetic document ingestion, memory writes and owner-bound search. The mock response goes through
-gateway → orchestrator → LLM gateway → mock provider with conversation writes disabled. The
+checks ten retained service health endpoints over mTLS, and supports synthetic document ingestion,
+memory writes and owner-bound search. The retired mock-response facade/button is removed. The
 reference uses deterministic 64-dimensional test vectors, so search verifies API/storage plumbing
 rather than semantic retrieval quality.
 Tev1 and real Ollama chat/embedding models are not installed in this reference. The component
@@ -149,17 +154,9 @@ The original `make console` continues to launch the independent local Ollama har
 not attach to a release namespace. Existing `viewsense-dev` installation recovery is a separate
 operator action and must preserve its credentials and state.
 
-![Green preview retrieving a synthetic namespace document](assets/release-preview-green.jpg)
-
-The component view reports Tev1 as not installed and distinguishes the installed mock inference
-and deterministic embedding paths from real models:
-
-![Green preview component availability and live health](assets/release-preview-components.jpg)
-
-The mock response checks the existing inference integration. An owner-bound search after this
-test returned no memories, confirming that the synthetic conversation was not persisted:
-
-![Green preview completing a mock LLM response](assets/release-preview-llm.jpg)
+Historical screenshots of the retired response/component layout are removed from the current guide.
+Use the live helper with an explicitly owned compatible evaluation environment, or the current
+native TrueForge preview described above. No old namespace is recreated to display a screenshot.
 
 ## Acceptance and inspection
 

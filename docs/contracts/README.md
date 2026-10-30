@@ -2,10 +2,16 @@
 
 These schemas are the portable boundary between independently replaceable components. Runtime models and contract tests must evolve with them. Provider payloads stay behind adapters; callers exchange ViewSense AI®-owned envelopes only.
 
+The [TrueForge adoption contract register](../design/high-level/03-trueforge-adoption-decommission.md#boundary-contracts-and-compatibility)
+adds planned execution delegation, runtime binding/events, agent inference/native MCP and
+budget/evidence behavior. The [namespace design](../design/high-level/20-deployment/03-trueforge-namespace-integration.md#multi-namespace-network-and-identity-contract)
+requires a compatible versioned topology schema with qualified endpoint namespaces/identities.
+These are documentation requirements; no new executable schema or API ships yet. The current
+preview decision's `execution_authority: false` must stay false and cannot serve as a runtime token.
+
 - `trust-envelope-v1.schema.json` describes identity-signed tenant, purpose, subject, and classification context.
 - `provider-passport-v1.schema.json` describes admission input for a model, memory, MCP, workflow, agent, or ingestion provider.
 - `evidence-event-v1.schema.json` describes payload-minimized execution evidence input. The API derives producer and tenant from authenticated identity.
-- `agent-run-v1.schema.json` describes durable run creation, bounded budgets, lifecycle state,
   optimistic versioning, and ordered safe events.
 - `decision-request-v1.schema.json` describes state and named `noul`/`choice`/`score` questions.
   Models are selected server-side; question criteria and probabilities are validated at runtime.
@@ -91,3 +97,9 @@ role sources. V1 identity configuration is unchanged. Governance OpenAPI describ
 resource update models. The edge derives business assertions from verified tokens; simulation
 accepts synthetic assertions only under separate operator scopes. All pilot decisions explicitly
 carry no execution authority. See the [implemented contract/lifecycle guide](../fabric/governance/channel-console.md).
+
+The manual agent-run contract is retired. Current hosted verification uses the official runtime
+session/turn API behind the fixed fabric `/v1/runtime-check`; a future public business session
+contract still requires versioning/authorization/idempotency qualification. Topology-v2 is the
+current namespace-pair CNI contract; v1 remains the narrower management/mesh planning contract.
+For native GUI access and the separate preview state, see [Open TrueForge](../deploy/trueforge-access.md).

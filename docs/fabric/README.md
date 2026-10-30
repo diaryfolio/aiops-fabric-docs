@@ -4,7 +4,7 @@
 
 | Directory | Capability | Current maturity |
 |---|---|---|
-| `core/` | edge API and request orchestration | implemented reference |
+| `core/` | authenticated edge and runtime integration | implemented reference |
 | `governance/` | provider passports, admission, and safe execution evidence | implemented reference |
 | `identity/` | workload issuer, modular OIDC and browser SSO | implemented reference |
 | `certificates/` | public certificate inventory, expiry and bounded renewal API | implemented reference |
@@ -12,9 +12,9 @@
 | `memory/` | memory gateway and vector providers | implemented reference |
 | `mcp-registry/` | MCP catalog and invocation boundary | implemented reference |
 | `ingestion/` | governed document chunking and indexing entry point | implemented reference |
-| `agents/` | durable bounded agent runs | implemented reference |
+| `agents/` | external official TrueForge integration | partial reference; fixed synthetic path |
 | `workflows/` | n8n/Temporal/Argo provider boundary | contract only |
-| `networking/` | replaceable CNI/mesh, allowed topology and acceptance APIs | implemented reference |
+| `networking/` | topology-v2 CNI plus retained provider/management contracts | partial reference; mesh-v2 planned |
 | `observability/` | JSON/OTel/SIEM integration boundary | partial reference |
 
 Each capability directory in the implementation repository must contain:
@@ -33,3 +33,7 @@ The authoritative product and integration-mode list is [PRODUCTS.md](PRODUCTS.md
 independently enabled and provider products are selected through `products.*`. External Secrets,
 cluster workload identity, and production provider charts remain enterprise overlays. Run
 `make catalog-check` and `make profile-check` to reject catalog drift and invalid product profiles.
+
+For the native upstream GUI, use `make trueforge-ui` and `http://localhost:8791`;
+[Open TrueForge](../deploy/trueforge-access.md) distinguishes this temporary standalone preview
+from hosted mTLS/OIDC runtime access and the optional fabric management console.

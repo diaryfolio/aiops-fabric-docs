@@ -2,6 +2,14 @@
 
 This document is the acceptance checklist for an enterprise installation. A feature is “catered for” when ViewSense AI® defines its boundary and integration contract; a production deployment is ready only when the enterprise-selected implementation is configured and the evidence test passes.
 
+The [TrueForge adoption plan](../03-trueforge-adoption-decommission.md) retains these controls in
+the fabric around the selected execution runtime. Its [namespace design](../20-deployment/03-trueforge-namespace-integration.md)
+and [migration runbook](../40-ops/02-trueforge-migration-runbook.md) add planned identity, network,
+retention, budget/evidence and decommission gates. None of this matrix becomes production-ready
+merely by installing TrueForge. The source assessment maps each matrix domain to the existing
+foundation and missing acceptance work. The current conformance map and cleanup record describe
+the implemented namespace pair and retired components; installation never closes production gates.
+
 ```mermaid
 flowchart LR
     Identity["Enterprise identity"] --> Edge["API management + edge"]
@@ -87,7 +95,7 @@ the event's RFC3339 timestamp generated at runtime.
   "tenant_id": "pseudonymous-tenant-key",
   "principal": "workload-or-user-key",
   "http_method": "POST",
-  "http_path": "/v1/responses",
+  "http_path": "/v1/runtime-check",
   "http_status": 200,
   "duration_ms": 42.1,
   "outcome": "success"
@@ -178,7 +186,7 @@ cutover or a production traffic controller; those matrix acceptance gates remain
 Implemented now: JSON access/runtime logs, `X-Request-ID` correlation, certificate-required TLS,
 audience/scoped tokens, signed Trust Envelope tenant delegation, external OIDC edge verification,
 built-in provider admission plus an OPA decision boundary, append-only safe evidence metadata,
-durable bounded agent state,
+a fixed synthetic external-runtime integration,
 PostgreSQL/pgvector and Mem0 adapter boundaries, restricted pods, network policies, API schemas,
 profile rendering, and positive/negative smoke tests. Configuration-ready but environment-dependent:
 the credential-isolated OpenAI adapter, Keycloak/generic OIDC, OPA sidecar, Mem0, and collector
@@ -244,3 +252,7 @@ assertions are the only accepted input for own-access/decision APIs. AuthN v2 su
 verified-token snapshots, with no authoritative directory refresh yet. The built-in AuthZ contract
 is tested; external AuthZ equivalence remains a promotion gate. No connector/Oracle/Teams or
 external-model PII guarantee follows from this control-plane evidence.
+
+## End-user playground boundary
+
+The local playground separates end-user chat/AI destinations from administrative channel policy. Its local-only engine verifies tenant, approved console role/model and durable decision evidence; it blocks external/unknown destinations and credential payloads. Internal AI sensitivity assessment is optional for this local-only slice. External AI remains a future supported capability whose adapter-level inspection, enterprise-boundary review and receiver-observed containment gates must pass before activation. This does not satisfy the full company-boundary/PII matrix row across legacy model, embedding, tool or telemetry paths.

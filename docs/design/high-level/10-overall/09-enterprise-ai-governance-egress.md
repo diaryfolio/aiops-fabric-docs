@@ -133,7 +133,7 @@ Neither syntax alone proves equivalent semantics, quality or policy enforcement.
 
 | Boundary | Canonical interface | Adapter responsibility |
 |---|---|---|
-| Enterprise request | ViewSense AI® `/v1/responses` with verified channel context | Stable response/errors/correlation; reject caller-selected provider credentials/URLs |
+| Enterprise request | Future versioned fabric session API with verified channel context (unimplemented) | Stable response/errors/correlation; reject caller-selected provider credentials/URLs |
 | Generation | Supported `/v1/chat/completions` subset plus explicit capabilities | Translate messages/options into vendor-native API, choose server-approved model, normalise output/usage/errors |
 | Embeddings | Versioned text/batch and embedding-profile contract | Translate API, validate count/dimension/profile, enforce no truncation; vector space changes require migration |
 | Memory | Canonical record/search contract | Provider schema and isolation mapping; source/ACL/classification/freshness remain visible |
@@ -226,3 +226,7 @@ explicitly synthetic and create no execution authority. Runtime PII inspection, 
 wire enforcement, hard-cost reservations, actual connector restrictions and complete immutable
 execution evidence remain planned as described above. Existing legacy inference routes do not
 acquire these guarantees from the new catalog.
+
+## Local-only user playground
+
+The [playground policy engine](10-user-playground-policy-engine.md) implements a bounded local-only chat path and durable pre-generation policy evidence. External destinations deny unconditionally in this slice. Internal AI assessment is optional for local traffic. External processing remains a future supported route requiring the inspection/adapter/network gates above; neither a model score nor the playground policy can enable it.

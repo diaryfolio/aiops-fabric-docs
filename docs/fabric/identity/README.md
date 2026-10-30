@@ -41,3 +41,5 @@ governance retains role/channel catalog ownership. Product credentials and claim
 translations stay in adapters. Keycloak is an AuthN example only; another conforming provider needs
 no console/CRM changes after reviewed trust, subject linkage and mapping migration. Both identity
 and policy providers must pass the [neutral contract and replacement gates](../../design/high-level/10-overall/08-channel-consoles-role-mapping.md#provider-neutral-authentication-and-authorisation).
+
+Sales/SIEM now use the end-user Channel playground instead of administrative catalogs. Canonical profiles grant only edge `playground.use`; configuration reads remain Admin/Operations. Enterprise mappings must explicitly grant that scope alongside their console role marker. See the [playground guide](../governance/channel-console.md#end-user-playground).

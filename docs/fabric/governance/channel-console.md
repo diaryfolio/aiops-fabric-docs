@@ -11,8 +11,8 @@ This release implements the control plane. Business tool/CRM execution remains d
 |---|---|---|
 | ViewSense Admin | Overview & suites, AI & models, Networking, Observability, Certificates, Identity & access, Input Channels, Output Channels, Model test lab, Test history | Existing administration scopes; independent review remains separately provisioned |
 | Operations | Overview & suites, Certificates, Identity & access, Input Channels, Output Channels | Read only; no renewal, deployment-plan generation, model tests or policy mutations |
-| Sales | Input Channels, Output Channels | Read only |
-| SIEM | Input Channels, Output Channels | Read only |
+| Sales | Input Channels playground, Output Channels AI destinations | General chat through policy; no channel configuration access |
+| SIEM | Input Channels playground, Output Channels AI destinations | General chat through policy; no channel configuration access |
 
 Choose a POC identity at sign-in and supply its matching launch credential. The identity selector
 does not grant a role: the server authenticates the selected credential against operator-owned
@@ -31,8 +31,10 @@ For startup, per-role credential commands, sign-in steps and login troubleshooti
 `GET /api/console-roles` shows the role matrix inside Identity & access for Operations and Admin.
 Navigation, overview links and initial background requests obey that matrix. Forbidden page URLs
 fall back to Overview for Operations or Input Channels for Sales/SIEM. Direct requests to a
-forbidden console API or any non-admin mutation return 403 before downstream dispatch. Read-only
-channel pages hide mutation and synthetic-preview controls and disable resource fields.
+forbidden console API or non-admin configuration mutation return 403 before downstream dispatch.
+Operations channel pages hide mutation and synthetic-preview controls and disable resource fields.
+Sales/SIEM use a separate playground and cannot read administrative channel catalogs; scoped
+playground policy-check/chat POSTs are permitted.
 
 For enterprise SSO, configure the AuthN adapter's approved `role_scopes` mapping to emit
 `console.role.viewsense-admin`, `console.role.operations`, `console.role.sales` or
@@ -47,7 +49,7 @@ Console roles govern platform workspace admission. They do not create CRM entitl
 role mappings, Input entry bindings or Output grants. Sales/CRM execution still requires its own
 complete business grant, and remains disabled in this pilot. The role registry is shipped code
 plus operator configuration; dynamic console role editing and enterprise account provisioning are
-not implemented. The SIEM profile here is a Channel viewer, not a telemetry-export credential.
+not implemented. The SIEM profile here has the user playground, not a telemetry-export credential.
 
 ### Role acceptance
 
@@ -64,7 +66,7 @@ Read-only live acceptance against the provisioned local harness:
 
 This checks all four profiles, direct read/write denial, credential promotion rejection and absence
 of launch/workload credentials in service logs. It stores metadata-only evidence in private local
-state and signs out its test sessions. The latest coordinated revision passed all **203** repository
+state and signs out its test sessions. The original console-role revision passed all **203** repository
 tests. GUI checks verified all four identities, Sales forbidden-URL fallback, disabled resource
 fields, Operations identity/catalog/certificate access and Admin navigation. Local screenshots:
 
@@ -242,3 +244,60 @@ direct-tool enforcement, authoritative role refresh, external AuthZ equivalence,
 inspection/final-wire checks, hard budgets and independent immutable execution evidence remain
 acceptance gates. Existing legacy inference paths do not acquire these guarantees from a catalog.
 Explicit `channel_context` requests to the edge fail safely until execution is enabled.
+
+## End-user playground
+
+Sales and SIEM sign in normally, then open **Input Channels**. Select **ViewSense chat** and the
+approved **Internal AI** destination, enter a message and choose **Send to Internal AI**. **Check
+policy** evaluates the request without generation. **Clear conversation** removes the message and
+response from the current browser panel; navigation/sign-out also clears that transient panel.
+**Output Channels** shows approved AI services and an **Open playground** action. Users never edit
+provider endpoints, credentials, role bindings, routes or capability grants here. Admin/Operations
+continue to manage/inspect channels, with separate scopes and APIs.
+
+This slice supports bounded single-turn text chat. Teams, attachments, conversation history and
+actual CRM queries remain unavailable. Only general chat is granted; the Sales/CRM example still
+needs separately authorised data/tool capabilities. External destinations are blocked by the policy
+engine, with an explicit Internal AI alternative; there is no silent fallback.
+
+The local launcher creates private `.viewsense/local-ai/playground-policy.json` if absent and
+preserves it on restart. It contains `tenants`, canonical `roles`, `internal_model`,
+`internal_adapter_url`, `inspector_model` and `inspect_with_ai`. The default Internal AI chat model
+is the installed `qwen3.8:27b-mlx`; `VS_PLAYGROUND_INTERNAL_MODEL` can choose the initial model when
+provisioning a new policy. Edit the operator policy file and restart the harness to change an
+existing deployment, keeping the adapter's approved model in sync. No weights are downloaded and
+the existing model-test defaults are not changed. TEV and EmbeddingGemma alone cannot generate chat.
+
+Internal AI sensitivity assessment is optional and off by default for this local-only route. When
+`inspect_with_ai` is true, the engine calls the internal decision model and requires a valid response
+from `inspector_model`; an outage/model mismatch blocks generation. The assessment never grants
+permission or enables external processing. Recognised credential patterns block any destination.
+Decision evidence stores safe metadata in governance `evidence_events`, excluding prompts, replies,
+matched sensitive values and execution payload digests. Failed durable storage blocks generation.
+
+Existing enterprise AuthN provider mappings need the explicit `playground.use` scope and approved
+canonical role marker. Regenerating the optional provider fixture does not silently update an
+existing enterprise realm. The [playground design](../../design/high-level/10-overall/10-user-playground-policy-engine.md)
+records deployment, future external activation and production limits.
+
+### Playground acceptance
+
+The coordinated playground revision passed **224** unit tests, including endpoint/payload binding,
+role/tenant/presenter rejection, storage and inspector failure, denied external destinations and
+browser authority/CSRF denial. Live acceptance checks all four role profiles and verifies that
+blocked requests produce zero generation calls and that synthetic payloads stay out of service logs.
+Optional TEV sensitivity assessment and actual Qwen internal generation were exercised locally.
+Run from the implementation checkout against the running harness:
+
+```bash
+.venv-console/bin/python scripts/test-console-roles.py
+.venv-console/bin/python scripts/test-playground.py
+```
+
+The playground script temporarily enables optional internal assessment and restores its original
+operator policy in a `finally` block. It uses synthetic data, performs no external AI calls and
+writes metadata-only evidence to private `.viewsense/local-ai/playground-acceptance.json`.
+
+![Sales end-user playground](../../assets/screenshots/channel-console/user-playground-gui.png)
+
+[Approved AI destinations](../../assets/screenshots/channel-console/user-ai-destinations-gui.png).

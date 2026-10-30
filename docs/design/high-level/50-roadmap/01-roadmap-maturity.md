@@ -2,6 +2,15 @@
 
 ## Delivery strategy
 
+The selected next implementation direction is the [TrueForge adoption backlog](../03-trueforge-adoption-decommission.md#ordered-implementation-backlog):
+retain `aiops-fabric`, qualify a private runtime in a separate namespace, connect verified identity
+and governed capabilities, then migrate bounded routes before decommissioning overlapping services.
+M00/M01 and a fixed synthetic M02 path now have executable foundations. The owner-authorized
+development reset separately retires legacy orchestration/kernel source and old namespaces;
+M03–M06 business enablement and production operations remain incomplete. This supersedes building an independent autonomous loop in the fabric or a
+new `keepview_harness` project. Existing local AI and enterprise acceptance gates remain requirements;
+the historical phases below describe capability maturity rather than completed migration work.
+
 Build thin end-to-end slices and prove replaceability/security with tests before adding providers. Dates depend on enterprise controls and provider choices; exit criteria, not elapsed weeks, determine readiness.
 
 ```mermaid
@@ -14,8 +23,8 @@ flowchart LR
 
 ## Phase 0 — executable contract foundation (current)
 
-Deliver edge, orchestrator, LLM/memory/MCP gateways, mock providers, PostgreSQL/pgvector memory,
-the Mem0 adapter boundary, persistent bounded agent lifecycle, development workload identity,
+Deliver edge, independent official TrueForge integration, LLM/memory/MCP gateways, mock providers,
+PostgreSQL/pgvector memory, the Mem0 adapter boundary and development workload identity,
 Kubernetes packaging, network policy, product profiles, and smoke tests.
 
 Exit: a clean cluster can deploy into an isolated namespace; missing authorization is denied; model, persisted memory, and MCP paths pass end to end.

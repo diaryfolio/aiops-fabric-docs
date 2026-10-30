@@ -1,7 +1,16 @@
 # ViewSense AI® High-Level Design
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 This directory is the canonical architecture set for ViewSense AI®. Read the index, then the executable
 conformance map before using a target-state document as an implementation claim.
+
+The selected next change retains `aiops-fabric` and adopts TrueForge as its execution runtime.
+Start with the [adoption/decommission plan](03-trueforge-adoption-decommission.md), then the
+[namespace design](20-deployment/03-trueforge-namespace-integration.md) and
+[migration runbook](40-ops/02-trueforge-migration-runbook.md). The namespace pair and fixed synthetic probe are implemented; the owner-authorized clean-state reset
+retires legacy execution. Business/production migration gates remain open. See the
+[operation record](40-ops/03-clean-state-rebuild.md). `keepview_harness` is not required.
 
 All design and product documentation is owned by `aiops-fabric-docs`. The code
 repository's root README and agent instructions point here; module guides,
@@ -29,6 +38,14 @@ flowchart LR
 - [Networking and mesh design](20-deployment/02-modular-networking-mesh.md) — replaceable CNI,
   strict workload transport and headless networking management.
 - [Implementation conformance](00-implementation-conformance.md)
+- [TrueForge source assessment](02-trueforge-keepview-assessment.md) — source-based reuse and
+  enterprise-control gaps; its separate-project proposal is superseded by the adoption plan.
+- [TrueForge adoption and decommission](03-trueforge-adoption-decommission.md) — retained repository,
+  keep/adapt/remove register, ordered backlog and acceptance gates.
+- [TrueForge namespace integration](20-deployment/03-trueforge-namespace-integration.md) — separate
+  fabric/runtime releases, workload identities, API connections and versioned network-policy requirements.
+- [TrueForge migration runbook](40-ops/02-trueforge-migration-runbook.md) — cutover, drain, rollback,
+  legacy shutdown, source cleanup and separate data disposition.
 - [Input and Output Channels](10-overall/07-input-output-channels.md) — planned business routing,
   Tool-Sense module integration, and the Sales → CRM-Logistics1 Oracle opportunity use case.
 - [Channel consoles and role mapping](10-overall/08-channel-consoles-role-mapping.md) — planned
@@ -63,3 +80,5 @@ and operations documents above.
 The Input/Output console control-plane pilot now ships reviewed governance catalogs and
 non-executing policy/Sales previews. See the [channel console guide](../../fabric/governance/channel-console.md)
 and current conformance section before interpreting the broader execution target designs.
+
+- [User playground and Internal AI policy engine](10-overall/10-user-playground-policy-engine.md) — end-user chat, approved AI destinations and the local-only runtime boundary.

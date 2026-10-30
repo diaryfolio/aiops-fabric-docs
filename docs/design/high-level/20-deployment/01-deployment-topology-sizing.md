@@ -9,15 +9,14 @@ flowchart TB
     subgraph Namespace["viewsense-dev reference namespace"]
       subgraph Stateless["Deployments"]
         Edge["gateway"]
-        Control["orchestrator + gateways"]
+        Control["fabric gateways"]
         Providers["mock/provider adapters"]
-        Admin["governance + ingestion + agent runtime"]
+        Admin["governance + ingestion"]
       end
       subgraph Stateful["Single-replica development StatefulSets"]
         MemoryDB[("memory-db")]
         RegistryDB[("registry-db")]
         GovernanceDB[("governance-db")]
-        AgentDB[("agent-db")]
       end
       Policy["default-deny + explicit NetworkPolicy"]
       Secrets["generated development PKI/credentials"]
@@ -29,9 +28,16 @@ flowchart TB
 
 ## Namespace and cluster patterns
 
+The [TrueForge namespace integration design](03-trueforge-namespace-integration.md) is implemented
+as the development namespace-pair profile: fresh fabric in `viewsense-dev`, official private
+runtime/state in `trueforge-dev`. The owner explicitly authorized the old development/evaluation
+reset without backups. Legacy orchestration/manual kernel source and agent storage are removed.
+The [operation record](../40-ops/03-clean-state-rebuild.md) documents the boundaries and actual
+qualification. Production multi-cell and offline paired packaging remain future work.
+
 | Profile | Isolation | Suitable for |
 |---|---|---|
-| development | one `viewsense-dev` namespace, single replicas | contract and integration testing |
+| development | `viewsense-dev` + `trueforge-dev`, single replicas | synthetic runtime and retained fabric integration testing |
 | standard | separate edge/control/provider/data namespaces | normal enterprise production |
 | regulated | dedicated provider/data cluster or tenant cell | strict residency and blast-radius controls |
 | GPU scale | control cluster plus one or more inference clusters | large model fleets and independent capacity |
@@ -145,16 +151,7 @@ because it is a stateless local policy decision point with a narrow loopback API
 managed selection requires credentials, CA trust, explicit egress, conformance tests, version
 pinning, upgrade/rollback ownership, and a provider passport before production routing.
 
-The `openai` Helm profile deploys only the ViewSense AI® `openai-adapter`; it does not create or manage
-an OpenAI account. Its local default model is read from `config/models.env` and currently resolves
-to `gpt-5.6-luna`. The model is non-secret, but the development overlay stores it beside the API key
-in the provider Secret so the adapter receives one provider configuration. The model remains
-server-controlled. In production the API-key Secret must be supplied by the platform secret
-controller, while the model is a Helm value. The development
-overlay permits public IPv4 HTTPS while excluding private, loopback, link-local, and reserved
-ranges. Production must replace that broad rule with an egress proxy or CNI FQDN policy restricted
-to `api.openai.com`, plus DNS/proxy failure tests. `make openai-disable` restores the mock route and
-deletes the development credential Secret and adapter resources.
+The retained OpenAI adapter takes an explicitly deployed server-controlled model from its Helm/environment configuration. The old single-namespace provider-switch launchers/default file are removed; hosted real-model enablement remains gated by protocol, identity, PII, budget, evidence and retention acceptance. Rollback uses a qualified profile or disables the affected route; it does not reapply the obsolete base.
 
 ```mermaid
 flowchart LR
@@ -189,7 +186,12 @@ Provider descriptors include locality, residency, classification ceiling, capabi
 
 ## Development workflow in this repository
 
-`scripts/k8s-deploy-dev.sh` builds the image, imports it to the active k3d cluster, creates generated Secrets, applies `deploy/kubernetes/base`, and waits for rollout in `viewsense-dev`. It is an installation/update operation, not a routine cluster-start command. An existing stopped cluster resumes with `k3d cluster start cks`, after which Kubernetes restores its workloads and retained volumes. The base includes an independently addressed governance API and database with explicit NetworkPolicy. On an installed suite, `make openai-enable` prompts without echo, reads the non-secret model from `config/models.env`, creates the provider Secret, and applies `deploy/kubernetes/overlays/openai` without rebuilding images; `make openai-enable-fresh` performs the full deployment first. `make openai-model-update` patches only the validated model field and restarts the adapter without reading or replacing its API key. `scripts/k8s-test.sh` runs a namespaced smoke Job that validates provider admission and evidence alongside the core AI path, then pairs reachable and denied in-pod mTLS HTTP data-transfer probes to prove the local CNI enforces two representative NetworkPolicy boundaries. The scripts validate their fixed namespace before mutation. The operator-oriented lifecycle and recovery commands are maintained in the top-level `QUICKSTART.md`.
+`scripts/k8s-deploy-dev.sh` delegates to `scripts/runtime/deploy.sh`: it checks context, renders
+namespace-qualified boundaries/private resources, builds the fabric image and installs the pinned
+official TrueForge release in the paired namespace. `make k8s-test` qualifies the retained APIs,
+fixed runtime turn and real allowed/denied paths. Static base manifests remain fabric packaging
+inputs; applying them directly is not the namespace-pair workflow. See [Quick start](../../../QUICKSTART.md)
+and [Open TrueForge](../../../deploy/trueforge-access.md).
 
 ## Production gaps from the reference
 
@@ -249,3 +251,22 @@ Startup creates the additive table idempotently; old services ignore it on rollb
 governance database before upgrade, retain snapshots/disabled entries during rollback and restore
 them as one consistent state. Do not roll back to a consumer that ignores channel decisions to
 continue business execution. Full channel execution remains disabled in this slice.
+
+## Local-only playground deployment
+
+The edge-to-governance policy path requires `policy.evaluate`; governance is the sole decision
+journal owner. New allow-listed flows permit governance to identity/Internal AI inspection and
+edge to the approved Internal AI generation adapter. The local harness provisions private policy
+and distinct scoped clients. Kubernetes defaults keep playground execution disabled without policy.
+
+For Helm, enable `playground.enabled`, set `playground.policySecret` to an operator-provisioned
+Secret containing `policy.json`, and set `playground.internalModel`. Enable the Ollama adapter with
+an enterprise-approved internal runtime. Provision a `governance` workload credential with only
+`ollama-adapter/provider.invoke` for optional inspection, and extend gateway grants with
+`governance/policy.evaluate` and `ollama-adapter/playground.generate`. Human or fixed-tenant clients
+need edge `playground.use` and a canonical approved console role. The policy model and adapter
+model must agree. The source-checkout console attaches independently; it owns no database.
+
+No external egress route is introduced by the playground. Future external AI needs adapter-level
+final-wire inspection and receiver-observed containment tests before activation. See the
+[playground design](../10-overall/10-user-playground-policy-engine.md).

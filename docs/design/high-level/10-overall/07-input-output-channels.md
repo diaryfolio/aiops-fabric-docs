@@ -19,7 +19,7 @@ control-plane slice with non-executing policy and synthetic Sales previews. Chan
 Tool-Sense execution from chat, the CRM/Oracle connector and Teams integration remain **planned**.
 The shipped orchestrator calls memory and the LLM, but does not call the MCP gateway. Its existing
 tool registry and manual agent lifecycle do not implement this design. See
-[implementation conformance](../00-implementation-conformance.md#input-and-output-channels-major-design-only).
+[implementation conformance](../00-implementation-conformance.md#input-and-output-channels).
 
 Tool-Sense is the logical capability for discovering and executing approved business tools through
 the existing MCP gateway/provider boundary. It is not a new independent service or a claim that
@@ -188,7 +188,7 @@ repository and validate them end to end before promotion.
 | Governance | `GET/PUT /v1/channels/input/{id}` and `/v1/channels/output/{id}`; filtered list APIs | Scoped metadata read/admin, optimistic revision checks, audited enable/disable; no secret values |
 | Governance | `GET/PUT /v1/channel-routes/{id}` and `POST /v1/channel-routes:resolve` | Filtered discovery; deterministic policy resolution returning a revision-bound authorised route |
 | Governance / edge | Framework roles, IdP mappings, Input bindings, Output grants, policy preview/decision APIs | Planned [qualified role contracts](08-channel-consoles-role-mapping.md#planned-headless-apis-and-contracts); all console operations are headless |
-| Edge | Optional `channel_context` on `POST /v1/responses` | User-supplied IDs are selection hints; tenant, membership, permissions and reply binding are server-derived |
+| Edge | Proposed channel context on a future versioned public session API | User-supplied IDs are selection hints; tenant, membership, permissions and reply binding are server-derived |
 | MCP gateway/provider | Channel-aware extension of `POST /v1/tools/call` | Validated action and parameters plus authenticated route context; no raw external URL/SQL |
 | CRM connector | `sales.opportunities.list` tool | Bounded read; typed account filter, limit/cursor, structured opportunities and completeness metadata |
 
@@ -205,7 +205,7 @@ Candidate public request, using friendly labels resolved to catalog IDs:
 }
 ```
 
-The excerpt is not a complete current `/v1/responses` payload. It illustrates the future optional
+The excerpt illustrates proposed selection fields, not a current public execution payload; `/v1/responses` is retired. It illustrates the future optional
 channel selection fields only. Existing request requirements remain until a versioned migration
 defines them. A typed field cannot be smuggled into current `metadata` to obtain routing privileges.
 

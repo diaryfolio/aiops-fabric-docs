@@ -1,5 +1,17 @@
 # ViewSense AI® Day-2 Operations and SRE
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
+## Planned TrueForge migration operations
+
+The [migration runbook](02-trueforge-migration-runbook.md) governs baseline/restore inventory,
+synthetic runtime qualification, route-specific cutover, drain, safe rollback or route disable,
+legacy shutdown and source cleanup. It accompanies the [retained-repository decision](../03-trueforge-adoption-decommission.md).
+No operation has been executed by that design. Track the fabric/runtime namespace pair and their
+independent artifact/configuration/state owners. Code removal, workload shutdown and persistent-data
+disposal are distinct operations with separate evidence. Existing operating procedures below
+continue to apply to the current reference until a qualified route is migrated.
+
 ## Observability: current and target
 
 ```mermaid
@@ -23,7 +35,7 @@ Prompt, completion, memory, and tool bodies remain excluded from baseline logs.
 
 The local console provisions separate Admin, Operations, Sales and SIEM credentials. Operations
 has read-only Overview/Certificates/Identity/Channels access; certificate renewal and policy
-publication require an appropriately scoped Admin identity. Sales/SIEM only inspect Channels.
+publication require an appropriately scoped Admin identity. Sales/SIEM use the Channel playground and approved AI destination list; they cannot inspect administrative catalogs.
 Credential files and their role/client bindings stay in private local state; restart after an
 operator configuration change to invalidate browser sessions. Back up governance data independently
 of these development credentials. Console role visibility supplies no CRM execution grant.
@@ -52,7 +64,7 @@ credential for the intended POC identity:
 2. Select the matching **POC identity** on the sign-in page.
 3. Paste the command output into **Launch credential**, then sign in.
 4. Confirm the role shown in the header and the permitted navigation links. Operations has five
-   workspaces; Sales and SIEM have only Input Channels and Output Channels. ViewSense Admin has
+   workspaces; Sales and SIEM have only Input Channels (playground) and Output Channels (AI destinations). ViewSense Admin has
    all workspaces.
 
 A credential for one identity cannot sign in as another. A missing credential file usually means
@@ -117,7 +129,7 @@ trust and sessions, drain requests/work and define a data-safe fallback before o
 
 Each state owner defines RPO/RTO, encryption, retention, legal hold, restore order, and integrity verification. PostgreSQL uses PITR plus regular full backups. Vector records retain enough canonical source/embedding metadata to reindex. MCP catalog backups exclude retrievable secrets. Restore tests run monthly in an isolated environment; regional/cluster failover is exercised quarterly for required tiers.
 
-The agent database is a separate state owner. Restore it before resuming workers, hold all restored
+The selected runtime database is a separate state owner. Restore it through its owner before resuming work; hold all restored
 runs paused until version/idempotency reconciliation completes, and never infer that a side effect
 must be repeated merely because an event is absent. Mem0 backup/export, Keycloak realm recovery,
 SPIRE trust-bundle recovery, OPA bundle rollback, and workflow recovery remain owned by their
@@ -131,15 +143,7 @@ selected product operators and must be tested with the ViewSense AI® conformanc
 - token runaway: cancel request/workflow, enforce tenant stop-loss, quarantine route;
 - model quality/safety regression: pin previous provider/model policy, preserve evaluation evidence, notify owners.
 
-For an OpenAI route, 401/403 indicates credential/configuration failure and pages the route owner;
-429 is a capacity/quota signal and must not cause residency-unsafe fallback; timeout/5xx consumes
-the provider dependency budget. Rollback runs `make openai-disable` in development or promotes the
-previous signed route configuration in production. Rotate/revoke the provider key at OpenAI first,
-then synchronize the secret and restart only the adapter; verify callers and logs never contain it.
-The local OpenAI model default is controlled by `config/models.env` and currently resolves to
-`gpt-5.6-luna`. Changing that default requires replaying representative
-memory-grounding, safety, latency, token-usage, and output-contract evaluations before promotion;
-rollback restores the last admitted model value without changing the stable ViewSense AI® API.
+The retained OpenAI adapter takes an explicitly deployed server-controlled model from its Helm/environment configuration. The old single-namespace provider-switch launchers/default file are removed; hosted real-model enablement remains gated by protocol, identity, PII, budget, evidence and retention acceptance. Rollback uses a qualified profile or disables the affected route; it does not reapply the obsolete base.
 
 ## Capacity and cost
 
@@ -216,6 +220,9 @@ flowchart LR
 ```
 
 ## Local embedding profiles and GUI operation
+
+Open **AI Workspace → Model test lab** for model testing. The **Open test lab** heading button
+appears only within that workspace; Control Plane pages and Test history omit it.
 
 The development console shows actual dependency health separately from repository capability.
 `memory_embeddings` retains model/revision/dimension profiles while the legacy 64-d column remains
@@ -312,3 +319,18 @@ production retention and recovery automation remain promotion work. Include this
 governance database backup and restore the catalog, active snapshot, candidates and disabled set
 together. Run the local sample acceptance and verify retained revisions after restart. Decision
 latency/freshness SLOs and authoritative role-refresh outages require later runtime acceptance.
+
+## Playground operation and recovery
+
+The [Channel operating guide](../../../fabric/governance/channel-console.md#end-user-playground)
+contains the user flow, operator-owned model/tenant/role policy, optional Internal AI assessment
+and startup instructions. No external destination can be enabled by the current playground policy.
+Use a generation-capable installed chat model; TEV sensitivity decisions and EmbeddingGemma
+embeddings are separate capabilities. Model/policy changes require a harness restart and new
+acceptance; existing launch/workload credentials and database state are retained.
+
+If policy or evidence storage is unavailable, generation stops. Restore the governance database
+before retrying. If Internal AI is unavailable, restore its approved runtime/model; never introduce
+an automatic external fallback. Back up the operator policy and governance evidence independently
+of credentials. This evidence is not an immutable external audit sink. Decision IDs appear in the
+user panel and JSON request metadata for correlation; payloads remain excluded from service logs.

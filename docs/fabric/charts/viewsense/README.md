@@ -1,5 +1,7 @@
 # ViewSense AI® Helm Chart
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 The chart is the modular installation interface. All components are independently toggled under `modules.*.enabled`; provider products are selected under `products.*`. Curated combinations live under `profiles/`; render them before installation and supply the Secrets named by the selected profile.
 
 The distribution version and application image tag are 1.0.1. Chart defaults use

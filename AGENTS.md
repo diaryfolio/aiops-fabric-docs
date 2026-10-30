@@ -1,5 +1,15 @@
 # ViewSense AI® documentation repository
 
+## Strict TrueForge independence rule
+
+Treat TrueForge as an unmodified, independently upgraded upstream dependency. Do not propose
+or implement local forks, source/chart patches, monkey-patches, vendored internals or customized
+TrueForge images. All customization stays in `aiops-fabric` through supported external APIs,
+SDKs and documented deployment values. If a feature needs unsupported upstream changes,
+leave it disabled and solve the adaptation in the fabric tier. Preserve this requirement in
+architecture, implementation and upgrade acceptance; the canonical reusable prompt is
+`docs/prompts/governance/design-sync-guardrail.prompt.md`.
+
 ## Manual Git ownership
 
 Do not stage, commit, amend commits, or push changes through Git or any equivalent tool/API.

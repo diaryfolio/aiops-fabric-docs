@@ -1,8 +1,18 @@
 # ViewSense AI® Project Status and Local AI Integration Plan
 
+For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+
 Includes the local AI console changes after baseline `0001b14`.
 The [implementation conformance map](00-implementation-conformance.md) is the canonical route and
 runtime inventory. Live evidence below applies to the isolated development stack, not production.
+
+The [TrueForge adoption and decommission plan](03-trueforge-adoption-decommission.md) is the selected
+next integration direction. Retain `aiops-fabric` and its local adapters; qualify TrueForge as the
+execution runtime, beginning with a synthetic two-namespace profile. No separate `keepview_harness`
+application or wholesale repository retirement is required. The local-AI capability table and evidence below retain their original scope. The
+[clean-state rebuild](40-ops/03-clean-state-rebuild.md) now supplies an independent namespace pair
+and fixed synthetic TrueForge turn, retires the legacy orchestrator/manual kernel and returns
+HTTP 410 from the former response route. Business execution remains disabled.
 
 ## Enterprise harness for local AI
 
@@ -14,7 +24,7 @@ Installed-model dropdowns also support decision, embedding and chat previews bef
 Save as default. Known incompatible choices remain visible and disabled. Previewing does not
 modify memory profiles; saving a new embedding model requires owner backfill for existing records.
 
-The edge AI endpoint already existed at `POST /v1/responses`. A mock remains the base regression
+The historical edge AI endpoint was `POST /v1/responses`; it is now explicitly retired (HTTP 410). A mock remains the base regression
 provider; OpenAI is optional. The new local console is a separate development entrypoint with its
 own PKI, fixed tenant and pgvector volume. It does not replace enterprise SSO or a production
 administrative control plane.
@@ -75,7 +85,7 @@ The public response path can use the Ollama chat adapter through the existing LL
 operator selects a chat model, configures credentials/trust/egress and completes its conformance
 checks. The current public gateway/orchestrator budgets (50/55 seconds) also need alignment
 before certifying minute-long Qwen requests; the longer console preview budget does not change
-that route. The cloud setup remains in the [quick start](../../QUICKSTART.md#enable-openai-securely).
+that route. The cloud setup remains in the [LLM adapter guide](../../fabric/llm/README.md).
 
 ## Embedding compatibility and migration
 

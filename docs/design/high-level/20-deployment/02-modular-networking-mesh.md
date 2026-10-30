@@ -6,6 +6,14 @@ Applications address versioned APIs using stable Service DNS and keep their mTLS
 verified tenant checks. No provider SDK, proprietary mesh header or mesh authorization decision
 enters the application data model.
 
+For the selected TrueForge migration, the [namespace integration design](03-trueforge-namespace-integration.md)
+requires a versioned multi-namespace flow contract and exact namespace/service-account principals.
+The older `NetworkTopology` and `istio_policies` management implementation use one namespace.
+The fabric-owned `RuntimeTopology` v2 and CNI generator now represent the executable namespace
+pair with exact namespace+pod peers and both-sided rules. The v1 mesh planner remains separate
+and must not overwrite this profile. Mesh-v2/API management integration is still planned;
+actual allowed/denied connectivity must pass before promoting the profile.
+
 ```mermaid
 flowchart LR
     Client[Headless client / detachable GUI] --> Edge[Gateway API]

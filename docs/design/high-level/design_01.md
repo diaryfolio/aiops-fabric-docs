@@ -4,13 +4,33 @@
 
 ViewSense AI® is an API-first, Kubernetes-native sovereign AI control and evidence fabric with a small
 portable reference suite. It owns portable trust envelopes, provider admission, policy, routing,
-bounded agent state, safe evidence context, and stable contracts. Model, memory, workflow, identity,
+safe evidence context and stable contracts. Target execution state belongs to the selected agent
+runtime; the legacy bounded agent kernel is retired in the authorized development reset. Model, memory, workflow, identity,
 policy, and MCP products remain replaceable behind those contracts.
 
 Product packaging uses four explicit modes: `bundled`, `adapter`, `managed-dependency`, and
 `external`. A bundled component is installed and tested with ViewSense AI®; an adapter is installed but
 its upstream product is separate; a managed dependency is installed/operated at platform scope; an
 external product is reached through an API. Product selection never implies product installation.
+
+### TrueForge adoption decision (major, development integration)
+
+Retain `aiops-fabric` and integrate TrueForge as its agent execution runtime. No separate
+`keepview_harness` application is required. The [adoption and decommission plan](03-trueforge-adoption-decommission.md)
+defines retained capabilities, replacement gates and the implementation backlog. The retained gateway
+calls a private runtime in a [separate namespace](20-deployment/03-trueforge-namespace-integration.md):
+`viewsense-dev` for fabric and `trueforge-dev` for the initial runtime profile. Authenticated,
+narrowed API connections join them; neither namespace reads the other's databases.
+
+TrueForge owns runtime turns and execution mechanics for the fixed synthetic integration;
+full governed business model/tool execution remains gated. Fabric retains
+identity/delegation, business grants, governed capability/credential boundaries, memory and evidence.
+The owner-authorized development clean-state rebuild retires the legacy orchestrator and manual
+agent kernel. The retained gateway connects across namespaces to stock TrueForge using its
+supported APIs and configuration. The current path is a fixed synthetic verification fixture;
+business execution remains gated. See the [implementation record](40-ops/03-clean-state-rebuild.md).
+All customer behavior stays in `aiops-fabric`; local TrueForge source, chart and image changes
+are prohibited.
 
 Application distributions use a versioned Helm chart and architecture-specific offline image
 bundles. Evaluation environments are replaceable release-specific namespaces with isolated state
@@ -42,6 +62,12 @@ explicit Save as default. An opt-in admin test contract leaves normal inference 
 RAG retrieval on the saved embedding profile until an operator saves and backfills a new profile.
 Local chat uses Ollama's native API behind the existing internal completion contract; the console
 has a longer bounded preview budget for the installed Qwen model. No new hop or state owner is added.
+
+For an immediate native GUI demonstration, `make trueforge-ui` launches the same official pinned
+image in a separate localhost-only standalone preview. Its temporary SQLite/configuration data
+and no-login browser surface are outside the enterprise execution path. See the
+[GUI instructions](../../deploy/trueforge-access.md); hosted runtime
+mTLS/OIDC and the strict no-upstream-customization condition remain in force.
 
 ## System boundaries
 
@@ -117,30 +143,24 @@ Related code/design changes must reference their paired commits or PRs. See the
 
 ## Reference request path
 
-This sequence shows the optional OpenAI-selected route. The deterministic regression route stops at
-the LLM gateway's mock adapter and is the default after a base deployment.
+The current integrated path is the fixed synthetic runtime check. No customer payload or memory
+retrieval is automatically copied into runtime transcripts. Real model/tool execution remains gated.
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Edge
-    participant Orchestrator
-    participant Memory
-    participant LLM
-    participant OpenAIAdapter
-    participant OpenAI
-    Client->>Edge: POST /v1/responses + tenant token
-    Edge->>Orchestrator: mTLS + audience token + derived tenant
-    Orchestrator->>Memory: search through stable memory API
-    Memory-->>Orchestrator: tenant/owner-bound memories
-    Orchestrator->>LLM: OpenAI-compatible completion request
-    LLM->>OpenAIAdapter: mTLS + aud: openai-adapter + provider.invoke
-    OpenAIAdapter->>OpenAI: Bearer provider key + minimized request
-    OpenAI-->>OpenAIAdapter: provider completion
-    OpenAIAdapter-->>LLM: normalized safe response
-    LLM-->>Orchestrator: normalized completion
-    Orchestrator->>Memory: store interaction when enabled
-    Orchestrator-->>Client: response + request ID
+    participant Edge as Fabric edge
+    participant Runtime as Official TrueForge
+    participant Bridge as Fabric transport
+    participant Mock as LLM gateway / mock
+    Client->>Edge: POST /v1/runtime-check · {}
+    Edge->>Runtime: mTLS + qualified-subject OIDC JWT
+    Edge->>Runtime: create one fixed session/turn
+    Runtime->>Bridge: fixed fixture model call
+    Bridge->>Mock: mTLS + scoped constant mock request
+    Mock-->>Runtime: fixture SSE through bridge
+    Edge->>Runtime: observe same turn
+    Edge-->>Client: synthetic result; business_execution false
 ```
 
 ## Design set
@@ -164,23 +184,7 @@ sequenceDiagram
 
 ## Implemented reference slice
 
-The current code proves edge-to-orchestrator-to-memory/LLM flow, a credential-isolated OpenAI
-adapter, PostgreSQL/pgvector and Mem0
-memory boundaries, MCP registration and ViewSense AI® tool-provider invocation, persistent bounded
-agent lifecycle, signed Trust
-Envelope tenant delegation, external OIDC validation, built-in admission plus an OPA decision
-boundary, append-only safe
-evidence events, mTLS, scoped tokens, database ownership, provider host allow-listing, network
-segmentation, and Kubernetes deployment. The OpenAI adapter is configuration-ready and its live
-test requires a customer key; the deterministic mock remains the default regression provider.
-When the OpenAI adapter is selected, its local default model comes from the non-secret
-`config/models.env` and is currently `gpt-5.6-luna`; callers cannot override that server-controlled
-route through the public request model field. Built-in provider admission is executable; OPA has an
-executable decision boundary and chart sidecar but remains environment-dependent.
-Keycloak and SPIRE are documented managed integrations;
-their operators are not bundled. Autonomous agent workers, workflow adapters, cryptographic
-third-party passport verification, immutable evidence export, full OpenTelemetry, HA, backups, and
-provider certification remain roadmap work and are not represented as complete.
+The retained OpenAI adapter takes an explicitly deployed server-controlled model from its Helm/environment configuration. The old single-namespace provider-switch launchers/default file are removed; hosted real-model enablement remains gated by protocol, identity, PII, budget, evidence and retention acceptance. Rollback uses a qualified profile or disables the affected route; it does not reapply the obsolete base.
 
 The local harness supports API-only startup and an independently attached GUI, with direct mTLS/
 scoped-token component tests and additive binary decision probabilities. See the
@@ -209,7 +213,7 @@ flowchart LR
 
 | Capability / owner | API surface | Current implementation / gap |
 |---|---|---|
-| Public edge / gateway | `/v1/responses` | Implemented, enterprise OIDC verifier available; local reference mTLS/token client |
+| Public edge / gateway | `/v1/runtime-check`; `/v1/responses` retired | Fixed synthetic fixture; enterprise OIDC verifier retained; no general business execution |
 | Generation / LLM gateway and adapters | `/v1/chat/completions` | Implemented mock/OpenAI/Ollama adapters; public slow-local-model route budgets need alignment |
 | Judgment / Ollama adapter | `/v1/decisions`, `/v1/model-tests` | Implemented; explicit backend probabilities/favored answer; quality not certified |
 | Embeddings / Ollama adapter | `/v1/embeddings`, `/v1/model-tests` | Implemented real embeddings and profile isolation |
@@ -295,3 +299,7 @@ a cluster service or expand workload grants. See the [release preview guide](../
 Release preview inference uses the existing gateway response API and smoke `api.invoke` grant,
 then the established orchestrator/LLM/mock path. Conversation writes are disabled for that test.
 Tev1/Ollama capability absence is separate from live LLM gateway health.
+
+## User playground and local-only policy
+
+The [user playground design](10-overall/10-user-playground-policy-engine.md) adds a separate Sales/SIEM experience: ViewSense chat source, approved Internal AI destination, bounded single-turn generation and mandatory governance decisions. Channel management stays with Admin/Operations. General chat grants do not authorise CRM/memory/tools. External AI remains a future route and is always denied by this playground; existing legacy inference paths are separate.
