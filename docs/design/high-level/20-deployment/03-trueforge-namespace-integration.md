@@ -133,8 +133,14 @@ These are the new target edges. Existing internal provider/store/identity flows 
 | N09 | Approved telemetry collector | Runtime metrics endpoint | 8790 TLS | Scrape-only path and controlled namespace/workload, no access to ordinary APIs | M01/M04; path enforcement at proxy/app, not L3 policy |
 | N10 | Selected workloads in either namespace | Approved cluster DNS endpoints | UDP/TCP 53 | DNS only; resolve approved services/upstreams; accommodate node-local DNS explicitly if installed | M01 |
 | N11 | Runtime `trueforge-server` | Approved internal collector/identity discovery endpoints | Exact configured TLS port | Safe telemetry and verified identity discovery only; enumerate each destination, no wildcard public egress | When selected and tested |
+| N12 | Explicitly owned acceptance Job in fabric namespace | Runtime server and individually selected fabric test APIs | 8790/8443 TLS | Unique acceptance identity, synthetic fixtures and exact test-only operations; ephemeral allow rules removed after verification | M01–M04 test profile only |
 
 The controller currently uses a static internal API key upstream. Production requires an audience/scoped workload authorization integration for its exact internal operations; a fresh Secret value alone does not satisfy that requirement. An isolated synthetic experiment using that existing upstream mechanism remains a documented development exception, with the controller normally disabled.
+
+N12 is not a production ingress exception or database-admin grant. Install it only with the
+operator-controlled acceptance profile, enumerate each destination and operation, and remove its
+credentials/rules after the Job completes or fails. Negative probes use separate denied identities;
+the acceptance workload cannot broaden its own access or supply deployment credentials to a UI.
 
 Model/MCP dispatch checks run on every call, including non-streaming summaries/compaction, deferred tools, retries, resumes and any later enabled child agent. Extra root capabilities alone do not cover these paths. Connector/server enforcement stays authoritative even when runtime selectors or user approval say a call may proceed.
 

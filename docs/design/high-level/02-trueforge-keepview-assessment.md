@@ -372,7 +372,13 @@ Disable unqualified features in the initial profile: dynamic subagents, external
 
 ## Operational and migration requirements
 
-Compose the upstream chart from a ViewSense AI® parent chart/profile. Override the publicly known development credentials, require the chosen authentication mode, use secret references and verified TLS to state services, and add actual default-deny network resources. The upstream chart already has useful non-root/read-only-filesystem settings, service-account token control, probes, resource tiers, PDB and autoscaling options. Retain those strengths while qualifying the database/Redis/controller topology.
+Coordinate the upstream runtime chart and retained fabric chart as separate namespace releases,
+using the [namespace-pair design](20-deployment/03-trueforge-namespace-integration.md). Override the
+publicly known development credentials, require the chosen authentication mode, use secret
+references and verified TLS to state services, and add actual default-deny network resources.
+The upstream chart already has useful non-root/read-only-filesystem settings, service-account
+token control, probes, resource tiers, PDB and autoscaling options. Retain those strengths while
+qualifying the database/Redis/controller topology.
 
 The documented chart defaults include disabled OIDC, a placeholder service API key, a known bundled PostgreSQL password, unauthenticated bundled Redis and disabled mTLS. These are development defaults requiring explicit profile changes; the presence of a Helm chart is not a production security baseline. Certificate validation alone also does not authorize the exact service identity or business action.
 
