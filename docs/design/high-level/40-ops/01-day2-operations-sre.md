@@ -1,7 +1,5 @@
 # ViewSense AI® Day-2 Operations and SRE
 
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
-
 ## Planned TrueForge migration operations
 
 The [migration runbook](02-trueforge-migration-runbook.md) governs baseline/restore inventory,
@@ -88,11 +86,9 @@ capabilities.
 
 Define SLOs separately for edge/control overhead, memory, each model route, and each MCP class. End-to-end alerts use multi-window error-budget burn. A provider outage must identify the dependency instead of presenting as generic orchestrator failure. Route changes and degraded no-memory operation are visible events.
 
-The local Qwen chat preview allows a 240-second total provider deadline and 260-second console hop,
-with connect timeout 5 seconds. A minute-long cold/large-model response is visible as elapsed wait
-time, not a hung success indicator. Native chat token counts and load/prompt/generation durations
-are transient result metadata. Production routing must align every enclosing gateway/orchestrator
-budget; current public-route timeouts do not certify the slow Qwen path.
+Optional direct Ollama diagnostics retain bounded model deadlines and safe errors. They are
+separate from native TrueForge runtime configuration and the fabric console's capability tests.
+Real-provider quality, load and protocol qualification remain acceptance gates.
 
 ## Release safety
 
@@ -219,39 +215,25 @@ flowchart LR
     Rollback --> Observe
 ```
 
-## Local embedding profiles and GUI operation
+## TrueForge integration and retained memory operation
 
-Open **AI Workspace → Model test lab** for model testing. The **Open test lab** heading button
-appears only within that workspace; Control Plane pages and Test history omit it.
+Open **TrueForge integration** (`?page=ai`) in the fabric console to inspect the local preview's
+version, reachability and configured models/connectors/skills/sandbox/web search. Configure these
+in the native TrueForge interface. Refresh the fabric page; it also refreshes every 15 seconds
+while visible. An empty inventory is unconfigured; unavailable/denied means observation failed.
+Configured does not prove provider health or fabric admission. Never copy provider credentials
+into the fabric console. See the [console ownership contract](../10-overall/06-local-ai-console.md).
 
-The development console shows actual dependency health separately from repository capability.
-`memory_embeddings` retains model/revision/dimension profiles while the legacy 64-d column remains
-available for rollback. Real writes are atomic with records; queries fail with 409 when an owner's
-active-profile coverage is incomplete. `POST /v1/memories:reembed` is an owner/tenant-bound bounded
-backfill; repeat batches until `remaining=0`. It skips already completed vectors, retains older
-profiles, and makes model calls outside DB leases. Old-profile rollback requires restoring the
-adapter model revision/configuration; profile changes must not silently mix vector spaces.
-The provider enforces a 110-second batch deadline. A timed-out batch retains committed vectors;
-retrying resumes missing records. The isolated launcher preserves valid development PKI and credentials on restart, renewing
-certificates with less than one day remaining. This lets an attached GUI reconnect without
-being stopped. GUI-only attach never changes this material.
-The base development bootstrap now checks CA and leaf expiry before reusing existing material;
-renewal preserves database passwords and stored data.
+The standalone preview and secured hosted runtime have different state. Hosted settings remain
+not observed; use `make k8s-test` for the fixed secured synthetic route. The earlier model dropdowns,
+save-default controls and direct generation/decision test lab are retired. **Fabric capability
+tests** retains ingest/store/search/backfill and labels that these do not execute TrueForge agents.
 
-Use synthetic data for GUI tests. Request history and JSON logs contain IDs, operation, outcome and
-duration only; raw test results are an explicit transient diagnostic view. Stop host APIs with
-Ctrl+C and restart using `make console`; pgvector data persists. The GUI does not provide immutable
-audit, enterprise SSO, full tracing, ANN indexes, HA or automated backup/restore. Production migration
-jobs, load/quality tests and operator-controlled routing promotion remain acceptance gates.
-
-Use the test lab's model dropdown, Test model, and Save as default to promote local selections.
-The preview records no memory and changes no default; embedding dimensions are discovered from a
-validated response. All installed models are shown with capabilities, and known incompatible options
-are disabled. RAG/Search/Ingestion/Backfill remain on the saved profile. Configuration-page saves
-remain explicit operator changes; production model promotion requires its admission/evaluation gates.
-
-The local harness supports API-only startup and an independently attached GUI, with direct mTLS/
-scoped-token component tests and additive binary decision probabilities. See the
+Memory profiles remain owned by the memory provider. After a deliberate operator profile change,
+use the bounded owner backfill until `remaining=0`; older vectors are retained. Incomplete profile
+coverage returns 409. A TrueForge chat-model change does not migrate knowledge vectors. The
+isolated launcher preserves valid PKI/credentials/database state on ordinary restart. Ctrl+C
+stops only its processes; pgvector data remains. See the
 [detachable API harness contract](../10-overall/06-local-ai-console.md#detachable-local-api-harness).
 
 ## SSO and certificate operating model

@@ -52,16 +52,14 @@ Implementation truth is maintained in
 [Implementation Conformance](00-implementation-conformance.md). Target-state requirements in this
 design are not evidence that a capability is deployed.
 
-The immediate delivery objective is an enterprise harness for local AI. The
-[project status and local AI integration plan](01-project-status-and-local-ai-plan.md) identifies
-the local Ollama adapter, real embedding integration, versioned vector backfill and acceptance
-gates. The [console design](10-overall/06-local-ai-console.md) defines the working development GUI
-and its production promotion boundary.
-Installed-model dropdowns support isolated decision, embedding and chat previews, followed by
-explicit Save as default. An opt-in admin test contract leaves normal inference pinned and keeps
-RAG retrieval on the saved embedding profile until an operator saves and backfills a new profile.
-Local chat uses Ollama's native API behind the existing internal completion contract; the console
-has a longer bounded preview budget for the installed Qwen model. No new hop or state owner is added.
+The management console is the fabric control plane. TrueForge owns runtime models/providers,
+connectors, skills, sandbox/web-search configuration and agent execution. The console's
+**TrueForge integration** page reads safe configuration metadata from the supported upstream APIs;
+it does not duplicate their editors or run a parallel model test lab. The
+[console design](10-overall/06-local-ai-console.md) defines the read-only preview connection,
+owner boundaries and remaining hosted management gates. Memory profiles, policy/identity,
+controlled egress and evidence remain fabric responsibilities. Direct adapter diagnostics are
+separate from runtime administration and require their own operator identity.
 
 For an immediate native GUI demonstration, `make trueforge-ui` launches the same official pinned
 image in a separate localhost-only standalone preview. Its temporary SQLite/configuration data
@@ -70,6 +68,13 @@ and no-login browser surface are outside the enterprise execution path. See the
 mTLS/OIDC and the strict no-upstream-customization condition remain in force.
 
 ## System boundaries
+
+The [reorganisation-performance](../../business/hr-departure-workflow.md) and
+[deployment-failure investigation](../../business/deployment-failure-investigation.md) examples
+illustrate the target flow for business and technical teams: authorized source integrations supply
+facts, unmodified TrueForge executes agent work, and fabric validates and delivers permitted
+outcomes. They apply existing ownership and acceptance gates. These documentation examples
+implement no business connectors, cluster investigator, execution API or channel rename.
 
 ViewSense AI® is the target enterprise AI governance layer between enterprise users/apps and
 approved local/external models and services: identity, resource grants, guardrails, policy,
@@ -277,7 +282,7 @@ PKI is inventoried as externally managed and is not silently replaced. Workload 
 CA trust migration require separate controlled rollout; issuing a certificate does not prove a
 running workload has loaded it.
 
-The platform management GUI adds independent Overview/suite planning, AI/models, Identity,
+The platform management GUI adds independent Overview/suite planning, TrueForge integration, Identity,
 Certificates and Observability pages. `/v1/platform/catalog`, `/v1/platform/suites`,
 `/v1/platform/status` and `/v1/platform/suite-plans` own read-only catalog/health and reproducible
 plans. Plans never mutate Kubernetes; deployment apply/GitOps remains a separate planned backend.

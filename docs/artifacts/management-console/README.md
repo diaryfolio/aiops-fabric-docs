@@ -1,7 +1,7 @@
 # ViewSense AI® management console POC
 
 Live screenshots captured after browser SSO with the dedicated POC operator account.
-They show Overview/suites, AI/models, Identity/access, Certificates, Observability and the responsive
+These historical screenshots show the earlier Overview/suites, AI/models, Identity/access, Certificates, Observability and responsive
 mobile overview. These are runtime screenshots of the detachable client, not static mockups.
 
 Reproduce using `scripts/test-management-browser.py` with Playwright and installed Chromium after
@@ -38,3 +38,7 @@ No passwords, bearer tokens, private keys or real customer memory are included.
 ## Mobile overview
 
 ![Mobile overview](mobile-overview.png)
+
+The current AI page is **TrueForge integration**, with read-only safe configuration inventory.
+The duplicate model editor and direct model test lab are retired. See the
+[current management contract](../../design/high-level/10-overall/06-local-ai-console.md).

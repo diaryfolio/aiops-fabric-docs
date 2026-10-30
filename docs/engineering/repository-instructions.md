@@ -50,6 +50,20 @@ See the [release publishing guide](../publishing.md#documentation-per-applicatio
 
 ViewSense AI® is a Kubernetes-native, API-first, zero-trust enterprise AI backbone. Preserve component replaceability, provider neutrality, tenant isolation, workload identity, and data ownership boundaries in every change.
 
+## Product language in documentation
+
+Present **ViewSense AI®** as the customer-facing product. Use ViewSense or the platform for short
+references, and describe execution as the agent runtime or backend. Business examples, benefits,
+workflow visuals and general navigation should focus on ViewSense outcomes rather than promoting
+an implementation dependency.
+
+Name TrueForge where its exact identity matters: upstream attribution, architecture ownership,
+installation, pinned artifacts, upgrades, troubleshooting and the strict independence rule.
+Keep command names, API fields, namespaces, image references, URLs and licensing/provenance
+accurate. Product wording must not imply ownership of upstream code or change its unmodified
+status. Runtime configuration and execution remain backend responsibilities, and proposed
+capabilities must retain their implementation/acceptance limits.
+
 ## Mandatory design-sync workflow
 
 Before editing code, APIs, deployment assets, policy, dependencies, or runtime configuration:

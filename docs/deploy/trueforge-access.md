@@ -1,8 +1,10 @@
-# Open TrueForge
+# Agent runtime access
 
-Run commands below from the **`aiops-fabric` repository root**. TrueForge is an independent,
-unmodified upstream dependency. The fabric supplies the launcher and integration configuration;
-never edit the upstream source, generated files, chart templates or image.
+ViewSense has a management console and a separate agent-runtime administration interface.
+The current backend is **TrueForge**, an independently maintained, unmodified upstream dependency.
+Its native interface retains its upstream identity. ViewSense supplies the launcher, integrations
+and enterprise controls; never edit the backend source, generated files, chart templates or image.
+Run commands below from the **`aiops-fabric` repository root**.
 
 ## Open the native GUI
 
@@ -17,7 +19,7 @@ No client certificate, username or password is needed. The launcher waits for a 
 before printing the URL. Python 3 and Docker are sufficient; no Node installation, frontend build
 or fabric/Kubernetes deployment is required to view the GUI.
 
-This is the official bundled TrueForge interface, served directly by the pinned official image
+This is the official bundled upstream interface, served directly by the pinned official image
 in its supported standalone mode. With no model configured, it opens **Settings → Models**.
 The Connectors, Skills, Sandbox providers and Web search tabs are also native upstream screens.
 A model must be configured before chat can execute; the launcher neither downloads models nor
@@ -46,13 +48,27 @@ Do not expose the no-login preview remotely or treat it as an enterprise executi
 
 | Interface | Address / access | Purpose |
 |---|---|---|
-| Native TrueForge preview | `http://localhost:8791`, `make trueforge-ui` | Official GUI with separate temporary SQLite data |
-| Optional fabric management console | `http://127.0.0.1:8787`, `make console` or `make gui` with its API harness | Fabric policy, identity, provider, memory and component management; separate from TrueForge |
-| Integrated Kubernetes TrueForge | `https://trueforge-server.trueforge-dev.svc.cluster.local:8790` | Private hosted runtime called by the fabric through mTLS and native OIDC |
+| Runtime administration preview | `http://localhost:8791`, `make trueforge-ui` | Official GUI with separate temporary SQLite data |
+| Optional fabric management console | `http://127.0.0.1:8787`, `make console` or `make gui` with its API harness | Fabric policy/identity/memory controls and read-only runtime preview inventory |
+| Integrated Kubernetes runtime | `https://trueforge-server.trueforge-dev.svc.cluster.local:8790` | Private hosted runtime called by the fabric through mTLS and native OIDC |
 
-The preview cannot show Kubernetes sessions or fabric memory/governance data. The optional fabric
+The preview cannot show Kubernetes sessions or fabric memory/governance data. Fabric management can observe safe preview configuration metadata. The optional fabric
 console is retained for fabric capabilities; it is not a second agent runtime or a replacement
-for TrueForge's GUI. Its local AI/SSO examples have separate prerequisites and credentials.
+for the native runtime interface. Its local AI/SSO examples have separate prerequisites and credentials.
+
+## Observe runtime configuration in ViewSense
+
+Run `make console` (or `make gui` with an existing local harness), sign in as ViewSense Admin and
+open [TrueForge integration](http://127.0.0.1:8787/?page=ai). The page reads the native preview's
+configured model names, connectors, skills, sandbox and web-search types through supported APIs.
+Configure an item in the runtime preview on 8791, then select **Refresh integration** in fabric; the page
+also refreshes every 15 seconds while visible. There is no duplicate model editor or direct chat
+model test lab. API keys, manifests, endpoint URLs and skill content are not returned to the browser.
+
+Reachable means the preview API responded; configured means it reports an item. Neither proves
+provider health, admission or customer execution. Hosted Kubernetes settings remain separately
+**not observed**. The reader is disabled for SSO/release/production profiles and does not use the
+hosted bootstrap identity. See the [ownership and API contract](../design/high-level/10-overall/06-local-ai-console.md).
 
 ## Why port 8790 reports a certificate error
 
@@ -72,7 +88,7 @@ A normal browser at `https://localhost:8790` receives:
 That is expected mTLS enforcement. Port-forwarding does not create browser identity or interactive
 login. The current fabric issuer supports workload tokens; an integrated browser gateway and
 interactive AuthN/SSO remain unimplemented. Do not disable mTLS/OIDC, copy private workload keys
-into the browser, expose the private service or customize TrueForge to bypass the error.
+into the browser, expose the private service or customize the backend to bypass the error.
 Use the separate localhost preview above when the aim is to explore the GUI.
 
 ## Deploy and verify the integrated runtime
@@ -100,6 +116,15 @@ and its separate PostgreSQL/Redis stores. The runtime controller is disabled in 
 The only integrated execution route is the authenticated fixed synthetic `/v1/runtime-check`.
 General customer execution, native governed MCP, real-model tool protocols and production
 policy/PII/budget/evidence/retention acceptance remain gated. Preview success does not close them.
+
+## Pinned API compatibility
+
+Inspect the running release's `/api/v1/openapi.json` before planning settings lifecycle actions.
+The pinned 0.3.0 preview reports model-provider GET/POST/PUT but no provider-delete endpoint;
+a newer source checkout's DELETE route is not evidence that this image supports deletion.
+Avoid disposable provider experiments in a preview containing valuable state. Removing the
+preview container discards all its temporary state; obtain the operator's choice before using
+that reset as cleanup. Never edit the upstream database or patch the backend to add a missing API.
 
 ## Troubleshooting
 

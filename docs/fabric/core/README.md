@@ -1,8 +1,6 @@
 # Core API and Runtime Integration Module
 
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
-
-The core module retains the authenticated edge and fabric-owned runtime adapter. TrueForge runs
+The core module retains the authenticated edge and fabric-owned runtime adapter. The agent backend runs
 as an independent official release; no upstream customization is permitted. Identity, governance,
 provider credentials and long-term memory remain separate fabric boundaries.
 

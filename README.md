@@ -2,7 +2,7 @@
 
 The dedicated documentation repository for ViewSense AI® and AIOps Fabric.
 
-For the native GUI, start with [Open TrueForge](docs/deploy/trueforge-access.md).
+For ViewSense management and runtime setup, start with the [quick start](docs/QUICKSTART.md).
 
 Start with the [documentation homepage](docs/index.md). The deployed URL comes from
 the repository’s GitHub Pages settings during the build.

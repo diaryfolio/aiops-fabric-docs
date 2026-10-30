@@ -191,7 +191,7 @@ namespace-qualified boundaries/private resources, builds the fabric image and in
 official TrueForge release in the paired namespace. `make k8s-test` qualifies the retained APIs,
 fixed runtime turn and real allowed/denied paths. Static base manifests remain fabric packaging
 inputs; applying them directly is not the namespace-pair workflow. See [Quick start](../../../QUICKSTART.md)
-and [Open TrueForge](../../../deploy/trueforge-access.md).
+and [Agent runtime access](../../../deploy/trueforge-access.md).
 
 ## Production gaps from the reference
 

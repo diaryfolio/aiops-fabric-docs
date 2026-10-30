@@ -102,4 +102,4 @@ The manual agent-run contract is retired. Current hosted verification uses the o
 session/turn API behind the fixed fabric `/v1/runtime-check`; a future public business session
 contract still requires versioning/authorization/idempotency qualification. Topology-v2 is the
 current namespace-pair CNI contract; v1 remains the narrower management/mesh planning contract.
-For native GUI access and the separate preview state, see [Open TrueForge](../deploy/trueforge-access.md).
+For native GUI access and the separate preview state, see [Agent runtime access](../deploy/trueforge-access.md).

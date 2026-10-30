@@ -1,7 +1,5 @@
 # ViewSense AI® High-Level Design
 
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
-
 This directory is the canonical architecture set for ViewSense AI®. Read the index, then the executable
 conformance map before using a target-state document as an implementation claim.
 
@@ -38,13 +36,21 @@ flowchart LR
 - [Networking and mesh design](20-deployment/02-modular-networking-mesh.md) — replaceable CNI,
   strict workload transport and headless networking management.
 - [Implementation conformance](00-implementation-conformance.md)
-- [TrueForge source assessment](02-trueforge-keepview-assessment.md) — source-based reuse and
+- [Integration compatibility and acceptance](10-overall/11-integration-compatibility.md) — product
+  choices, readiness labels, environment qualification and planned integration limits.
+- [Supplier assurance and renewal example](../../business/examples/supplier-assurance-renewal.md) —
+  scoped supplier, commercial and assurance evidence, without automated risk or contract approval.
+- [Reorganisation-performance example](../../business/hr-departure-workflow.md) — HR, department
+  and Finance data become a scoped senior-management report with a six-month comparative chart.
+- [Deployment-failure investigation example](../../business/deployment-failure-investigation.md) —
+  scoped read-only operational evidence, supported findings and authorized delivery, without automatic remediation.
+- [Runtime source assessment](02-trueforge-keepview-assessment.md) — source-based reuse and
   enterprise-control gaps; its separate-project proposal is superseded by the adoption plan.
-- [TrueForge adoption and decommission](03-trueforge-adoption-decommission.md) — retained repository,
+- [Runtime adoption and decommission](03-trueforge-adoption-decommission.md) — retained repository,
   keep/adapt/remove register, ordered backlog and acceptance gates.
-- [TrueForge namespace integration](20-deployment/03-trueforge-namespace-integration.md) — separate
+- [Fabric/runtime namespace integration](20-deployment/03-trueforge-namespace-integration.md) — separate
   fabric/runtime releases, workload identities, API connections and versioned network-policy requirements.
-- [TrueForge migration runbook](40-ops/02-trueforge-migration-runbook.md) — cutover, drain, rollback,
+- [Runtime migration runbook](40-ops/02-trueforge-migration-runbook.md) — cutover, drain, rollback,
   legacy shutdown, source cleanup and separate data disposition.
 - [Input and Output Channels](10-overall/07-input-output-channels.md) — planned business routing,
   Tool-Sense module integration, and the Sales → CRM-Logistics1 Oracle opportunity use case.
@@ -54,11 +60,10 @@ flowchart LR
   platform position, company-boundary/PII checks, canonical adapters, model swaps and cost/audit gates.
 - [Release automation and recovery](../../releases/installation.md#manually-build-a-release)
   — draft discovery permissions, release asset selection and recovery without rebuilding artifacts.
-- [Project status and local AI integration plan](01-project-status-and-local-ai-plan.md) — current
-  capabilities, missing local inference/embedding integrations, and delivery acceptance gates.
-- [Local AI console and provider design](10-overall/06-local-ai-console.md) — component management,
-  suite planning, separate AI/identity/certificate/observability workspaces, Tev1 decisions, real
-  embeddings, pgvector migration and live RAG tests. See the
+- [Project status and integration plan](01-project-status-and-local-ai-plan.md) — current
+  execution/management scope and remaining acceptance gates.
+- [Management console and runtime integration](10-overall/06-local-ai-console.md) — runtime
+  ownership, safe read-only configuration inventory, retained fabric controls and hosted gaps. See the
   [SSO and certificate operating guide](../../deploy/integrations/keycloak.md) for the separate
   Keycloak pod, certificate operator and detachable console startup.
 

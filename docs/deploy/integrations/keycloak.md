@@ -72,7 +72,7 @@ product-neutral; these realm fixtures are an optional example.
 
 - Overview and suites: select Development, Local AI, Enterprise or Sovereign, inspect readiness and
   download a reproducible plan. `applied:false` means no deployment or provider switch occurred.
-- AI/models: installed-model dropdowns, explicit preview/save, decision, embedding, chat and RAG tests.
+- Runtime integration: settings belong in backend administration. Standalone read-back is disabled in the SSO profile; hosted observation requires a supported scoped identity. Fabric capability tests retain memory/ingestion operations.
 - Identity/access: verified subject, signed tenant, mapped roles/scopes and provider management link.
 - Certificates: local and Kubernetes public inventory, expiry, cert-manager readiness/revision,
   scheduled renewal and approved renewal requests. Private keys are never returned.

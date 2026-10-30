@@ -6,7 +6,7 @@ does not imply production readiness. The default suite uses a development issuer
 static mTLS certificates, deterministic embeddings and four single-replica databases.
 
 For the current source-checkout fabric/TrueForge namespace pair, use [Quick start](../QUICKSTART.md).
-For the native upstream GUI, use [Open TrueForge](../deploy/trueforge-access.md) and port 8791.
+For the native upstream GUI, use [Agent runtime access](../deploy/trueforge-access.md) and port 8791.
 The historical fabric bundles below are not namespace-pair TrueForge distributions. Published
 release snapshots retain their original source/behavior; the current helper omits retired response
 and manual-agent UI operations. These instructions do not recreate the deleted blue/green cells.

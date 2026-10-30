@@ -197,9 +197,11 @@ remain planned. OpenAI acceptance additionally requires a provider project/key,
 residency and retention review, egress enforcement, spend limits, rotation, and the documented live
 memory-grounding test.
 
-Local selected-model previews use the existing mTLS/tenant boundary and require `provider.admin`
-plus opt-in runtime management. They do not change state or constitute provider admission. Explicit
-Save as default remains a local development change; production uses audited policy/config promotion.
+Runtime model/provider administration belongs to TrueForge. The fabric console's read-only
+preview inventory exposes safe metadata through supported APIs and does not confer provider
+admission or production readiness. Direct optional adapter diagnostics retain separate operator
+identity. Hosted settings read authority, interactive browser identity, audit and least-privilege
+administration are unimplemented; standalone preview observation cannot satisfy these requirements.
 Planned: workflow adapters, SCIM, runtime enforcement of provider admission, signed third-party
 passports, evaluation runners/datasets, immutable evidence/audit export, full OTel
 instrumentation/exporters, external secrets, HA/DR,

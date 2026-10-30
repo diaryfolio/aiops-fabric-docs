@@ -1,90 +1,75 @@
----
-hide:
-  - toc
----
+# Value and use cases
 
-# Business value and use cases
+ViewSense AI® brings together permitted information, AI-assisted analysis and reviewed outcomes.
+Choose a team below. Linked titles open a walkthrough under **Detailed examples**.
 
-The business case for ViewSense AI® is a shared way to connect AI and company knowledge while
-keeping access, supplier choices, and approval decisions under enterprise control. Benefits must
-be demonstrated in a specific use case; the platform does not establish savings or answer quality
-by itself.
+> **Proposed workflows.** Business connectors, governed tools and delivery still require
+> implementation and acceptance. See [current capabilities](../design/high-level/00-implementation-conformance.md).
 
-## Start with knowledge assistance
+## Security, risk and supplier assurance
 
-A suitable pilot lets a limited group ask questions about approved company information. Start
-with a small, prepared knowledge set and review answers against an agreed reference. The current
-memory and response paths provide a basis for this evaluation; a real model requires environment
-acceptance as described in the [compatibility guide](compatibility.md).
+Five selected examples cover security operations (SOC), governance/risk/compliance (GRC) and
+cybersecurity supply-chain risk.
 
-```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontSize": "22px", "fontFamily": "Arial, sans-serif", "lineColor": "#0f9f96"}, "flowchart": {"nodeSpacing": 35, "rankSpacing": 45, "padding": 24, "wrappingWidth": 360, "useMaxWidth": false}}}%%
-flowchart TB
-    accTitle: Knowledge assistance pilot
-    accDescr: Approved company knowledge informs an AI-assisted answer for an authorised user. A human reviews the answer before making a business decision.
-    A["Approved company knowledge"] --> B["AI-assisted answer<br/>for an authorised user"]
-    B --> C["Human review"]
-    C --> D["Business decision"]
-    classDef step fill:#082a3a,color:#ffffff,stroke:#0f9f96,stroke-width:2px;
-    classDef outcome fill:#0f766e,color:#ffffff,stroke:#0f9f96,stroke-width:2px;
-    class A,B,C step;
-    class D outcome;
-```
-
-On smaller screens, scroll the diagram horizontally to see all the boxes.
-
-This is a proposed pilot process. The business decision remains with the reviewer; the diagram
-does not imply that the platform supplies a complete document-management or decision-approval application.
-
-## Candidate use cases
-
-| Use case | A bounded first evaluation | Dependency or limitation |
+| Example | ViewSense brings together and compares | Outcome and recipients |
 |---|---|---|
-| Internal knowledge assistance | Answer questions from an approved policy or procedure set for one team. | Validate retrieval and answer quality; prepare the source text and enforce permissions. |
-| Support-team assistance | Draft an answer using a small, approved support knowledge set, with an employee reviewing the result. | A case-management connector and automatic customer delivery are not included. |
-| Local AI evaluation | Compare model decisions or grounded answers on representative non-sensitive examples. | Ollama is configuration-ready; development evidence is not a general model-quality guarantee. |
-| Governed agent lifecycle | Exercise budget, approval, cancellation, and evidence decisions using controlled runs. | The current lifecycle is manually driven; autonomous task execution and business-tool adapters are planned. |
+| S1 · Suspicious privileged access | Sign-in alerts, administrator activity, approved changes and service ownership | SOC analysts receive an evidence timeline and unanswered questions; service owners receive relevant exposure. |
+| S2 · Vulnerability business impact | Scanner findings, deployed versions, exploitation advisories and service criticality | Security receives a rule-based priority review; engineering receives affected components and owners. |
+| G1 · Change-approval audit evidence | Production releases, change tickets, approvals and recorded exceptions | Control owners receive evidence gaps; reviewers receive linked records for assessment, without an automatic compliance verdict. |
+| C1 · Supplier breach impact | Supplier notices, connected services, data-sharing records and access grants | Security receives exposure questions; business owners receive dependencies; procurement receives supplier follow-ups. |
+| C3 · [Supplier assurance and renewal](examples/supplier-assurance-renewal.md) | Assessments, open findings, contract terms, service history and business dependencies | Procurement and risk owners receive a renewal brief with evidence gaps, conditions and decisions for authorized owners. |
 
-## Sales opportunities from CRM data
+## People and HR
 
-A planned practical use case lets an authorised employee ask “give me sales opportunities” from
-chat or Teams. **Sales** is the Input Channel; **CRM-Logistics1** is the Output Channel accessed
-through Tool-Sense. The answer returns to the employee's authorised conversation. The read path
-uses approved CRM/Oracle facts, account permissions and owner-reviewed rules, with reasons and
-freshness visible for each opportunity.
-
-| Customer example | Opportunity to review |
-|---|---|
-| ClientA: Silver1, API disabled | Qualify API need and check whether enablement or an eligible package upgrade fits. |
-| ClientB: Gold, all features, growing footprint | Compare measured billable usage with finite licence headroom before suggesting more licences. |
-| ClientC: Platinum, unlimited pool, legacy Windows | Review a supported Linux migration against authoritative terms and migration costs; potential savings are not guaranteed. |
-
-Measure time to produce reviewed leads, factual accuracy, useful opportunities and safe account
-access against a manual baseline. ClientC can be a retention/customer-value opportunity rather
-than a revenue increase. Missing or stale evidence must remain visible. This does not contact
-customers or write CRM records. Channel routing, Oracle tools and Teams integration are planned;
-see the [full channel design and acceptance gates](../design/high-level/10-overall/07-input-output-channels.md).
-
-## Translate platform goals into measurable value
-
-| Goal | Business measure to agree | Evidence to collect |
+| Example | ViewSense brings together and compares | Outcome and recipients |
 |---|---|---|
-| Help employees find reliable information | Time to produce a reviewed answer and the proportion accepted by reviewers. | Representative questions, a baseline without AI, review scores, and correction reasons. |
-| Preserve supplier choice | Effort to qualify and switch an approved provider for the same use case. | Compatibility tests, application changes, quality differences, and operating effort. |
-| Control data access | Whether unauthorised users and disallowed data movements are blocked. | Negative access tests, data-flow review, and environment security acceptance. |
-| Keep costs understandable | Cost per accepted answer or completed controlled run. | Model usage, infrastructure, integration, operations, review, and support costs. |
-| Make approvals accountable | Whether owners can reconstruct an approval or cancellation without unnecessary confidential data. | Evidence completeness, access controls, retention decisions, and review outcomes. |
+| HR1 · [Reorganisation and business performance](hr-departure-workflow.md) | Six months of confirmed HR exits, department mappings, staffing and financial measures | Authorized leaders receive comparative charts and an explanation of evidence limits. |
+| HR2 · Employee onboarding readiness | Confirmed starters, role requirements, equipment and training records | HR receives readiness gaps; IT and managers receive proposed tasks for review. |
+| HR3 · Workforce capacity planning | Approved workload forecasts, staffing, skills and leave coverage | Department managers receive aggregate capacity gaps and planning scenarios, without individual performance rankings. |
 
-Define the comparison method and target before the pilot. Report quality and safety failures
-alongside productivity results. Pricing, showback dashboards, and automatic savings calculations
-are not established by this documentation.
+## Finance
 
-## What a sponsor should fund
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| FIN1 · Invoice discrepancy review | Invoices, purchase orders and goods receipts | Finance receives matched records and discrepancies; procurement receives supplier questions. |
+| FIN2 · Budget variance explanation | Approved budgets, actual expenditure, commitments and department mappings | Budget owners receive validated variances, supporting transactions and questions requiring explanation. |
+| FIN3 · Cloud cost and capacity review | Billing, utilization, workload schedules and ownership records | Finance and platform owners receive cost drivers and candidates to investigate, without automatic resource changes. |
 
-Budget for the selected model and hosting, knowledge preparation, integration work, platform
-operations, security acceptance, and user training. Assign owners for incorrect answers, provider
-outages, unexpected usage, and access failures. Agree a stop or rollback decision if the pilot
-fails its acceptance criteria.
+## Sales and customer service
 
-The [adoption and governance guide](adoption-and-governance.md) turns these choices into a staged
-evaluation with clear ownership.
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| CX1 · Sales opportunity discovery | CRM accounts, product usage and contract entitlements | Account managers receive evidence-backed opportunities for their permitted customers. |
+| CX2 · Customer support resolution | Support tickets, approved documentation and service status | Support agents receive a response draft; engineering receives unresolved technical findings. |
+| CX3 · Customer renewal preparation | Customer contract milestones, adoption, support history and account plans | Account owners receive a renewal brief with observed concerns and follow-ups, without invented churn probabilities. |
+
+## Procurement and legal
+
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| PROC1 · Supplier commercial renewal | Supplier contracts, usage, prices and service history | Procurement and Finance receive comparable costs and negotiation questions; assurance concerns link to the separate security review. |
+| PROC2 · Supplier delivery exceptions | Purchase commitments, promised deliveries, receipts and affected work | Procurement receives supplier follow-ups; operations receives dependencies and confirmed delays. |
+| PROC3 · Contract obligation tracking | Approved obligations, notice periods, assigned owners and completion evidence | Contract owners receive upcoming obligations and missing evidence; legal reviewers receive questions requiring interpretation. |
+
+## Operations and project delivery
+
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| OPS1 · IT incident investigation | Monitoring alerts, service-desk records, recent changes and dependencies | Responders receive an evidence-backed investigation; service owners receive an impact summary. |
+| OPS2 · Project delivery health | Milestones, work tracking, incidents and dependency updates | Project managers receive blockers; sponsors receive scoped delivery concerns and owner decisions. |
+| OPS3 · Service-demand planning | Request volumes, approved service targets, staffing and backlog age | Operations managers receive validated demand trends and capacity scenarios for review. |
+
+## Engineering and DevOps
+
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| ENG1 · [Deployment-failure investigation](deployment-failure-investigation.md) | Release identity, rollout status, selected telemetry and approved runbooks | On-call engineers receive findings and proposed checks; service owners receive a scoped brief. |
+| ENG2 · CI and test-failure triage | Failed builds, test results, sanitized job logs and source changes | Developers receive a failure summary, supporting evidence and hypotheses to verify. |
+| ENG3 · API-change impact analysis | Proposed contracts, known consumers and contract-test results | API owners receive evidenced compatibility risks; consuming teams receive migration and testing proposals. |
+
+These examples begin with read-only analysis and human review. Calculations and comparisons use
+approved rules; AI helps explain the evidence. Missing information remains visible. A report does
+not authorize payments, contract acceptance, account changes or production operations.
+
+Continue to [Detailed examples](examples/index.md) for the walkthroughs, or
+[Adoption and governance](adoption-and-governance.md) to plan a pilot.
