@@ -143,6 +143,57 @@ do not certify the new namespace pair.
 Validation results belong in the coordinated Design Sync Report and implementation conformance;
 business-readiness claims must not be inferred from synthetic success.
 
+## Open the native TrueForge GUI
+
+For an immediate look at the upstream GUI, the implementation checkout provides an explicitly
+separate **standalone preview** at **[http://localhost:8791](http://localhost:8791)**:
+
+```bash
+make trueforge-ui
+make trueforge-ui-status
+make trueforge-ui-stop
+```
+
+`make trueforge-ui` starts the official pinned TrueForge image using supported standalone
+configuration and waits for its health endpoint. The native UI assets are served unchanged by
+that image; no UI SDK rebuild, custom frontend or upstream patch is involved. With no model
+configured, the native UI opens Settings → Models. Add a model before expecting chat execution.
+
+This is a local GUI demonstration, **not browser access to the Kubernetes runtime**. It has its
+own temporary SQLite database, no fabric credentials or host-directory mounts, and no access to
+the Kubernetes sessions, governance or memory stores. It binds only `127.0.0.1:8791` and uses the
+upstream localhost-only no-login mode. The browser hop is plain HTTP on loopback, an explicit
+personal-preview exception; internal Kubernetes mTLS/OIDC remains enabled. Never publish this
+port remotely or treat this preview as an enterprise route.
+
+The launcher owns only Docker resources labeled `io.viewsense.purpose=trueforge-gui-preview`.
+It refuses resources with conflicting ownership. The container is non-root, read-only, drops
+Linux capabilities and has bounded CPU, memory, process count and temporary filesystems. Its
+SQLite/configuration data resides in container tmpfs and is discarded on stop/removal/restart.
+This includes any model keys entered into the preview: they are not migrated or backed up.
+The dedicated Docker bridge supports ordinary outbound traffic; it is not a provider egress
+policy, and no fabric PII, budget or evidence guarantees apply. Use synthetic/non-sensitive data.
+The upstream standalone logger uses its native human-readable format; production JSON logging
+requirements continue to apply to the hosted fabric profile, not this isolated UI demonstration.
+
+Directly forwarding `trueforge-dev/service/trueforge-server` to port 8790 still requires a trusted
+client certificate. A normal browser receives `Client certificate required`; adding a port-forward
+alone does not provision browser identity. The development fabric issuer currently supports workload
+tokens, not interactive authorization-code login. Full browser access to the integrated namespace
+therefore remains future fabric-owned gateway/interactive AuthN work using supported upstream
+interfaces. The preview does not weaken those boundaries or satisfy that acceptance gate.
+
+Preview validation confirmed the native Settings → Models screen in a browser, health version
+`0.3.0`, the official image digest, non-root/read-only container and localhost-only port binding.
+The launcher status command is repeatable; unit/lint, Kustomize and strict publication checks pass.
+The existing Kubernetes deployment and synthetic/security regression checks also pass. No upstream
+files, credentials, cluster authentication or maintained deployment topology were changed by the
+preview launcher. No real model is configured automatically.
+
+The [official introduction](https://trueforge.dev/introduction) describes both the bundled UI
+and standalone/hosted modes. This launcher uses the independently pinned official image already
+qualified for the development runtime; existing Kubernetes releases and resources are not changed.
+
 ## Verified development evidence
 
 The completed development workflow passed `make k8s-deploy` and `make k8s-test` on `k3d-cks`.

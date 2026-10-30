@@ -32,6 +32,13 @@ and does not authorize future customer data deletion. Short-lived static PKI, un
 JWT identity and single-replica stores remain development limitations. No-retention, hard budgets,
 immutable export and final business authorization are not supplied by this synthetic bridge.
 
+The optional [standalone GUI preview](../40-ops/03-clean-state-rebuild.md#open-the-native-trueforge-gui)
+is a separate localhost-only development tool using official upstream no-login mode. Its HTTP
+loopback listener and disposable SQLite data are not an enterprise route or a Kubernetes security
+exception. It receives no fabric credentials or host-directory mounts and must not be exposed
+remotely. Its Docker bridge is not an egress-policy implementation. Integrated browser identity,
+TLS termination and production user/tenant authorization remain unqualified.
+
 ```mermaid
 flowchart LR
     Request["Request"] --> Net["NetworkPolicy reachability"]

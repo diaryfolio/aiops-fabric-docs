@@ -34,6 +34,7 @@ No source/chart patch, injected runtime hook, fork or customized TrueForge image
 | Legacy response contract | explicitly retired | Authenticated `POST /v1/responses` returns HTTP 410; `/v1/agent-runs` service removed; this is an authorized fresh-state breaking change |
 | Previous namespace data | deleted without backup | Old dev and blue/green evaluation namespaces removed with UID preconditions; fresh dev namespace recreated; no data migration or restore claim |
 | Business execution / native MCP / shared sessions | disabled or planned | No end-to-end PII, hard budget, immutable evidence, idempotent creation, no-retention or delivery acceptance; existing governed registry API remains separate |
+| Native GUI standalone preview | implemented development tooling | `make trueforge-ui` opens the stock official image on localhost:8791; ephemeral independent SQLite, no fabric credentials; integrated Kubernetes browser login remains unimplemented |
 | Production operations | planned | HA, rotation/reload, SSO entitlement refresh, restore, mesh v2 and offline paired release packaging require qualification |
 
 The [clean-state record](40-ops/03-clean-state-rebuild.md) documents exact scope, commands,

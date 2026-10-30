@@ -5,7 +5,7 @@
 ViewSense AI® is an API-first, Kubernetes-native sovereign AI control and evidence fabric with a small
 portable reference suite. It owns portable trust envelopes, provider admission, policy, routing,
 safe evidence context and stable contracts. Target execution state belongs to the selected agent
-runtime; the existing reference still owns its legacy bounded agent state. Model, memory, workflow, identity,
+runtime; the legacy bounded agent kernel is retired in the authorized development reset. Model, memory, workflow, identity,
 policy, and MCP products remain replaceable behind those contracts.
 
 Product packaging uses four explicit modes: `bundled`, `adapter`, `managed-dependency`, and
@@ -13,16 +13,17 @@ Product packaging uses four explicit modes: `bundled`, `adapter`, `managed-depen
 its upstream product is separate; a managed dependency is installed/operated at platform scope; an
 external product is reached through an API. Product selection never implies product installation.
 
-### TrueForge adoption decision (major, design-only)
+### TrueForge adoption decision (major, development integration)
 
 Retain `aiops-fabric` and integrate TrueForge as its agent execution runtime. No separate
 `keepview_harness` application is required. The [adoption and decommission plan](03-trueforge-adoption-decommission.md)
 defines retained capabilities, replacement gates and the implementation backlog. The retained gateway
-will call a private runtime in a [separate namespace](20-deployment/03-trueforge-namespace-integration.md):
+calls a private runtime in a [separate namespace](20-deployment/03-trueforge-namespace-integration.md):
 `viewsense-dev` for fabric and `trueforge-dev` for the initial runtime profile. Authenticated,
 narrowed API connections join them; neither namespace reads the other's databases.
 
-TrueForge will own model/tool iteration, turns, context and streaming mechanics. Fabric retains
+TrueForge owns runtime turns and execution mechanics for the fixed synthetic integration;
+full governed business model/tool execution remains gated. Fabric retains
 identity/delegation, business grants, governed capability/credential boundaries, memory and evidence.
 The owner-authorized development clean-state rebuild retires the legacy orchestrator and manual
 agent kernel. The retained gateway connects across namespaces to stock TrueForge using its
@@ -61,6 +62,12 @@ explicit Save as default. An opt-in admin test contract leaves normal inference 
 RAG retrieval on the saved embedding profile until an operator saves and backfills a new profile.
 Local chat uses Ollama's native API behind the existing internal completion contract; the console
 has a longer bounded preview budget for the installed Qwen model. No new hop or state owner is added.
+
+For an immediate native GUI demonstration, `make trueforge-ui` launches the same official pinned
+image in a separate localhost-only standalone preview. Its temporary SQLite/configuration data
+and no-login browser surface are outside the enterprise execution path. See the
+[GUI instructions](40-ops/03-clean-state-rebuild.md#open-the-native-trueforge-gui); hosted runtime
+mTLS/OIDC and the strict no-upstream-customization condition remain in force.
 
 ## System boundaries
 
