@@ -1,5 +1,10 @@
 # Durable Agent Runtime Module
 
+The selected target is [TrueForge adoption](../../design/high-level/03-trueforge-adoption-decommission.md).
+The existing kernel below remains shipped until D02's consumer/API/state migration and shutdown
+gates pass. Do not build a second autonomous loop here or remove its database before archive/restore
+acceptance. No runtime replacement is implemented by the documentation plan.
+
 The bundled `viewsense_agent_runtime` is a PostgreSQL-backed bounded state machine. It provides
 idempotent run creation, optimistic versioning, checkpoints, approval/rejection, step budgets,
 cancellation, terminal states, and ordered safe events through Agent Run v1.

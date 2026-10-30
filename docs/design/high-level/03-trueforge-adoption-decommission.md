@@ -1,0 +1,134 @@
+# ViewSense AI® TrueForge Adoption and Decommission Plan
+
+## Decision and scope
+
+Retain **`aiops-fabric` as the implementation repository** and **`aiops-fabric-docs` as the documentation repository**. TrueForge becomes the selected replaceable agent execution runtime. The retained fabric supplies enterprise identity, policy, governed model/tool/memory capabilities, customer integrations and operational evidence. `keepview_harness` has no role in this architecture and is not a migration destination. Do not rename the repositories or remove that unused checkout as part of this documentation change.
+
+This is a **major, design-only change**. No service has been decommissioned, no namespace created, no traffic moved and no customer data migrated. The existing reference continues to run its documented paths. Every migration milestone below is **planned** until executable implementation and acceptance evidence are recorded in [Implementation Conformance](00-implementation-conformance.md).
+
+This decision supersedes the separate-project proposal in the [source assessment](02-trueforge-keepview-assessment.md). The source findings remain applicable. Reuse is substantial, but a percentage of production completion cannot be inferred from module count: enforcement, recovery and customer acceptance remain necessary.
+
+## Target architecture
+
+```mermaid
+flowchart LR
+    Client["Chat / headless application"] --> Edge["Retained fabric gateway + runtime adapter"]
+    Edge --> Governance["Retained governance / identity / evidence"]
+    Edge --> Runtime["TrueForge: execution, turns, context, streaming"]
+    Runtime --> Model["Fabric governed model capability"]
+    Runtime --> Tools["Fabric governed MCP capability"]
+    Model --> Providers["Credential-owning provider adapters"]
+    Tools --> Connectors["Customer/data-owner connectors"]
+    Tools --> Memory["Optional governed memory"]
+    Runtime --> Governance
+```
+
+This is the target, not the current request graph. TrueForge owns loop/thread/turn execution; fabric components enforce business authority and protect data before, during and after that execution. Governance owns policy, admission, budget and safe evidence. Data owners retain their credentials and databases. A namespace or an agent prompt grants no access.
+
+The runtime adapter starts as a logical module in the existing edge process. It calls TrueForge APIs and translates stable fabric contracts; it must not implement another model/tool loop. A small integration record may bind public IDs and idempotency keys to runtime IDs. That is adapter-owned correlation state, never a second transcript or independently writable run state. If durable binding storage is needed, add an explicitly owned schema/credential/migration and document it before use; do not borrow another service's database.
+
+Deployment placement and exact permitted connections are specified in [TrueForge Namespace Integration](20-deployment/03-trueforge-namespace-integration.md). Cutover, rollback and removal are specified in the [migration runbook](40-ops/02-trueforge-migration-runbook.md).
+
+## Keep, adapt and decommission register
+
+“Decommission candidate” is a target disposition, not permission to delete the component now. All rows are pending their removal gate. Paths are implementation-relative review locators.
+
+| ID | Existing component/assets | Target disposition | Replacement or retained responsibility | Removal / acceptance gate |
+|---|---|---|---|---|
+| D01 | `src/viewsense_orchestrator/` | Decommission after cutover | TrueForge execution plus thin gateway runtime adapter | All response consumers migrated or explicitly version-deprecated; memory/remember semantics and errors qualified; no remaining route/config/caller |
+| D02 | `src/viewsense_agent_runtime/` | Decommission execution kernel | TrueForge turns/approvals/cancellation; optional stable fabric run facade | Run API compatibility decision, legacy non-terminal run drain and evidence export; resume/cancel/idempotency tests; no competing state owner |
+| D03 | `agent-db` StatefulSet/PVC, credentials, grants and backups | Retire live service after D02; preserve retained data | TrueForge-owned fresh runtime database; legacy archive governed separately | Verified export/restore, retention/legal-hold review and restore window; workload shutdown is separate from data destruction |
+| D04 | `src/viewsense_llm_gateway/` | Adapt | Governed inference contract, admission, per-call inspection/budget/evidence | Retain the boundary; replace simple forwarding only when tool/stream/usage contracts and final adapter checks pass |
+| D05 | `src/viewsense_mcp_gateway/` and `registry-db` | Adapt; no wholesale removal | Approved tool/provider registry, native MCP server boundary, deterministic grants and connector enforcement | TrueForge supplies the MCP client; new server transport and legacy `/v1/tools/call` compatibility need tests; registry remains owned here |
+| D06 | `src/viewsense_gateway/` | Retain and extend | Public identity/session/tenant binding, reviewed route selection, runtime API adapter, authorized delivery | Reject unsupported legacy behavior explicitly; secure the direct runtime API; preserve the public contract until versioned migration |
+| D07 | `src/viewsense_governance/` | Retain and extend | Qualified grants, reviewed snapshots, admission, reservations, safe evidence/export | Keep preview `execution_authority: false`; add separately authenticated execution authority and runtime checks |
+| D08 | `src/viewsense_common/` | Retain selectively | Canonical contracts, delegated identity, safe transport/logging, embedding validation | Separate capability owners; remove helpers only with callers; add multi-namespace topology contract rather than weakening v1 |
+| D09 | `src/viewsense_identity/` | Development fixture; replace production issuance | Production AuthN/entitlement/workload delegation adapters | Development issuer remains for isolated tests only; verify exact tenant/subject/audience and rotation before production |
+| D10 | Memory gateway, PostgreSQL and Mem0 packages; `memory-db` | Retain as selected optional capability | Governed long-term memory and replaceable embeddings/providers | Bind owner/account access to verified policy; lifecycle/export/delete/profile and live provider tests |
+| D11 | `src/viewsense_ollama_adapter/` | Retain decision/embedding operations; adapt chat | Local provider isolation and configuration | Agent-compatible tool messages/streaming must be implemented or explicitly refused; local inference still needs deployment/quality evidence |
+| D12 | `src/viewsense_openai_adapter/` | Retain isolation; adapt protocol before runtime use | Vendor credential ownership, exact destination, safe errors and final wire enforcement | Existing non-streaming text-only adapter is insufficient; no external execution until egress/budget/evidence gates pass |
+| D13 | `src/viewsense_ingestion/` | Retain if selected; improve independently | Source/ACL-aware ingestion into memory | Idempotent operations, partial-write recovery, progress, deletion and profile migration; not replaced by chat file upload |
+| D14 | `src/viewsense_console/` | Retain management; replace duplicate chat integration selectively | Policy/identity/certificates/network/status APIs and TrueForge UI components | API parity, role ceilings, CSRF/auth, accessibility and no policy bypass; no admin controls exposed to ordinary users |
+| D15 | Certificates and networking packages/manifests | Retain and extend | Workload trust, namespace/flow definitions and runtime enforcement evidence | New multi-namespace identity graph, exact policies and live positive/negative probes |
+| D16 | Mock LLM/MCP and smoke package | Retain test-only assets | Deterministic regressions and contract fixtures | Production profiles exclude mocks; update acceptance to new topology before deleting old-only scenarios |
+| D17 | Workflow module metadata | Retain planned capability; defer engine implementation | Optional durable business workflow contract | TrueForge schedules are not a general workflow engine; add a provider only for a qualified customer requirement |
+| D18 | Helm/Kustomize/Compose, launchers, Docker build, product/module catalogs, CI and release scripts | Update with each component | Reproducible supported profiles, versions and correct maturity claims | Remove every retired service/port/image/secret/probe/flow dependency; validate baseline and new profile independently |
+| D19 | Legacy tests, schemas and published guides | Preserve behavior; retire obsolete implementation assertions | Runtime adapter/contract/security suites and versioned compatibility | Replacement evidence first; retain historical release documentation and externally supported contract versions |
+
+Do not remove governance, memory, identity/transport contracts or credential adapters merely because TrueForge has a similarly named feature. Runtime session history is not governed memory; UI approval is not business authorization; catalogs are not provider admission; usage totals are not atomic spend limits.
+
+## Boundary contracts and compatibility
+
+| Boundary | Required work before cutover |
+|---|---|
+| Public `/v1/responses` | Inventory clients and exact schemas; retain current behavior until a route-specific compatibility suite passes. TrueForge `/api/v1/sessions` and turns are internal runtime APIs, not an automatic wire replacement |
+| `user_id` / memory owner | Resolve requested owner under verified subject/account policy; never preserve the legacy owner-selection gap |
+| `remember` / retrieval | Either implement equivalent governed behavior or reject unsupported requests before dispatch. No silent ignoring, automatic transcript-to-memory copying or unapproved retention |
+| `/v1/agent-runs` | Document each legacy action against runtime semantics. Unsupported manual checkpoint/state actions require a versioned migration/deprecation, not invented successful responses |
+| Public session and SSE | Authorize creator/collaborators and recipient, define event IDs/cursors/order/errors/disconnects; translate vendor events into a stable safe contract |
+| Retry/idempotency | Bind key to tenant/actor/action/request digest; reject conflicting reuse; persist creation mapping before returning a durable accepted response; reconcile uncertain upstream creation instead of duplicate execution |
+| Execution context | New versioned authenticated delegation binds real tenant, qualified actor/subject, input/output/action/purpose, session, revisions, expiry and narrowing obligations |
+| Model capability | Explicit supported protocol subset, tool-call round trip, structured output, stream/non-stream, usage, cancellation and bounded limits; final wire authorization belongs in the credential adapter |
+| Tool capability | Native MCP exposed by the governed server; exact schemas/actions/arguments and complete-grant/data enforcement at invocation, including Code Mode and future subagents |
+| Evidence / budget | Safe durable pre-dispatch intent and reconciled outcome/reservation; no transcript dump and no unacknowledged regulated dispatch |
+| Data lifecycle | Separate transcript, business facts, governed memory, sandbox artifacts, backups and evidence retention; preserve the current no-retention channel promise |
+
+Machine-readable schemas, OpenAPI/event contracts and conformance tests will be authored in `aiops-fabric` in the implementation slice. The names/fields above are design requirements, not new APIs available today. Reuse one canonical schema owner and generate cross-language clients/types.
+
+The production identity bridge is a prerequisite. Stock OIDC in the examined TrueForge baseline places users in internal tenant `default`; a shared fixed service user would collapse employee ownership. First deploy one customer/environment cell per namespace pair, keep real tenant/subjects in verified delegation and establish distinct runtime subjects. A custom authenticator/resolver integration or thin core host must validate this. A reverse proxy forwarding unsigned identity headers, or configuring OIDC alone, is insufficient.
+
+Existing no-retention business channels cannot enter ordinary durable TrueForge turns with sensitive facts until an approved ephemeral execution/storage path is qualified. Synthetic data may use normal runtime storage under a separate explicit test retention policy. No unattended business scheduling, external model route, arbitrary skill, shared-session delivery or sandbox is enabled by the initial adoption profile.
+
+## Ordered implementation backlog
+
+Every row begins **planned**. Its implementation change updates the conformance map, contracts, relevant domain documents and evidence; a source file or a healthy pod alone does not close it.
+
+| Milestone | Dependencies | Concrete deliverable | Exit evidence |
+|---|---|---|---|
+| M00: freeze baseline | This design | Inventory consumers/state, pin TrueForge chart/image/SDK/core and record configuration digests, assign owners | Source/artifact manifest, contract inventory, data/retention and rollback decisions |
+| M01: isolated runtime deployment | M00 | Add opt-in namespace-pair profile, independent releases, trust/secret references, default deny, quotas and synthetic probes | Render both namespaces; validate policies; runtime health and allowed/denied connectivity on enforcing CNI; old profile still works |
+| M02: identity and runtime adapter | M01 | Gateway adapter, authenticated real-subject/tenant context, public/runtime ID and idempotency mapping, secure resume/cancel/history | Spoof/cross-subject tests, compatibility/error tests, duplicate/uncertain-start tests, no direct-runtime bypass |
+| M03: governed provider and tool calls | M02 | Agent-compatible local inference, native governed MCP server, fresh per-dispatch policy/admission/budget/evidence | Root and summary calls covered; direct/deferred/Code Mode and later child paths enforce same ceilings; outage tests yield zero unauthorized dispatch |
+| M04: retention and operations qualification | M02–M03 | Qualified storage profile, deletion/backup/artifact controls, export/outbox, SLO/deadline/recovery contracts | Sensitive canaries absent where retention is prohibited; restore, drain, interruption and evidence-loss tests |
+| M05: bounded route pilot and cutover | M04 | Synthetic then owner-approved read-only Sales/local route through API and chat; enable live data only after every applicable gate | Qualified account/field scope, deterministic facts/rules, grounding, recipient and complete/partial coverage; old path disabled for this route |
+| M06: optional features | M05 | Individually qualify memory, subagents, schedules, sandbox, external models or workflow integration as needed | Separate feature-specific contract/security/operations acceptance; no inherited permission from the pilot |
+| M07: legacy shutdown | M05 plus closure for every affected consumer | Drain/deactivate D01/D02 and old routing only after all consumers migrate; revoke unused credentials/flows | No remaining caller/config/flow dependency, zero active old runs, rollback/restore and archive evidence |
+| M08: source and resource cleanup | M07 | Delete retired source/config/manifests/tests and revise catalogs/release tooling; keep archives per retention | Full unit/lint/profile/package checks, live smoke/denials, no dangling imports/routes/ports/docs; old data deletion remains separately governed |
+
+The first executable change should implement M00/M01 as a **synthetic-only integration profile**, without replacing `/v1/responses`, removing the orchestrator or moving databases. M02–M04 are real implementation work, not configuration already supplied by TrueForge.
+
+## Decommission rules
+
+```mermaid
+stateDiagram-v2
+    [*] --> retained
+    retained --> replacement_verified: contract and security gates pass
+    replacement_verified --> route_cutover: state and drain checks pass
+    route_cutover --> disabled: all affected consumers migrated
+    disabled --> archived: evidence and restore verified
+    archived --> source_removed: dependency and release checks pass
+    archived --> data_disposed: retention and hold permit disposal
+```
+
+Code removal and data disposal are separate transitions. Helm uninstall, PVC deletion, backup expiration or namespace deletion must never be hidden inside routine decommission tooling. Keep an operation record with component, implementation version, owner, affected contracts, acceptance references, active-run count, data disposition and rollback limitations. The repository owner records manual paired commits/PRs after review.
+
+Never mirror a live prompt into both runtimes to compare output: that doubles processing, spend and potential side effects. Compare controlled fixtures or explicitly approved isolated evaluations. Cut over one reviewed route revision at a time and keep an in-flight request on its bound backend; do not move a live conversation or retry side effects across backends.
+
+Rollback can restore an earlier implementation only if it enforces the current security/retention requirements. The legacy orchestrator does not enforce the new business-channel policy chain. When a safe rollback is unavailable, disable the route and preserve evidence/state; do not send traffic to a permissive legacy fallback.
+
+## Design sync and maturity
+
+The runtime, namespace pair, multi-namespace topology schema, authentication bridge, native governed MCP transport, agent-compatible provider protocol, no-retention runtime profile and decommission automation are all **planned**. No current conformance claim is upgraded by this document. Supporting changes to architecture, deployment, security, operations and roadmap link to this decision and preserve the existing implementation inventory.
+
+```text
+Design Sync Report
+- Change Classification: major, design-only
+- Design Docs Updated: adoption/decommission plan, namespace design, migration runbook,
+  architecture/conformance/domain indexes and source-assessment direction
+- Code Areas Updated: none
+- Architecture Delta: retain aiops-fabric; select TrueForge runtime in a separate namespace;
+  plan authenticated capability edges and gated retirement of overlapping components
+- Tests/Evidence: documentation/static validation and limitations recorded in completion handoff
+- Known Production Gaps: every planned milestone and feature-specific acceptance gate above
+- Sync Status: PASS for documented current-versus-target separation; migration is not implemented
+```

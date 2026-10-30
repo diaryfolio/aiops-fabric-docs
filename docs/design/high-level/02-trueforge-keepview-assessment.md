@@ -1,6 +1,10 @@
-# TrueForge and KeepView Harness Assessment
+# TrueForge Source Assessment for ViewSense AI®
 
-ViewSense AI® design principles provide a useful foundation for `keepview_harness`. TrueForge should supply the agent execution engine, while KeepView supplies enterprise policy, business integrations and operational controls. Rebuilding the old fabric around TrueForge would preserve too much duplication; replacing the old fabric with an unmodified TrueForge installation would lose important trust and data boundaries.
+The selected direction is to retain `aiops-fabric` and use TrueForge as its execution runtime. The
+[adoption and decommission plan](03-trueforge-adoption-decommission.md) supersedes this assessment's
+earlier separate-project proposal. `keepview_harness` is not required. The fabric retains enterprise
+policy, business integrations and operational controls; overlapping execution components are removed
+only after replacement acceptance. Source findings below remain relevant.
 
 This document is an analysis and proposed implementation direction. It does not change the deployed architecture, enable a provider, or certify either codebase for production. Statements about existing behavior are grounded in the source baselines below; proposed components and contracts are explicitly described as proposals.
 
@@ -9,7 +13,7 @@ This document is an analysis and proposed implementation direction. It does not 
 | Checkout | Examined baseline | Role in the assessment |
 |---|---|---|
 | `trueforge` | `e3fed89fc99df9fe5b8335d9ae59c525c068d7dd` | Execution runtime, server, storage, authentication, MCP, sandbox, SDK, UI, tests and packaging |
-| `aiops-fabric` | `87a1efc8b2c07f64163135d497091b9175051247` | Retired implementation; candidate contracts, policy logic, adapters and acceptance assets |
+| `aiops-fabric` | `87a1efc8b2c07f64163135d497091b9175051247` | Retained implementation; candidate contracts, policy logic, adapters and acceptance assets |
 | `aiops-fabric-docs` | `5ee2a5f3304f7100485effdfbf67026cbc0708e8` | Canonical principles, conformance statements, channel/security/enterprise/operations designs |
 | `keepview_harness` | Initial repository containing `.gitignore` and a two-line README | No application, runtime extension, policy integration or tests exist yet |
 
@@ -21,15 +25,15 @@ Source references below use checkout-relative paths in code formatting. They are
 
 ## Recommended ownership split
 
-Use TrueForge for model/tool iteration, context management, session/turn persistence, interactive approval mechanics, streaming, sandbox integration and reusable chat components. Use KeepView for verified customer context, authorization, approved routes, credential-owning capability adapters, governed memory, customer connectors, budget enforcement, safe evidence and deployment profiles.
+Use TrueForge for model/tool iteration, context management, session/turn persistence, interactive approval mechanics, streaming, sandbox integration and reusable chat components. Use ViewSense AI® for verified customer context, authorization, approved routes, credential-owning capability adapters, governed memory, customer connectors, budget enforcement, safe evidence and deployment profiles.
 
 Keep the existing design documents as architectural requirements, but revise their implementation mapping when migration is actually implemented. Preserve invariants rather than every old service name, Python package or development port. A versioned API boundary can be fulfilled by an existing upstream service; it does not require rebuilding the same capability behind another service.
 
 | Capability | Canonical owner after migration | Avoid |
 |---|---|---|
-| Agent loop, threads, turns, compaction and interactive execution state | TrueForge runtime | A second KeepView plan/act/observe engine |
-| Verified tenant/user identity, business context and public product API | KeepView edge and identity adapters | Caller-selected tenant or a single shared service user standing in for every employee |
-| Roles, mappings, channels, grants, route revisions, admission and budget policy | KeepView governance | Duplicate permission copies in UI, agent prompts or customer manifests |
+| Agent loop, threads, turns, compaction and interactive execution state | TrueForge runtime | A second ViewSense AI® plan/act/observe engine |
+| Verified tenant/user identity, business context and public product API | ViewSense AI® edge and identity adapters | Caller-selected tenant or a single shared service user standing in for every employee |
+| Roles, mappings, channels, grants, route revisions, admission and budget policy | ViewSense AI® governance | Duplicate permission copies in UI, agent prompts or customer manifests |
 | Model credentials, provider translation and final outbound checks | Isolated model/provider adapter | Provider keys in TrueForge's runtime database or agent configuration |
 | Business credentials, query semantics and account/field enforcement | Data-owner connector | Direct Oracle access from TrueForge or arbitrary SQL generated by a model |
 | Long-term memory, knowledge records and embeddings | Memory capability/provider | Treating chat history as governed RAG or the vector index as the business system of record |
@@ -41,7 +45,7 @@ Keep the existing design documents as architectural requirements, but revise the
 
 The core is substantially more complete than the fabric's runtime. `AgentThread`, `AgentThreadOrchestrator`, `SessionHandle` and `TurnHandle` implement real execution, dynamic child threads, context snapshots, tool invocation and event persistence. The old `viewsense_agent_runtime` persists a lifecycle operated through explicit API actions; it does not autonomously call a model or tool. Replacing that kernel with TrueForge removes real duplication without surrendering the governance requirements.
 
-| Area | Existing TrueForge foundation | KeepView responsibility |
+| Area | Existing TrueForge foundation | ViewSense AI® responsibility |
 |---|---|---|
 | Execution | Actual model/tool loop, iteration ceiling, cancellation and subagent concurrency bound | Aggregate budgets, business policy and authorization at each step |
 | Context | Compaction, deferred tools, large-result offloading, capability state | Classification, provenance, policy-safe compaction and artifact retention |
@@ -51,13 +55,13 @@ The core is substantially more complete than the fabric's runtime. `AgentThread`
 | Tools | Remote MCP, user OAuth, selectors, approval policy, Code Mode dispatch | Certified action schemas, data scope, current grants and connector isolation |
 | Sandbox | Provider interface, hosted providers, standalone local sandbox support | Approved provider profile, egress, retention, artifact and supply-chain controls |
 | Scheduling | Persisted schedules and controller dispatch | Explicit machine identity and fresh policy checks at dispatch and delivery |
-| API clients | Generated TypeScript and Python clients | Stable KeepView contracts and a contained runtime adapter |
+| API clients | Generated TypeScript and Python clients | Stable ViewSense AI® contracts and a contained runtime adapter |
 | UI | Embeddable React UI, theme/slot/custom server contracts | Customer workspace, policy/status screens and server-enforced capability ceilings |
 | Operations | Hosted JSON logs, Prometheus metrics, chart resource/security settings | End-to-end OTel, evidence export, HA dependencies, restore and network acceptance |
 
 TrueForge's package separation is useful: `trueforge-core` owns execution; the `trueforge` package wires HTTP routes, authentication and persistence; `trueforge-sdk` is a generated HTTP client; `trueforge-ui` and `assistant-ui-runtime` provide presentation/runtime integration; `frontend` is the bundled application. The TrueFoundry-specific stores and authentication are integration examples, not prerequisites for the open-source deployment.
 
-The local core README explicitly disclaims backward compatibility guarantees. Its extension interfaces are valuable, but KeepView must pin exact compatible artifacts and test upgrades. Source package versions of `0.0.0` are build placeholders, not a useful compatibility baseline. Record the commit, lockfile and produced package/image digests.
+The local core README explicitly disclaims backward compatibility guarantees. Its extension interfaces are valuable, but ViewSense AI® must pin exact compatible artifacts and test upgrades. Source package versions of `0.0.0` are build placeholders, not a useful compatibility baseline. Record the commit, lockfile and produced package/image digests.
 
 ## Important gaps and integration traps
 
@@ -82,7 +86,7 @@ There are two material limitations:
 
 Therefore enforce at every model client's streaming and non-streaming call boundary and at the credential-owning provider adapter. A capability can enrich context or improve user experience, but cannot alone guarantee final-payload governance. Direct and child model calls, summaries, transformations, retry attempts and provider-native serialization all need coverage.
 
-The CLI/server is not currently a generic policy-plugin host. `main.ts` selects authenticators/authorizers and `apis/turns.ts` constructs `VercelAILLM` and `TurnResourceResolver` directly. The core supports custom wiring, but stock server configuration does not expose every core seam. Plan and test a small upstream-compatible integration change if those seams are required; do not claim that a YAML catalog can inject an arbitrary KeepView capability into the stock server.
+The CLI/server is not currently a generic policy-plugin host. `main.ts` selects authenticators/authorizers and `apis/turns.ts` constructs `VercelAILLM` and `TurnResourceResolver` directly. The core supports custom wiring, but stock server configuration does not expose every core seam. Plan and test a small upstream-compatible integration change if those seams are required; do not claim that a YAML catalog can inject an arbitrary ViewSense AI® capability into the stock server.
 
 ### Tool selectors and approvals need an enterprise ceiling
 
@@ -90,21 +94,21 @@ The CLI/server is not currently a generic policy-plugin host. `main.ts` selects 
 
 However, the default enabled selector is `@all`. Default approvals match `@write` and `@destructive`, which depend on provider annotations. `toolSelectors.ts` explicitly exempts unannotated tools unless named or covered by `@all` approval. A tool advertised as read-only is not automatically a safe business read either: it may return unauthorized rows or export sensitive fields.
 
-KeepView must supply explicit approved tool names/schema revisions and connector-enforced actions. Unknown tools and missing/changed classifications deny. User-edited agent selectors and approval preferences can narrow authority but cannot expand the enterprise ceiling. A click approving a call never grants a missing CRM entitlement.
+ViewSense AI® must supply explicit approved tool names/schema revisions and connector-enforced actions. Unknown tools and missing/changed classifications deny. User-edited agent selectors and approval preferences can narrow authority but cannot expand the enterprise ceiling. A click approving a call never grants a missing CRM entitlement.
 
-Do not assume `x-tfg-*` headers are a portable extension mechanism. Inline models/MCP/skills/tools have TrueFoundry-mode restrictions; ordinary `McpServerWithAuthStore.resolveInvokeHeaders` uses configured authentication/OAuth and does not consume arbitrary turn metadata to mint a fresh KeepView delegation. A secure dynamic identity bridge is a real integration requirement.
+Do not assume `x-tfg-*` headers are a portable extension mechanism. Inline models/MCP/skills/tools have TrueFoundry-mode restrictions; ordinary `McpServerWithAuthStore.resolveInvokeHeaders` uses configured authentication/OAuth and does not consume arbitrary turn metadata to mint a fresh ViewSense AI® delegation. A secure dynamic identity bridge is a real integration requirement.
 
 ### Secrets are isolated from sandbox code, but remain in the harness
 
 The default model manifest contains `auth.api_key`; `PostgresModelProviderStore` writes that manifest as JSON. `getModelDetails` passes the key into `VercelAILLM` in the runtime process. Responses redact secrets, but redaction is different from moving credentials out of the orchestrator.
 
-The fabric design requires provider SDKs and credentials to stay in owning adapters. For KeepView, configure TrueForge against an internal governed endpoint and keep vendor credentials only in its provider adapter. Internal short-lived capability credentials may be required; they must be scoped and must not become vendor keys. Apply the same separation to MCP business connectors, web search, embedding services and sandbox credentials according to their capability roles.
+The fabric design requires provider SDKs and credentials to stay in owning adapters. For ViewSense AI®, configure TrueForge against an internal governed endpoint and keep vendor credentials only in its provider adapter. Internal short-lived capability credentials may be required; they must be scoped and must not become vendor keys. Apply the same separation to MCP business connectors, web search, embedding services and sandbox credentials according to their capability roles.
 
 ### Application SSRF protection is not destination admission
 
 The TrueForge URL guard includes DNS/IP checks and redirect handling. Its allowed-host list grants exceptions for otherwise blocked private hosts; it is not a deny-all-except-these-hosts policy. Other public destinations remain permitted when the guard is enabled. The chart's `networkPolicy` setting controls this application guard, not Kubernetes NetworkPolicy resources. The chart defaults that setting to false, while server configuration defaults it to true outside that chart override.
 
-KeepView needs actual deny-by-default network policy and an approved egress path. Allow only the required internal capability endpoints from the runtime; public provider access belongs to the selected credential adapter. Include DNS, callbacks, telemetry, skill acquisition and sandbox paths in the graph. Enabling the URL guard or naming a host in `allowedHosts` does not establish company-boundary containment.
+ViewSense AI® needs actual deny-by-default network policy and an approved egress path. Allow only the required internal capability endpoints from the runtime; public provider access belongs to the selected credential adapter. Include DNS, callbacks, telemetry, skill acquisition and sandbox paths in the graph. Enabling the URL guard or naming a host in `allowedHosts` does not establish company-boundary containment.
 
 ### Transcript persistence conflicts with a no-retention channel
 
@@ -134,7 +138,7 @@ Authorize the machine principal at each dispatch, recheck entitlement and revoca
 
 The authoritative principles are in [Objectives and Principles](10-overall/01-objective-principles.md). All eight remain requirements; none should be asserted as satisfied solely by adopting TrueForge.
 
-| Principle | TrueForge fit | Required KeepView acceptance |
+| Principle | TrueForge fit | Required ViewSense AI® acceptance |
 |---|---|---|
 | API first | Strong REST/SSE/OpenAPI/SDK foundation | Versioned customer-facing capability APIs; headless parity; contract snapshots and safe errors |
 | Replace through contracts | Model/tool/sandbox/resolver interfaces are useful; core API compatibility is not guaranteed | Contained runtime adapter; neutral provider capabilities; two implementations passing the same consumer and semantic tests |
@@ -149,7 +153,7 @@ The authoritative principles are in [Objectives and Principles](10-overall/01-ob
 
 This maps every domain in the [enterprise integration control matrix](60-enterprise/01-enterprise-integration-controls.md). “Foundation” means useful code exists; it is not a production readiness declaration.
 
-| Domain | Existing foundation | KeepView work / evidence |
+| Domain | Existing foundation | ViewSense AI® work / evidence |
 |---|---|---|
 | SSO | OIDC verification and browser login | Tenant/source mapping, assurance, disabled-user/role-change/logout acceptance |
 | Workload identity | Optional TLS listener/controller support | Renewable distinct service identity and exact peer authorization on every internal edge |
@@ -179,7 +183,9 @@ This maps every domain in the [enterprise integration control matrix](60-enterpr
 
 ## Reuse and retirement inventory
 
-The retired implementation has useful assets beyond its runtime. Reuse means selecting and qualifying a boundary, not importing every old package and deploying the entire fabric again.
+The retained implementation has useful assets beyond its runtime. Reuse means qualifying existing
+boundaries in place and retiring overlap incrementally, rather than copying the repository into
+a new backend.
 
 | Existing area | Disposition | Reason / necessary adaptation |
 |---|---|---|
@@ -199,7 +205,7 @@ The retired implementation has useful assets beyond its runtime. Reuse means sel
 | `viewsense_agent_runtime` | Retire from the execution path | A second lifecycle owner would conflict with TrueForge; translate any required public run facade through a runtime adapter |
 | `viewsense_orchestrator` | Retire generic memory-to-LLM orchestration | Duplicates runtime capability and lacks the planned governed business tool path |
 | `viewsense_llm_gateway` | Replace simple forwarding with a governed capability boundary | A static proxy adds little; payload/admission/budget enforcement is the missing value |
-| `viewsense_gateway` | Reuse selected validation/delegation/facade patterns | Build a focused KeepView edge; avoid copying every legacy route and bypass |
+| `viewsense_gateway` | Reuse selected validation/delegation/facade patterns | Build a focused ViewSense AI® edge; avoid copying every legacy route and bypass |
 | `viewsense_console` | Reuse role matrix and management workflows | Use TrueForge UI for chat; policy/network/certificate views remain optional API clients |
 | Certificates, networking and module catalogs | Reuse declarative topology, maturity/evidence and operator patterns | Regenerate exact flows for the new topology; do not transplant ports, identities or database grants blindly |
 | `viewsense_identity`, mocks and smoke service | Development/test fixtures only | Useful for deterministic acceptance; not production identity or model quality evidence |
@@ -219,7 +225,7 @@ There are important limits in the candidates:
 
 | Approach | Benefits | Costs and constraints | Recommended use |
 |---|---|---|---|
-| KeepView façade plus private hosted TrueForge over HTTP | Reuses most server/API/UI work; smaller upstream coupling | Needs real identity propagation, governed model/MCP endpoints, retention solution and complete bypass controls | Preferred initial integration, limited to a tested cell/profile |
+| ViewSense AI® façade plus private hosted TrueForge over HTTP | Reuses most server/API/UI work; smaller upstream coupling | Needs real identity propagation, governed model/MCP endpoints, retention solution and complete bypass controls | Preferred initial integration, limited to a tested cell/profile |
 | Custom host around pinned `trueforge-core` | Direct resolver, model/tool wrappers, tracing and storage control | Must own host lifecycle, routes/auth/persistence integration; core APIs can change | Use when required invariants cannot be met through stock server plus a small extension |
 | Full customer fork of TrueForge | Immediate access to every internal function | Persistent merge burden and customer divergence | Avoid as the product model; keep any temporary patch small, generic and upstreamable |
 | Prompt/skill/config-only customization | Fast behavior prototyping | Cannot establish tenancy, data authorization, hard budgets or egress containment | Synthetic demonstrations and approved instruction packs only |
@@ -230,11 +236,11 @@ This qualification is a concrete engineering decision, not a choice between mere
 
 ### Proposed topology
 
-All arrows in this diagram are a proposed KeepView topology, not existing runtime evidence.
+All arrows in this diagram are a proposed ViewSense AI® topology, not existing runtime evidence.
 
 ```mermaid
 flowchart TB
-    Users["Chat / headless client"] --> Edge["KeepView edge: verified identity and session"]
+    Users["Chat / headless client"] --> Edge["ViewSense AI® edge: verified identity and session"]
     Edge --> Gov["Governance: policy, admission, budgets"]
     Edge --> TF["Private TrueForge runtime"]
     TF --> Model["Governed model capability"]
@@ -252,42 +258,23 @@ flowchart TB
     Memory --> MemoryDB[("Memory-owned state")]
 ```
 
-These are logical boundaries, not a requirement to create a separate Deployment for every box. Provider credentials and data-owner databases require real isolation; governance policy/admission/budget modules can start in one owned service. TrueForge's own controller/server persistence is one runtime ownership domain. KeepView must not independently query or mutate that database to implement policy.
+These are logical boundaries, not a requirement to create a separate Deployment for every box. Provider credentials and data-owner databases require real isolation; governance policy/admission/budget modules can start in one owned service. TrueForge's own controller/server persistence is one runtime ownership domain. ViewSense AI® must not independently query or mutate that database to implement policy.
 
-KeepView may own a small binding/idempotency record mapping its public run/session IDs to TrueForge IDs. That record is integration state, not a duplicate transcript or parallel agent lifecycle. Read runtime state through runtime APIs. Lifecycle transitions, transcript cleanup and export need explicit owning APIs.
+ViewSense AI® may own a small binding/idempotency record mapping its public run/session IDs to TrueForge IDs. That record is integration state, not a duplicate transcript or parallel agent lifecycle. Read runtime state through runtime APIs. Lifecycle transitions, transcript cleanup and export need explicit owning APIs.
 
-### Proposed repository layout
+### Retained implementation layout
 
-```text
-keepview_harness/
-  apps/
-    api/                         # verified product API and runtime adapter
-    console/                     # TrueForge UI plus policy/status workspaces
-    governance/                  # policy, admission, budget and evidence modules
-  packages/
-    contracts/                   # canonical machine-readable boundary contracts
-    trueforge-adapter/            # pinned SDK/core coupling and event translation
-    policy/                      # reusable policy logic if implemented in this language
-    telemetry/                   # safe correlation and exporter integration
-  connectors/
-    crm-logistics1/               # data-owner-approved API/query/rule mapping
-    memory/                      # optional selected memory adapters
-    models/                      # isolated provider adapters
-  customers/
-    example/                     # reviewed references and bounded configuration
-  deploy/
-    charts/                      # composition of upstream and KeepView components
-    profiles/                    # development, local-only, enterprise, sovereign
-  tests/
-    contract/
-    security/
-    integration/
-    acceptance/
-```
+Keep `src/viewsense_*`, `contracts/`, `fabric/`, `deploy/`, `scripts/` and `tests/` in `aiops-fabric`.
+Add the logical runtime adapter to the existing gateway, governed provider/MCP extensions to their
+capability owners, and the opt-in namespace-pair profile to implementation deployment assets.
+The [decommission register](03-trueforge-adoption-decommission.md#keep-adapt-and-decommission-register)
+defines eventual removal of overlap. Narrative documentation remains here. No new application
+repository, language rewrite or source scaffold is part of the decision.
 
-This is a proposal, not a scaffold added by this assessment. Maintained narrative documentation remains in this documentation repository under the current ownership rules. Resolve future KeepView naming/documentation ownership explicitly; do not perform a global ViewSense-to-KeepView rename as part of runtime adoption.
-
-TypeScript is the natural choice for the runtime adapter and React UI. Existing Python governance and provider services can remain separate API-owned components during migration. There is no need to port proven logic purely for language uniformity. If it is ported, retain the same contract fixtures and one canonical implementation owner. Generate cross-language models from the boundary schemas rather than maintaining hand-written parallel definitions.
+The existing Python edge can use TrueForge's HTTP API or generated Python SDK; a TypeScript
+bridge is required only if the selected core integration demands it. React UI components can be
+integrated independently. Any language-specific bridge remains thin and owns no duplicate loop,
+policy model or transcript. Generate cross-language contracts from one canonical boundary schema.
 
 ### Customer customization model
 
@@ -328,7 +315,7 @@ This file is not authorization. Verified identity, current entitlements, active 
 | Memory/embedding profile | Memory capability | Authorized owner/ACL/purpose, classification, source revision, model digest/dimensions, retention and migration |
 | Budget reservation/reconciliation | Governance ledger | Atomic pre-dispatch reserve, idempotency, aggregate limits, uncertain calls, versioned trusted measurements/pricing |
 | Safe execution evidence | Governance/evidence | Typed allow-listed metadata, correlation and config/policy/route versions; durable ordering/deduplication/export acknowledgement |
-| Runtime binding | KeepView runtime adapter | Public-to-runtime IDs, idempotent starts, resume/cancel semantics and stable safe error/event translation |
+| Runtime binding | ViewSense AI® runtime adapter | Public-to-runtime IDs, idempotent starts, resume/cancel semantics and stable safe error/event translation |
 
 Do not place runtime secrets, JWTs or permanent entitlements in TrueForge metadata/capability state. They can be persisted and become stale. Persist references and revisions, then reacquire current authority through trusted services. Avoid exposing internal permit digests or identity material to vendor model requests.
 
@@ -385,7 +372,7 @@ Disable unqualified features in the initial profile: dynamic subagents, external
 
 ## Operational and migration requirements
 
-Compose the upstream chart from a KeepView parent chart/profile. Override the publicly known development credentials, require the chosen authentication mode, use secret references and verified TLS to state services, and add actual default-deny network resources. The upstream chart already has useful non-root/read-only-filesystem settings, service-account token control, probes, resource tiers, PDB and autoscaling options. Retain those strengths while qualifying the database/Redis/controller topology.
+Compose the upstream chart from a ViewSense AI® parent chart/profile. Override the publicly known development credentials, require the chosen authentication mode, use secret references and verified TLS to state services, and add actual default-deny network resources. The upstream chart already has useful non-root/read-only-filesystem settings, service-account token control, probes, resource tiers, PDB and autoscaling options. Retain those strengths while qualifying the database/Redis/controller topology.
 
 The documented chart defaults include disabled OIDC, a placeholder service API key, a known bundled PostgreSQL password, unauthenticated bundled Redis and disabled mTLS. These are development defaults requiring explicit profile changes; the presence of a Helm chart is not a production security baseline. Certificate validation alone also does not authorize the exact service identity or business action.
 
@@ -437,10 +424,10 @@ Source review and tracked inventory checks were completed. An attempt to run the
 Validation completed for this documentation change:
 
 - The strict documentation publication builder passed: one available version (`latest`), with “No issues found.” The ordinary `make docs-build` entry first failed because the existing Zensical launcher has a shebang pointing to the checkout's former directory. Running the same builder with its Zensical subprocess directed through the current virtual-environment interpreter succeeded; no toolchain source or environment file was changed.
-- `kubectl kustomize deploy/kubernetes/base` rendered successfully. This verifies baseline manifest composition only, not cluster enforcement or the proposed KeepView topology.
+- `kubectl kustomize deploy/kubernetes/base` rendered successfully. This verifies baseline manifest composition only, not cluster enforcement or the proposed ViewSense AI® topology.
 - All 102 tracked fabric Python files parsed, all 44 tracked fabric JSON files parsed, and documentation navigation TOML parsed. These are syntax checks, not runtime behavior tests.
 - Assessment-local Markdown links, explicit checkout source locators and balanced code fences were checked; `git diff --check` passed for tracked edits.
-- The TrueForge, retired implementation and KeepView working trees remain unchanged. Only this report and the documentation navigation/index are added or edited.
+- The TrueForge, fabric implementation and ViewSense AI® working trees remain unchanged. Only this report and the documentation navigation/index are added or edited.
 
 No live Kubernetes deployment, model call, Oracle connection, customer data migration, external message, staging, commit or push is part of this work.
 

@@ -4,6 +4,12 @@ Includes the local AI console changes after baseline `0001b14`.
 The [implementation conformance map](00-implementation-conformance.md) is the canonical route and
 runtime inventory. Live evidence below applies to the isolated development stack, not production.
 
+The [TrueForge adoption and decommission plan](03-trueforge-adoption-decommission.md) is the selected
+next integration direction. Retain `aiops-fabric` and its local adapters; qualify TrueForge as the
+execution runtime, beginning with a synthetic two-namespace profile. No separate `keepview_harness`
+application or wholesale repository retirement is required. The capability table and live local
+evidence below remain the current baseline; new runtime connectivity and service removal are planned.
+
 ## Enterprise harness for local AI
 
 Applications use stable ViewSense AI® APIs while the enterprise controls model access, identity,

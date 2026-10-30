@@ -10,6 +10,14 @@ ViewSense AI® treats “agentic” as a governed execution capability, not perm
 
 All three use APIs; none can directly read another service's database or receive all provider credentials.
 
+The [TrueForge adoption plan](../03-trueforge-adoption-decommission.md) selects TrueForge for the
+online execution loop and turn/checkpoint/approval mechanics. Fabric will integrate it through
+stable contracts and retain independent authorization, budgets, evidence and data boundaries.
+The target autonomous flow below is fulfilled by a governed runtime integration, not a new fabric
+loop implementation. The currently shipped lifecycle kernel remains until its API consumers and
+state are migrated under the decommission register. Ingestion and durable business workflows
+remain separate capabilities; TrueForge schedules do not replace a general workflow provider.
+
 ## Implemented agent lifecycle
 
 ```mermaid

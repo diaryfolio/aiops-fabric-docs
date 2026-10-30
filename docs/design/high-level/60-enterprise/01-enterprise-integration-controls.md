@@ -2,6 +2,13 @@
 
 This document is the acceptance checklist for an enterprise installation. A feature is “catered for” when ViewSense AI® defines its boundary and integration contract; a production deployment is ready only when the enterprise-selected implementation is configured and the evidence test passes.
 
+The [TrueForge adoption plan](../03-trueforge-adoption-decommission.md) retains these controls in
+the fabric around the selected execution runtime. Its [namespace design](../20-deployment/03-trueforge-namespace-integration.md)
+and [migration runbook](../40-ops/02-trueforge-migration-runbook.md) add planned identity, network,
+retention, budget/evidence and decommission gates. None of this matrix becomes production-ready
+merely by installing TrueForge. The source assessment maps each matrix domain to the existing
+foundation and missing acceptance work; the existing implementation inventory remains unchanged.
+
 ```mermaid
 flowchart LR
     Identity["Enterprise identity"] --> Edge["API management + edge"]

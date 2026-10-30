@@ -10,6 +10,37 @@ For a source assessment and the next delivery slice toward an enterprise harness
 see the [project status and local AI integration plan](01-project-status-and-local-ai-plan.md).
 This map describes repository capability, not the configuration or health of a live installation.
 
+## TrueForge adoption and gated decommission (major, design-only)
+
+The selected direction is to retain `aiops-fabric` and its documentation, adopt TrueForge for agent
+execution, and retire overlapping components only after the [migration gates](03-trueforge-adoption-decommission.md).
+The earlier source assessment's separate `keepview_harness` repository proposal is superseded.
+All existing services, routes, stores and network denials documented below remain unchanged.
+
+| Capability / disposition | State | Missing implementation / evidence |
+|---|---|---|
+| TrueForge selected as replaceable runtime | design decision | No executable fabric integration, image/profile selection or compatibility qualification |
+| `viewsense-dev` + `trueforge-dev` namespace pair | planned | Opt-in profile, independent releases, trust/Secret references, scoped cross-namespace policy and live probes |
+| Multi-namespace topology and mesh generation | planned | Existing v1 model has one namespace; versioned endpoint identity/namespace schema and compatible generators required |
+| Gateway runtime adapter and real-subject delegation | planned | Stock OIDC `default` tenant and shared-service-user limitations unresolved; idempotency/session/authorization tests required |
+| Governed inference and native MCP integration | planned | Streaming/tool round trip, governed MCP server transport, fresh per-call authority/admission/budget/evidence and bypass denial |
+| Distinct runtime server/controller workload identities | planned | Upstream chart shares a service account/TLS configuration; controller disabled initially; qualified extension required |
+| No-retention business execution through TrueForge | planned | Standard runtime persists transcripts/context; storage/artifact/backup acceptance required before live business facts |
+| Legacy orchestrator / agent kernel shutdown | planned, not started | All affected consumers migrated/deprecated; run drain, export/restore, rollback and package dependency gates |
+| Legacy source or persistent-data deletion | not performed | Source cleanup follows shutdown; PVC/backups/archive disposition is a separate owner decision |
+
+The [namespace design](20-deployment/03-trueforge-namespace-integration.md) and
+[migration runbook](40-ops/02-trueforge-migration-runbook.md) specify target edges, ownership,
+failure behavior and removal records. M00–M08 are planned, not completed tasks. The first executable
+slice is synthetic-only deployment/integration qualification, preserving the legacy reference.
+
+Source evidence remains application `87a1efc8b2c07f64163135d497091b9175051247`, documentation
+`33628125fe73202bad1eb88eb769d276f512f309`, and examined TrueForge
+`e3fed89fc99df9fe5b8335d9ae59c525c068d7dd`; working-tree documentation adds this design. No runtime
+contract/schema, grant, manifest, database owner or provider maturity is changed. Documentation
+validation and unavailable runtime checks are reported in the handoff; existing historical live
+evidence does not validate the proposed topology.
+
 ## Channel policy consoles and canonical identity assertions (major)
 
 ### POC console roles

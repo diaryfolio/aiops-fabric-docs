@@ -2,6 +2,13 @@
 
 ## Delivery strategy
 
+The selected next implementation direction is the [TrueForge adoption backlog](../03-trueforge-adoption-decommission.md#ordered-implementation-backlog):
+retain `aiops-fabric`, qualify a private runtime in a separate namespace, connect verified identity
+and governed capabilities, then migrate bounded routes before decommissioning overlapping services.
+M00–M08 are planned. This supersedes building an independent autonomous loop in the fabric or a
+new `keepview_harness` project. Existing local AI and enterprise acceptance gates remain requirements;
+the historical phases below describe capability maturity rather than completed migration work.
+
 Build thin end-to-end slices and prove replaceability/security with tests before adding providers. Dates depend on enterprise controls and provider choices; exit criteria, not elapsed weeks, determine readiness.
 
 ```mermaid

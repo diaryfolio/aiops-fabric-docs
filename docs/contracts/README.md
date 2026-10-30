@@ -2,6 +2,13 @@
 
 These schemas are the portable boundary between independently replaceable components. Runtime models and contract tests must evolve with them. Provider payloads stay behind adapters; callers exchange ViewSense AI®-owned envelopes only.
 
+The [TrueForge adoption contract register](../design/high-level/03-trueforge-adoption-decommission.md#boundary-contracts-and-compatibility)
+adds planned execution delegation, runtime binding/events, agent inference/native MCP and
+budget/evidence behavior. The [namespace design](../design/high-level/20-deployment/03-trueforge-namespace-integration.md#multi-namespace-network-and-identity-contract)
+requires a compatible versioned topology schema with qualified endpoint namespaces/identities.
+These are documentation requirements; no new executable schema or API ships yet. The current
+preview decision's `execution_authority: false` must stay false and cannot serve as a runtime token.
+
 - `trust-envelope-v1.schema.json` describes identity-signed tenant, purpose, subject, and classification context.
 - `provider-passport-v1.schema.json` describes admission input for a model, memory, MCP, workflow, agent, or ingestion provider.
 - `evidence-event-v1.schema.json` describes payload-minimized execution evidence input. The API derives producer and tenant from authenticated identity.

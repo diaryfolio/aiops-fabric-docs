@@ -1,5 +1,14 @@
 # ViewSense AI® Runtime Topology and Flows
 
+## Selected next runtime topology
+
+The [TrueForge adoption decision](../03-trueforge-adoption-decommission.md) retains fabric services
+and introduces a planned private runtime in `trueforge-dev` beside `viewsense-dev`. The gateway's
+runtime adapter crosses the namespace boundary; the runtime calls governed model/MCP/policy APIs
+under narrowed authority. [Namespace placement and exact edges](../20-deployment/03-trueforge-namespace-integration.md)
+are the target. The diagrams and synchronous path below remain current implementation evidence;
+they are not changed until the new integration and route-specific cutover pass acceptance.
+
 ## Planes and trust boundaries
 
 Solid arrows are implemented calls. Dashed arrows are target integrations and require a shipped

@@ -4,6 +4,27 @@
 
 Compromise of one component must not grant implicit access to another component, another tenant, provider credentials, or a different data plane. Controls are layered: network reachability, workload TLS identity, audience/scoped authorization, tenant/data policy, provider egress policy, and audit.
 
+### TrueForge namespace boundary (planned)
+
+The [adoption decision](../03-trueforge-adoption-decommission.md) keeps fabric governance and
+credential adapters authoritative while TrueForge executes agent turns in a separate namespace.
+The [connection matrix](../20-deployment/03-trueforge-namespace-integration.md#connection-and-authorization-matrix)
+requires exact workload identities, both-sided default-deny rules, audience/scoped delegation,
+fresh subject/data policy and owner-only state services. Namespace membership and a valid client
+certificate alone confer no operation authority. The existing single-namespace policies do not
+implement this design.
+
+Stock TrueForge OIDC maps to internal tenant `default`; the target requires an independently
+qualified real-subject/tenant bridge. The examined chart shares server/controller service-account
+and TLS configuration, so distinct identities need an explicit tested extension before controller
+activation. Production cannot use its static controller API key as a substitute for scoped
+workload authorization. The controller is disabled for the initial pilot.
+
+Enforce policy on root, child, compaction, tool and retry paths; previews never become execution
+tokens. Keep vendor/CRM credentials outside runtime state. Live no-retention facts remain blocked
+until transcript/artifact/backup behavior is qualified. Decommissioning cannot fall back to a
+legacy path that ignores the active grant/egress policy, and does not authorize PVC/archive disposal.
+
 ```mermaid
 flowchart LR
     Request["Request"] --> Net["NetworkPolicy reachability"]

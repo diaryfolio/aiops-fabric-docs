@@ -6,6 +6,13 @@ Applications address versioned APIs using stable Service DNS and keep their mTLS
 verified tenant checks. No provider SDK, proprietary mesh header or mesh authorization decision
 enters the application data model.
 
+For the selected TrueForge migration, the [namespace integration design](03-trueforge-namespace-integration.md)
+requires a versioned multi-namespace flow contract and exact namespace/service-account principals.
+The current `NetworkTopology` and `istio_policies` implementation use one namespace and cannot
+represent that topology safely. Keep v1 for the existing reference; add v2/API/generator/evidence
+support in the implementation slice. Both-sided CNI rules and workload/operation authorization
+must be tested before the new cross-namespace edges open. Existing policies are unchanged.
+
 ```mermaid
 flowchart LR
     Client[Headless client / detachable GUI] --> Edge[Gateway API]

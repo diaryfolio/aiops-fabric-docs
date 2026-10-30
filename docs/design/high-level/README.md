@@ -3,6 +3,12 @@
 This directory is the canonical architecture set for ViewSense AI®. Read the index, then the executable
 conformance map before using a target-state document as an implementation claim.
 
+The selected next change retains `aiops-fabric` and adopts TrueForge as its execution runtime.
+Start with the [adoption/decommission plan](03-trueforge-adoption-decommission.md), then the
+[namespace design](20-deployment/03-trueforge-namespace-integration.md) and
+[migration runbook](40-ops/02-trueforge-migration-runbook.md). These are planned changes; the current
+reference is retained until replacement gates pass. `keepview_harness` is not required.
+
 All design and product documentation is owned by `aiops-fabric-docs`. The code
 repository's root README and agent instructions point here; module guides,
 operations/test guides, governance prompts, and screenshots must also be authored
@@ -29,8 +35,14 @@ flowchart LR
 - [Networking and mesh design](20-deployment/02-modular-networking-mesh.md) — replaceable CNI,
   strict workload transport and headless networking management.
 - [Implementation conformance](00-implementation-conformance.md)
-- [TrueForge and KeepView assessment](02-trueforge-keepview-assessment.md) — source-based reuse,
-  enterprise-control gaps and a proposed customer customization layer; no runtime migration is implemented.
+- [TrueForge source assessment](02-trueforge-keepview-assessment.md) — source-based reuse and
+  enterprise-control gaps; its separate-project proposal is superseded by the adoption plan.
+- [TrueForge adoption and decommission](03-trueforge-adoption-decommission.md) — retained repository,
+  keep/adapt/remove register, ordered backlog and acceptance gates.
+- [TrueForge namespace integration](20-deployment/03-trueforge-namespace-integration.md) — separate
+  fabric/runtime releases, workload identities, API connections and versioned network-policy requirements.
+- [TrueForge migration runbook](40-ops/02-trueforge-migration-runbook.md) — cutover, drain, rollback,
+  legacy shutdown, source cleanup and separate data disposition.
 - [Input and Output Channels](10-overall/07-input-output-channels.md) — planned business routing,
   Tool-Sense module integration, and the Sales → CRM-Logistics1 Oracle opportunity use case.
 - [Channel consoles and role mapping](10-overall/08-channel-consoles-role-mapping.md) — planned

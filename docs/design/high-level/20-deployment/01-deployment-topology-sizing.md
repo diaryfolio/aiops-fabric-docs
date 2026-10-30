@@ -29,6 +29,14 @@ flowchart TB
 
 ## Namespace and cluster patterns
 
+The [TrueForge namespace integration design](03-trueforge-namespace-integration.md) adds a planned,
+opt-in two-namespace profile: existing fabric in `viewsense-dev`, private runtime/state in
+`trueforge-dev`. Separate releases, per-workload trust, owner-only databases and narrowly scoped
+cross-namespace APIs are required. The existing single-namespace base and release installer remain
+unchanged. Do not treat the target namespace names as already deployed or reset existing state to
+adopt them. The [decommission register](../03-trueforge-adoption-decommission.md) governs eventual
+orchestrator/agent removal and distinguishes code shutdown from data disposal.
+
 | Profile | Isolation | Suitable for |
 |---|---|---|
 | development | one `viewsense-dev` namespace, single replicas | contract and integration testing |

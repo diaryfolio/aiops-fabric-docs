@@ -1,5 +1,12 @@
 # ViewSense AI® Component and Ownership Model
 
+The [adoption/decommission register](../03-trueforge-adoption-decommission.md#keep-adapt-and-decommission-register)
+is the selected target ownership mapping: TrueForge owns execution/turn state, fabric retains
+governance, identity and capability/credential/data boundaries. The existing orchestrator and
+manual agent kernel remain implemented until their replacement and consumer/state gates pass.
+The graph and detailed current modules below describe that retained reference, not an already
+completed migration. No separate `keepview_harness` application is required.
+
 ```mermaid
 flowchart TB
     Edge["Edge: authenticate + validate + delegate"] --> Control["Control: orchestrate + select configured gateways"]

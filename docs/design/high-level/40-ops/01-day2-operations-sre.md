@@ -1,5 +1,15 @@
 # ViewSense AI® Day-2 Operations and SRE
 
+## Planned TrueForge migration operations
+
+The [migration runbook](02-trueforge-migration-runbook.md) governs baseline/restore inventory,
+synthetic runtime qualification, route-specific cutover, drain, safe rollback or route disable,
+legacy shutdown and source cleanup. It accompanies the [retained-repository decision](../03-trueforge-adoption-decommission.md).
+No operation has been executed by that design. Track the fabric/runtime namespace pair and their
+independent artifact/configuration/state owners. Code removal, workload shutdown and persistent-data
+disposal are distinct operations with separate evidence. Existing operating procedures below
+continue to apply to the current reference until a qualified route is migrated.
+
 ## Observability: current and target
 
 ```mermaid
