@@ -5,6 +5,7 @@ includes a supplied scenario, example findings, recipient views and the limits o
 
 | Walkthrough | What it shows |
 |---|---|
+| [ITSM service dependency and impact](itsm-service-impact.md) | Service-map, monitoring and owner evidence becomes an impact brief, with a diagram separating observed and potential effects from unverified links. |
 | [Supplier assurance and renewal](supplier-assurance-renewal.md) | Procurement, security and service evidence becomes a renewal brief with owner decisions and explicit gaps. |
 | [Reorganisation and business performance](../hr-departure-workflow.md) | HR, department and Finance information becomes a six-month management report with charts. |
 | [Deployment-failure investigation](../deployment-failure-investigation.md) | Release and operational evidence becomes an engineering investigation and a service-owner brief. |

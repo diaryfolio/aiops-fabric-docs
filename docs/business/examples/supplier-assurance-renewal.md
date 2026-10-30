@@ -33,7 +33,7 @@ continuing or replacing the supplier. Each receives only the information they ma
 
 ## A synthetic renewal review
 
-**ClearDesk Support** is a fictional customer-support service used by three internal teams.
+**Supplier A** is a fictional customer-support service used by three internal teams.
 The example considers one supplier legal entity, one service and one proposed renewal term.
 References below are fictional evidence identifiers, not links to live systems.
 
@@ -66,7 +66,7 @@ silently offset a mandatory security or data-handling requirement.
 
 An example executive narrative would be:
 
-> ClearDesk Support serves three internal teams. The comparable annual fixed fee increases by
+> Supplier A serves three internal teams. The comparable annual fixed fee increases by
 > £12,000 (10%), and the supplied service report records its availability target as met for the
 > last three reporting months. Renewal preparation still has unresolved assurance issues:
 > two open findings, an expired risk exception and missing coverage for a proposed data processor.

@@ -18,7 +18,8 @@ nav = [
     { "Is ViewSense a fit?" = "business/compatibility.md" },
     { "Value and use cases" = "business/value-and-use-cases.md" },
     { "Detailed examples" = [
-      { "Overview" = "business/examples/index.md" },
+      { "Detailed examples" = "business/examples/index.md" },
+      { "ITSM service impact" = "business/examples/itsm-service-impact.md" },
       { "Supplier assurance and renewal" = "business/examples/supplier-assurance-renewal.md" },
       { "Reorganisation and performance" = "business/hr-departure-workflow.md" },
       { "Deployment-failure investigation" = "business/deployment-failure-investigation.md" },
@@ -119,7 +120,7 @@ features = [
   "navigation.tracking",
   "navigation.tabs",
   "navigation.tabs.sticky",
-  "navigation.sections",
+  "navigation.indexes",
   "navigation.path",
   "navigation.top",
   "navigation.footer",

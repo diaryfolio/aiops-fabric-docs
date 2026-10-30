@@ -100,6 +100,9 @@ target outcomes. They are planned use cases, not shipped HR/organisation/Finance
 The supplier-renewal walkthrough likewise adds no supplier/contract/assurance connector, risk
 acceptance, contract approval or delivery implementation. Department example tables describe
 proposed outcomes rather than installed integrations.
+The ITSM service-impact example and additional MCP-based product-suite examples are likewise
+design illustrations. No ServiceNow/ITSM connector, dependency traversal, service-health correlation,
+impact calculation or ITSM update capability is added by these pages or their synthetic diagram.
 Existing channel APIs and grants retain their current semantics. Real-model business processing,
 governed native tools, recipient-specific delivery and production remediation remain unimplemented.
 

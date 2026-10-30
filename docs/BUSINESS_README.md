@@ -28,10 +28,11 @@ This section is for business sponsors, management, procurement, and risk teams. 
 [value and use-case tables](business/value-and-use-cases.md) and
 [adoption and governance](business/adoption-and-governance.md).
 
-The [example comparison tables](business/value-and-use-cases.md) group ideas by team: security,
-People/HR, Finance, customer teams, Procurement/Legal, Operations and Engineering. Each group
-contains three examples, with five in security. Open [Detailed examples](business/examples/index.md)
-for supplier assurance and renewal, reorganisation-performance and deployment-investigation walkthroughs.
+The [example comparison tables](business/value-and-use-cases.md) group ideas by team, including
+security, HR, Finance, customer/product teams, Procurement, Operations, Engineering, manufacturing,
+facilities and research. Each group contains two to five examples, with MCP as the main product
+integration approach. Open [Detailed examples](business/examples/index.md) for ITSM service impact,
+supplier renewal, reorganisation-performance and deployment-investigation walkthroughs.
 
 These are target workflows with explicit acceptance gates, not shipped business connectors or
 autonomous production operations.

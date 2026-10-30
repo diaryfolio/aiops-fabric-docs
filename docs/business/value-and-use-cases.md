@@ -3,6 +3,10 @@
 ViewSense AI® brings together permitted information, AI-assisted analysis and reviewed outcomes.
 Choose a team below. Linked titles open a walkthrough under **Detailed examples**.
 
+Product-suite integrations in these target workflows primarily use approved MCP tools and
+resources. ViewSense combines their results with business rules, review and delivery; a product
+without a suitable MCP server needs an adapter over its supported API.
+
 > **Proposed workflows.** Business connectors, governed tools and delivery still require
 > implementation and acceptance. See [current capabilities](../design/high-level/00-implementation-conformance.md).
 
@@ -34,14 +38,16 @@ cybersecurity supply-chain risk.
 | FIN1 · Invoice discrepancy review | Invoices, purchase orders and goods receipts | Finance receives matched records and discrepancies; procurement receives supplier questions. |
 | FIN2 · Budget variance explanation | Approved budgets, actual expenditure, commitments and department mappings | Budget owners receive validated variances, supporting transactions and questions requiring explanation. |
 | FIN3 · Cloud cost and capacity review | Billing, utilization, workload schedules and ownership records | Finance and platform owners receive cost drivers and candidates to investigate, without automatic resource changes. |
+| FIN4 · Software licence optimization | Identity, software inventory, measured usage and purchasing records | Finance and asset owners receive unused or duplicate licence candidates and renewal questions for review. |
 
-## Sales and customer service
+## Sales, customer service and product
 
 | Example | ViewSense brings together and compares | Outcome and recipients |
 |---|---|---|
 | CX1 · Sales opportunity discovery | CRM accounts, product usage and contract entitlements | Account managers receive evidence-backed opportunities for their permitted customers. |
 | CX2 · Customer support resolution | Support tickets, approved documentation and service status | Support agents receive a response draft; engineering receives unresolved technical findings. |
 | CX3 · Customer renewal preparation | Customer contract milestones, adoption, support history and account plans | Account owners receive a renewal brief with observed concerns and follow-ups, without invented churn probabilities. |
+| CX4 · Customer feedback to product priorities | Support cases, customer feedback, product analytics and engineering backlog | Product managers receive recurring problems with source evidence and proposed backlog items for review. |
 
 ## Procurement and legal
 
@@ -55,7 +61,7 @@ cybersecurity supply-chain risk.
 
 | Example | ViewSense brings together and compares | Outcome and recipients |
 |---|---|---|
-| OPS1 · IT incident investigation | Monitoring alerts, service-desk records, recent changes and dependencies | Responders receive an evidence-backed investigation; service owners receive an impact summary. |
+| OPS1 · [ITSM service dependency and impact](examples/itsm-service-impact.md) | ServiceNow or another ITSM service map, incident records, monitoring and service owners through MCP | Responders receive dependency paths; business owners receive observed, potential and unverified impacts. |
 | OPS2 · Project delivery health | Milestones, work tracking, incidents and dependency updates | Project managers receive blockers; sponsors receive scoped delivery concerns and owner decisions. |
 | OPS3 · Service-demand planning | Request volumes, approved service targets, staffing and backlog age | Operations managers receive validated demand trends and capacity scenarios for review. |
 
@@ -66,6 +72,28 @@ cybersecurity supply-chain risk.
 | ENG1 · [Deployment-failure investigation](deployment-failure-investigation.md) | Release identity, rollout status, selected telemetry and approved runbooks | On-call engineers receive findings and proposed checks; service owners receive a scoped brief. |
 | ENG2 · CI and test-failure triage | Failed builds, test results, sanitized job logs and source changes | Developers receive a failure summary, supporting evidence and hypotheses to verify. |
 | ENG3 · API-change impact analysis | Proposed contracts, known consumers and contract-test results | API owners receive evidenced compatibility risks; consuming teams receive migration and testing proposals. |
+
+## Logistics and manufacturing
+
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| LM1 · Order-to-delivery disruption | Order management, warehouse stock, carrier tracking and CRM through MCP | Operations receives affected orders and recovery options; account owners receive customer-specific update drafts. |
+| LM2 · Quality complaint and batch traceability | Customer complaints, quality records, production batches and component traceability through MCP | Quality and Engineering receive shared batch/component evidence, coverage gaps and investigation proposals. |
+
+## Facilities, energy and continuity
+
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| FAC1 · Maintenance before disruption | Equipment observations, maintenance history, spare parts and operating schedules through MCP | Maintenance owners receive an evidence-backed work proposal and operational dependencies; no equipment changes are automatic. |
+| FAC2 · Energy-use investigation | Meter readings, site activity, facilities records and approved conversion factors through MCP | Facilities and sustainability teams receive comparable trends, missing measurements and investigation candidates. |
+| FAC3 · Business continuity preparedness | Business-process dependencies, service catalog, continuity plans and exercise records through MCP | Process owners receive dependencies, untested fallback assumptions and preparedness tasks for review. |
+
+## Data and research
+
+| Example | ViewSense brings together and compares | Outcome and recipients |
+|---|---|---|
+| DR1 · Conflicting business figures | CRM, billing, Finance reports and data-catalog definitions through MCP | Data and business owners receive a reconciliation of definitions, periods and records, with unresolved differences assigned for review. |
+| DR2 · Reuse previous research | Experiment records, internal documents, source repositories and issue tracking through MCP | Researchers receive referenced prior approaches, conflicting results and unanswered questions within their permitted scope. |
 
 These examples begin with read-only analysis and human review. Calculations and comparisons use
 approved rules; AI helps explain the evidence. Missing information remains visible. A report does

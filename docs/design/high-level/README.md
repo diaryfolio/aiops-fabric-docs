@@ -38,6 +38,8 @@ flowchart LR
 - [Implementation conformance](00-implementation-conformance.md)
 - [Integration compatibility and acceptance](10-overall/11-integration-compatibility.md) — product
   choices, readiness labels, environment qualification and planned integration limits.
+- [ITSM service-impact example](../../business/examples/itsm-service-impact.md) — reuse authorized
+  service relationships through MCP, distinguish observed/potential/unknown impact and preserve coverage limits.
 - [Supplier assurance and renewal example](../../business/examples/supplier-assurance-renewal.md) —
   scoped supplier, commercial and assurance evidence, without automated risk or contract approval.
 - [Reorganisation-performance example](../../business/hr-departure-workflow.md) — HR, department
