@@ -53,3 +53,15 @@ The cleanup deletes repository assets only; it does not delete any separate clus
 Keep the [networking design](../../design/high-level/20-deployment/02-modular-networking-mesh.md),
 [namespace contract](../../design/high-level/20-deployment/03-trueforge-namespace-integration.md)
 and [cleanup record](../../design/high-level/40-ops/04-cleanup-record.md) alongside provider changes.
+
+## Enforcement failure diagnosis
+
+If a forbidden transfer succeeds, keep the check failed. Compare Service and direct pod-IP paths,
+record node placement and inspect the affected node's policy-controller hooks. A healthy listener
+or a correct manifest does not prove filtering. During cleanup, an empty worker policy chain allowed
+same-node ingestion → MCP; the owner-approved worker restart restored hooks and the full denial
+suite passed. See the [recovery record](../../design/high-level/40-ops/04-cleanup-record.md#approved-worker-recovery-and-verified-results).
+A shared-node restart can interrupt unrelated workloads and needs its owner's maintenance approval;
+it is not automated by deployment or tests. Verify affected workloads and rerun complete acceptance.
+Do not add permissive rules, move the test to hide the failing placement or report a retry as proof
+that the underlying reliability issue is solved. Production needs ongoing per-node enforcement checks.

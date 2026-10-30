@@ -77,3 +77,47 @@ smoke/security acceptance for the coordinated change. Verify the native GUI laun
 the same localhost-only official image and the upstream checkout remains clean. Record actual
 results in the final Design Sync Report. Leave all edits unstaged/uncommitted for the repository
 owner; no Git history or published release snapshots are rewritten by this cleanup.
+
+## Approved worker recovery and verified results
+
+The cleaned image deployment completed. The first live regression run passed the fixed turn,
+JWT/mTLS/subject checks and other denials, but unexpectedly allowed ingestion → MCP. Inspection
+showed the worker's `KUBE-ROUTER-FORWARD` chain was empty and pod firewall hooks were missing.
+Both Service and direct same-node pod-IP access reproduced the bypass; declared policies were
+correct. This was a cluster enforcement failure, not evidence that the unwanted edge was allowed.
+
+Because the shared worker also hosts cert-manager, Elastic, n8n and other applications, the owner
+explicitly approved restarting only `k3d-cks-worker-0`. After restart, the worker had pod-policy
+hooks, both nodes were Ready and all **24 nonterminal worker pods** were Ready. No namespace,
+PVC, data or unrelated provider configuration was deleted. The standalone GUI stayed running.
+The full integration suite then passed, including same-node ingestion → MCP denial. The original
+failure remains part of this evidence; a controller restart is operational recovery, not a source
+fix or proof of production-wide CNI reliability. Per-node enforcement monitoring remains required.
+
+Validation passed **230 unit/design/catalog/security tests**, containerized lint, every Helm
+profile, base Kustomize, JavaScript syntax, Git whitespace checks and strict documentation builds
+for `latest`, `v1.0.2` and `v1.0.1`. One redundant default-file test was removed with its unused
+configuration file. Retained adapter/security tests remain. Link and fenced-Make-target audits
+found no missing relative targets or removed commands presented as executable instructions.
+Normal `make docs-build` and the release-publication regression test also pass. The ignored local
+Zensical CLI launcher had a shebang for the checkout's old location; it was repaired to the current
+virtual-environment interpreter, without changing the maintained publishing toolchain. The current
+native preview reports its running localhost URL; TrueForge's checkout remains clean.
+
+```text
+Design Sync Report
+- Change Classification: major
+- Design Docs Updated: canonical TrueForge access, quick start/technical/test guides, current
+  conformance and runtime/component/API/agentic designs, networking/operations, catalogs,
+  release/current artifact guidance, publishing and cleanup record
+- Code Areas Updated: removed obsolete console response path, seven legacy installer/helpers,
+  provider overlay/default, copied UI, old Make targets and obsolete packaging/test references;
+  networking/catalog metadata aligned; native preview launcher retained
+- Architecture Delta: one access guide; current external unmodified-runtime boundary;
+  retained enterprise capabilities and future controls; incompatible single-namespace mutators retired
+- Tests/Evidence: 230 tests; lint; Helm/Kustomize/JS; strict three-version docs build;
+  link/command audit; approved worker recovery; complete hosted/security regressions passed
+- Known Production Gaps: integrated browser identity, governed real models/native MCP, business
+  PII/budget/evidence/retention/recovery and per-node CNI monitoring; preview is separate temporary data
+- Sync Status: PASS for documented development/cleanup scope
+```

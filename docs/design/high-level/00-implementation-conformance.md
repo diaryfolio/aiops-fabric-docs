@@ -150,3 +150,9 @@ records the explicit no-backup development reset. The old networking/OpenAI over
 removed because they reapply the single-namespace base or switch a route outside the namespace-pair
 profile. They are not migration paths. Production qualification remains gated as described above;
 passing synthetic tests must not be presented as customer readiness.
+
+Current cleanup validation passed 230 tests, lint, profile/Kustomize/JS, strict publication and
+hosted/security regressions. The first live run exposed an empty worker policy chain; only after
+the owner-approved worker restart did the same-node denial pass. All 24 nonterminal worker pods
+were Ready after recovery. The cleanup record preserves this failure/recovery and the remaining
+per-node monitoring gap; this is development evidence, not production certification.
