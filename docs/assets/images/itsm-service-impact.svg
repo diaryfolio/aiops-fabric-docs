@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="820" viewBox="0 0 760 820" role="img" aria-labelledby="title desc">
+  <title id="title">From a database incident to business-service impact</title>
+  <desc id="desc">Synthetic example. Impact flows from orders-db-primary to its dependent application services, Order processing and Reporting export. Customer checkout has observed degradation. Daily sales reporting has potential impact before its next run. Warehouse dispatch has a stale relationship and needs validation. Dependency links do not prove every service has failed.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#526c7c"/></marker>
+    <marker id="uncertain-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#697586"/></marker>
+    <style>
+      text { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #123243; }
+      .step { font-size: 13px; font-weight: 700; letter-spacing: 1px; fill: #526c7c; }
+      .label { font-size: 17px; font-weight: 700; }
+      .body { font-size: 14px; fill: #465e6a; }
+      .status { font-size: 13px; font-weight: 700; }
+      .edge { fill: none; stroke: #526c7c; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="760" height="820" rx="18" fill="#f8fbfc"/>
+  <text x="28" y="40" font-size="23" font-weight="750">One incident. Different business impacts.</text>
+  <text x="28" y="68" class="body">Synthetic example · arrows follow impact towards dependent services</text>
+  <text x="28" y="109" class="step">1 · OBSERVED COMPONENT PROBLEM</text>
+  <rect x="204" y="126" width="352" height="85" rx="12" fill="#fff1ee" stroke="#c97a69"/>
+  <text x="380" y="157" text-anchor="middle" class="label">Database connection failure</text>
+  <text x="380" y="184" text-anchor="middle" class="body">orders-db-primary · INC-1 / MON-1</text>
+  <path d="M380 211 V240 H192 V295" class="edge"/>
+  <path d="M380 211 V240 H568 V295" class="edge"/>
+  <text x="380" y="278" text-anchor="middle" class="step">2 · APPLICATION SERVICES</text>
+  <rect x="28" y="304" width="328" height="83" rx="12" fill="#edf7f7" stroke="#7fadae"/>
+  <text x="192" y="336" text-anchor="middle" class="label">Order processing</text>
+  <text x="192" y="361" text-anchor="middle" class="body">Current dependency · MAP-1</text>
+  <rect x="404" y="304" width="328" height="83" rx="12" fill="#edf7f7" stroke="#7fadae"/>
+  <text x="568" y="336" text-anchor="middle" class="label">Reporting export</text>
+  <text x="568" y="361" text-anchor="middle" class="body">Current dependency · MAP-1</text>
+  <path d="M192 387 V420 H137 V492" class="edge"/>
+  <path d="M192 387 V437 H380 V492" fill="none" stroke="#697586" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#uncertain-arrow)"/>
+  <path d="M568 387 V420 H623 V492" class="edge"/>
+  <text x="28" y="411" class="step">3 · BUSINESS IMPACT</text>
+  <rect x="28" y="502" width="218" height="161" rx="12" fill="#fff1ee" stroke="#c97a69"/>
+  <text x="44" y="530" class="status" style="fill:#9b3524">OBSERVED DEGRADATION</text>
+  <text x="44" y="562" class="label">Customer checkout</text>
+  <text x="44" y="590" class="body">Journey check fails.</text>
+  <text x="44" y="614" class="body">Owner: Checkout team</text>
+  <text x="44" y="641" class="body">MAP-1 + MON-1</text>
+  <rect x="271" y="502" width="218" height="161" rx="12" fill="#f0f3f7" stroke="#9aa6b3"/>
+  <text x="287" y="530" class="status" style="fill:#4c586b">NEEDS VALIDATION</text>
+  <text x="287" y="562" class="label">Warehouse dispatch</text>
+  <text x="287" y="590" class="body">Stale dependency link.</text>
+  <text x="287" y="614" class="body">Owner: Unverified</text>
+  <text x="287" y="641" class="body">MAP-2 · confirm scope</text>
+  <rect x="514" y="502" width="218" height="161" rx="12" fill="#fff7e6" stroke="#c6a464"/>
+  <text x="530" y="530" class="status" style="fill:#825607">POTENTIAL IMPACT</text>
+  <text x="530" y="562" class="label">Daily sales reporting</text>
+  <text x="530" y="590" class="body">Next run not started.</text>
+  <text x="530" y="614" class="body">Owner: Reporting team</text>
+  <text x="530" y="641" class="body">MAP-1 + JOB-1</text>
+  <rect x="28" y="693" width="704" height="100" rx="12" fill="#fff" stroke="#d6e3e9"/>
+  <text x="46" y="721" class="label">A service link is a reason to investigate.</text>
+  <text x="46" y="746" class="body">It does not prove an outage. The dashed path is stale and needs confirmation.</text>
+  <text x="46" y="771" class="body">This map shows supplied evidence, not complete organisation-wide coverage.</text>
+</svg>

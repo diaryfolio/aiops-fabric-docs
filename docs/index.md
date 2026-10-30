@@ -7,7 +7,7 @@ It can run in an enterprise data centre, a private cloud, a public cloud, or acr
 > **Portable · Governed · Replaceable · Enterprise-controlled**
 
 For management readers, start with the [Business overview](BUSINESS_README.md),
-[compatibility guide](business/compatibility.md), and
+[pilot-fit guide](business/compatibility.md), and
 [adoption plan](business/adoption-and-governance.md).
 
 ```mermaid
@@ -25,24 +25,37 @@ The repository's exact executable scope is maintained separately in the
 [implementation conformance map](design/high-level/00-implementation-conformance.md).
 For the current project state, missing capabilities, and next steps toward an enterprise harness
 for local AI, read the
-[local AI and embedding integration plan](design/high-level/01-project-status-and-local-ai-plan.md).
-The old response API is retired (HTTP 410); hosted execution is currently a fixed synthetic fixture. A local development console now connects Ollama decisions and embeddings
-to real pgvector retrieval. Run APIs headlessly with `make harness`, optionally attach a
-GUI with `make gui`, or use combined `make console`; see the
-[console design](design/high-level/10-overall/06-local-ai-console.md).
+[project status and integration plan](design/high-level/01-project-status-and-local-ai-plan.md).
+The hosted execution path currently runs a fixed synthetic check. ViewSense management observes
+runtime configuration and manages enterprise controls; agent and model settings belong in runtime
+administration. The former response API returns authenticated HTTP 410. Run capability APIs with
+`make harness`, optionally attach management with `make gui`, or use combined `make console`;
+see the [management guide](design/high-level/10-overall/06-local-ai-console.md).
 
-## Open TrueForge
+## Business and technical workflows in practice
 
-Run `make trueforge-ui` from `aiops-fabric`, then open **[http://localhost:8791](http://localhost:8791)**.
-This is the official native GUI in a separate temporary standalone preview. No browser certificate
-or login is required; configure a model before chatting. It does not show Kubernetes/fabric data.
-See [Open TrueForge](deploy/trueforge-access.md) for start/status/stop, data lifetime and hosted access.
+Explore [15 business and technical examples](business/value-and-use-cases.md), from HR, finance
+and customer workflows to deployment investigation, pipeline triage and configuration drift.
+The detailed [reorganisation-performance](business/hr-departure-workflow.md) and
+[deployment-failure](business/deployment-failure-investigation.md) walkthroughs show how authoritative
+source facts become ViewSense-assisted analysis and authorized outcomes for different roles.
+These are proposed use cases with implementation gates, not claims of shipped business connectors.
+
+## Open ViewSense management
+
+Run `make console` from the implementation checkout and open
+**[ViewSense management](http://127.0.0.1:8787)**. The [quick start](QUICKSTART.md) covers
+prerequisites, sign-in, daily startup and verification.
+
+For models, agents and runtime settings, use [Agent runtime access](deploy/trueforge-access.md).
+The current runtime administration preview has separate temporary data; it does not display hosted
+sessions or establish production workflow readiness.
 
 ## Explore ViewSense AI®
 
 1. **Deploy the portable platform**
 
-    Install the current fabric/TrueForge namespace pair and run synthetic integration checks. [Open the quick start →](QUICKSTART.md)
+    Install the current ViewSense control-plane/runtime namespace pair and run synthetic integration checks. [Open the quick start →](QUICKSTART.md)
 
 2. **Validate real API flows**
 
@@ -100,7 +113,7 @@ specific model, database, identity, workflow, or observability vendor.
 | ✅ Provider gateways | Isolates model, memory, and tool-provider protocols and credentials behind replaceable boundaries. |
 | ✅ Governed memory contract | Provides tenant- and owner-bound create/search APIs without exposing provider databases to callers. |
 | ✅ Provider governance and evidence | Provides provider passports, evaluation admission, and payload-minimized evidence APIs. |
-| ✅ Runtime integration boundary | Delegates execution to unmodified TrueForge; fabric retains policy, credentials, memory and evidence. Current integration is synthetic-only. |
+| ✅ Runtime integration boundary | Uses an independent agent-runtime backend; ViewSense retains policy, credentials, memory and evidence. Current integration is synthetic-only. |
 | ✅ Vendor-neutral operational output | Provides structured JSON logs and request correlation suitable for enterprise collection. |
 | ✅ Kubernetes packaging | Provides portable manifests, Helm configuration, isolated service accounts, and deny-by-default network policy. |
 
@@ -129,12 +142,12 @@ ViewSense AI® is not another foundation model, vector database, low-code workfl
 For the current embedded/integratable product list, see the [product catalog](fabric/PRODUCTS.md).
 For the navigable web documentation, see the
 [ViewSense AI® documentation portal](#viewsense-ai-enterprise-ai-without-losing-control).
-For installation, daily startup, OpenAI configuration, testing, and shutdown, see the
+For installation, daily startup, GUI access, testing, and shutdown, see the
 [quick start](QUICKSTART.md).
 For architecture, installation, and engineering details, see the [technical guide](TECHNICAL_README.md).
 For copy-paste validation, see the [test guide](tests/README.md).
 
-The optional management GUI now provides separate Overview/suites, AI/models, Identity/access,
+The optional management GUI now provides separate Overview/suites, runtime connection status, Identity/access,
 Certificates and Observability workspaces. Modular OIDC supports a standalone Keycloak Kubernetes
 POC; certificate APIs inventory public material and request approved cert-manager renewal.
 See the [operating guide](deploy/integrations/keycloak.md) and

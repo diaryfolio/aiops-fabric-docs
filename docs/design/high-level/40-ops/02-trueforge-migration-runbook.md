@@ -1,6 +1,4 @@
-# ViewSense AI® TrueForge Migration and Decommission Runbook
-
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+# Agent Runtime Migration Runbook
 
 ## Status and ownership
 

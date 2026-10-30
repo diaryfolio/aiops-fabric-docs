@@ -132,6 +132,14 @@ retention of the previous artifact when a new build fails.
 
 ## Navigation and links
 
+Nested navigation uses expandable groups rather than static section headings. With
+`navigation.indexes` enabled, the group's `index.md` (or `README.md`) becomes its clickable
+landing page. Place that page first in the group. For **Business → Detailed examples**, the
+group title opens `business/examples/index.md`, which contains the overview; the separate
+arrow expands the individual walkthroughs. The overview is not repeated as a sibling link.
+Keep the theme's standard indentation and typography so child pages remain visibly nested.
+See the [Zensical navigation guide](https://zensical.org/docs/setup/navigation/#section-index-pages).
+
 1. Edit original Markdown under `docs/`, never generated `site/` content.
 2. When adding or moving a page, update its path in `zensical.toml` and all internal links.
 3. Use relative links between Markdown pages and documentation assets. Paths in navigation

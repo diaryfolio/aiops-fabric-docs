@@ -50,7 +50,7 @@ This is the target, not the current request graph. TrueForge owns loop/thread/tu
 
 The runtime adapter starts as a logical module in the existing edge process. It calls TrueForge APIs and translates stable fabric contracts; it must not implement another model/tool loop. A small integration record may bind public IDs and idempotency keys to runtime IDs. That is adapter-owned correlation state, never a second transcript or independently writable run state. If durable binding storage is needed, add an explicitly owned schema/credential/migration and document it before use; do not borrow another service's database.
 
-Deployment placement and exact permitted connections are specified in [TrueForge Namespace Integration](20-deployment/03-trueforge-namespace-integration.md). Cutover, rollback and removal are specified in the [migration runbook](40-ops/02-trueforge-migration-runbook.md).
+Deployment placement and exact permitted connections are specified in [Fabric/runtime namespace integration](20-deployment/03-trueforge-namespace-integration.md). Cutover, rollback and removal are specified in the [migration runbook](40-ops/02-trueforge-migration-runbook.md).
 
 ## Keep, adapt and decommission register
 

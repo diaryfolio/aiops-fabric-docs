@@ -18,7 +18,7 @@ flowchart LR
 
 ## Canonical access instructions
 
-[Open TrueForge](../../../deploy/trueforge-access.md) owns prerequisites, commands, ports, temporary
+[Agent runtime access](../../../deploy/trueforge-access.md) owns prerequisites, commands, ports, temporary
 data lifetime and troubleshooting. Home, quick start, technical/module guides and deployment/ops
 entry points link there. Navigation exposes it under Get started. The operation record retains
 the original preview validation rather than another full copy of instructions.
@@ -120,4 +120,73 @@ Design Sync Report
 - Known Production Gaps: integrated browser identity, governed real models/native MCP, business
   PII/budget/evidence/retention/recovery and per-node CNI monitoring; preview is separate temporary data
 - Sync Status: PASS for documented development/cleanup scope
+```
+
+## TrueForge management ownership cleanup
+
+The fabric AI page now presents the connected native preview and safe read-only inventory from
+supported TrueForge settings APIs. Models/providers, connectors, skills and runtime behavior are
+configured in TrueForge. The duplicated model selectors, configuration saves, direct chat/decision/
+embedding previews and console RAG workflow are removed, together with their browser proxy routes.
+The browser console's direct Ollama grant is removed on local bootstrap. The independent API client,
+memory embedding contract, controlled-egress adapters and separately scoped channel pilot remain.
+The console code change did not delete provider configuration or stored vectors. The separately
+approved temporary preview reset below discarded the preview's independent state.
+
+Fabric capability tests are explicitly memory/ingestion tests, not runtime execution. Upstream
+configuration changes/removals appear on refresh; failures clear the inventory. Preview observation
+is fixed-loopback development-only and Admin-only, with minimized fields and no credentials or
+upstream bodies exposed. The hosted runtime remains separately not observed. Hosted interactive
+identity and administrative observation are pending, with all customization confined to fabric.
+
+Validation of this management change passed 239 repository tests, lint, JavaScript syntax, base
+Kustomize, strict three-version docs builds and release-publishing regression. Live four-role
+console admission passed. A uniquely named synthetic provider created through the pinned native
+settings API appeared in fabric as minimized provider/model metadata. No inference was invoked.
+The pinned 0.3.0 API has no provider-delete route. The owner explicitly approved resetting only
+the temporary preview to remove the synthetic provider. The ownership-checking launcher removed
+the labelled preview container/network and recreated them using the same pinned official image.
+Health passed; model providers, connectors, skills, sessions and agents were empty. Sandbox and
+web-search settings returned their unconfigured 404 responses. Fabric read-back reported reachable
+with every configuration collection empty. The localhost-only binding and non-root/read-only
+runtime were verified. Kubernetes resources and fabric stores were untouched; no upstream source,
+chart, image customization or database editing was used.
+
+The first namespace-pair redeploy timed out because both nodes had disk-pressure scheduling
+taints. Pressure cleared automatically and all fabric deployments recovered, without operator
+image/data cleanup or node restarts. A fresh deploy and full hosted synthetic/auth/isolation/CNI
+suite then passed. The optional local memory smoke failed safely because its independent Ollama
+embedding dependency was not listening on 11434; process health alone did not certify that route.
+This failure is not a TrueForge inventory failure and no mock/silent fallback was substituted.
+
+### Design impact and paired handoff
+
+| Implementation area | Canonical design section |
+|---|---|
+| Console TrueForge reader and safe metadata projection | Management console: implemented read-only integration; conformance route inventory |
+| Removed model editor/test facades and retained capability lab | Management ownership/GUI workflow; overall system boundaries |
+| Local launcher and reduced browser model grant | Detachable harness and security boundary; Day-2 operation |
+| Source, role, live runtime and documentation evidence | Test guide; this cleanup record |
+
+Working-tree handoff baselines are implementation `e36e183` and documentation `580b4dc`.
+Edits remain unstaged/uncommitted for the owner's manual paired commits. No upstream TrueForge
+source, image or chart template was changed. The isolated QA console was stopped after matching
+its exact process, working directory and listening port; the actual management console is running
+with the final code. The independent preview was reset under the owner's explicit approval and
+verified healthy with empty configuration, sessions and agents.
+
+```text
+Design Sync Report
+- Change Classification: major
+- Design Docs Updated: management ownership, conformance, overall architecture, current status,
+  operations/cleanup, enterprise controls, GUI access, quick start, validation and navigation
+- Code Areas Updated: console read-only TrueForge adapter, UI/routes, launcher browser grant,
+  retained capability tests and role/security regression helpers
+- Architecture Delta: runtime configuration belongs to unmodified TrueForge; fabric reads
+  minimized live preview metadata instead of maintaining another runtime model editor/test loop
+- Tests/Evidence: 239 tests; lint/JS/Kustomize; strict three-version docs and publication regression;
+  live read-back and four-role admission; recovered deploy and hosted synthetic/auth/isolation/CNI pass
+- Known Production Gaps: hosted management/browser identity, governed real-model/native MCP
+  execution and enterprise acceptance; optional local embedding smoke blocked by offline Ollama
+- Sync Status: PASS for the implemented development scope; approved preview cleanup complete
 ```

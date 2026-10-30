@@ -1,6 +1,4 @@
-# Independent TrueForge Runtime Integration
-
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+# ViewSense AI® Agent Runtime Integration
 
 The retained fabric uses an official, unmodified TrueForge release in `trueforge-dev` beside
 `viewsense-dev`. All customization stays in fabric-owned adapters and documented upstream
@@ -10,7 +8,7 @@ The owner-authorized clean-state rebuild removes the legacy manual state machine
 database and lifecycle API. No manual checkpoint compatibility or business feature parity is claimed.
 
 The implemented route `POST /v1/runtime-check` requires `runtime.verify` and accepts `{}` only.
-It creates one fixed synthetic TrueForge session/turn using the mock model transport. No arbitrary
+It creates one fixed synthetic runtime session/turn using the mock model transport. No arbitrary
 customer prompt, native MCP, sandbox, schedules, subagents or shared-session business execution
 is enabled. The runtime owns sessions/turns; governed memory and evidence remain separate owners.
 

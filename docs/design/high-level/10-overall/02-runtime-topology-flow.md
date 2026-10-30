@@ -5,12 +5,12 @@
 The retained fabric lives in `viewsense-dev`; the independent official TrueForge runtime and its
 state live in `trueforge-dev`. The old request orchestrator/manual agent kernel and agent database
 are removed. All adaptation remains in fabric through supported upstream interfaces.
-[Open TrueForge](../../../deploy/trueforge-access.md) describes the separate native GUI preview;
+[Agent runtime access](../../../deploy/trueforge-access.md) describes the separate native GUI preview;
 it is not a browser client for the hosted runtime or its state.
 
 ```mermaid
 flowchart TB
-    API["Authenticated edge"] --> TF["Official TrueForge · fixed synthetic turn"]
+    API["Authenticated edge"] --> TF["Agent runtime · fixed synthetic turn"]
     TF --> Bridge["fabric loopback model transport"]
     Bridge --> LLM["LLM gateway"] --> Mock["mock SSE provider"]
     TF --> State[("runtime PostgreSQL / Redis")]
@@ -43,7 +43,7 @@ business delivery remain gated; the diagram does not imply that those future edg
 sequenceDiagram
     participant C as Synthetic client
     participant G as Fabric gateway
-    participant T as Official TrueForge
+    participant T as Agent runtime backend
     participant B as Fabric transport
     participant M as LLM gateway / mock
     C->>G: POST /v1/runtime-check · {}
@@ -52,7 +52,7 @@ sequenceDiagram
     B->>M: mTLS + scoped fixture request
     M-->>T: mock SSE through transport
     G->>T: observe existing turn until terminal
-    G-->>C: synthetic result; no business execution
+    G-->>C: synthetic result, no business execution
 ```
 
 `POST /v1/responses` is a retirement marker returning authenticated HTTP 410. Memory/remember

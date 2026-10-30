@@ -1,6 +1,4 @@
-# ViewSense AI® TrueForge Namespace Integration
-
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
+# Fabric and Agent Runtime Namespace Integration
 
 ## Deployment decision
 

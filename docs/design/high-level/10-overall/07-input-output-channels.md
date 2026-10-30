@@ -14,11 +14,17 @@ the verified initiating session through its reply binding. Teams, an LLM chat ap
 console, and a headless API are entry surfaces for an Input Channel. A Teams conversation named
 Sales is not evidence that its participants have Sales permissions.
 
+For a source-to-result walkthrough, see [reorganisation and business-performance analysis](../../../business/hr-departure-workflow.md).
+It uses the clearer business terms **source**, **workflow** and **destination**. Those labels do
+not rename the existing channel APIs: the HR and Finance sources are application boundaries, business entry
+context establishes request permissions, and final delivery has its own recipient binding.
+
 This is a **major uplift**. Channel catalogs and administration consoles now ship as a
 control-plane slice with non-executing policy and synthetic Sales previews. Channel-aware routing,
 Tool-Sense execution from chat, the CRM/Oracle connector and Teams integration remain **planned**.
-The shipped orchestrator calls memory and the LLM, but does not call the MCP gateway. Its existing
-tool registry and manual agent lifecycle do not implement this design. See
+The legacy orchestrator and manual agent lifecycle are retired. The current gateway-to-TrueForge
+path executes only a fixed synthetic fixture; the retained tool registry does not implement this
+business routing or native MCP execution. See
 [implementation conformance](../00-implementation-conformance.md#input-and-output-channels).
 
 Tool-Sense is the logical capability for discovering and executing approved business tools through

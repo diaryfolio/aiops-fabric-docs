@@ -12,7 +12,7 @@
 | `memory/` | memory gateway and vector providers | implemented reference |
 | `mcp-registry/` | MCP catalog and invocation boundary | implemented reference |
 | `ingestion/` | governed document chunking and indexing entry point | implemented reference |
-| `agents/` | external official TrueForge integration | partial reference; fixed synthetic path |
+| `agents/` | independent agent-runtime backend integration | partial reference; fixed synthetic path |
 | `workflows/` | n8n/Temporal/Argo provider boundary | contract only |
 | `networking/` | topology-v2 CNI plus retained provider/management contracts | partial reference; mesh-v2 planned |
 | `observability/` | JSON/OTel/SIEM integration boundary | partial reference |
@@ -35,5 +35,5 @@ cluster workload identity, and production provider charts remain enterprise over
 `make catalog-check` and `make profile-check` to reject catalog drift and invalid product profiles.
 
 For the native upstream GUI, use `make trueforge-ui` and `http://localhost:8791`;
-[Open TrueForge](../deploy/trueforge-access.md) distinguishes this temporary standalone preview
+[Agent runtime access](../deploy/trueforge-access.md) distinguishes this temporary standalone preview
 from hosted mTLS/OIDC runtime access and the optional fabric management console.

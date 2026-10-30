@@ -78,7 +78,7 @@ disabled in this profile. There is no orchestrator/manual-kernel service or agen
 | Workload identity | Development mTLS issuer, audience/scoped JWT and signed tenant Trust Envelope | Static short-lived PKI; production renewable workload identity and certificate/JWT binding remain planned |
 | Runtime identity | Stock OIDC via fabric-owned TLS discovery/JWKS, fixed tenant per cell, issuer-qualified subjects | Interactive hosted browser login and shared multi-customer runtime isolation remain unimplemented |
 | Native GUI | Official standalone image, localhost-only port, non-root/read-only process, ephemeral SQLite | Separate preview, no hosted data; no enterprise policy, PII, budget or evidence guarantees |
-| Fabric management console | Authenticated local sessions, CSRF, Admin/Operations/Sales/SIEM ceilings, detachable API client | Separate from native TrueForge; current release preview offers ingestion/memory/search only |
+| Fabric management console | Authenticated local sessions, CSRF and role ceilings; read-only safe TrueForge preview inventory at `/api/integrations/trueforge`, live refresh; duplicate model editor/test facade retired | Preview configuration observation only; hosted settings/browser identity not connected; retained fabric memory/ingestion tests do not execute agents |
 | Channel policy / AuthZ | Tenant-scoped drafts, immutable candidates/review, publication/disable epoch, canonical identity assertions and complete-grant evaluator | Previews have `execution_authority: false`; authoritative entitlement refresh and business connectors remain planned |
 | User playground | Server-selected approved internal generation, narrowed role ceilings, mandatory safe decision record | Dedicated optional local harness; not general governed TrueForge business execution |
 | Provider governance | Passports, evaluation records, OPA admission boundary and safe evidence API | Catalog admission is not fresh per-dispatch policy; immutable export and atomic hard spend limits remain planned |
@@ -93,6 +93,18 @@ disabled in this profile. There is no orchestrator/manual-kernel service or agen
 | Packaging | Fabric chart/profiles, independent official runtime release, release build/upload tooling | Historical bundles are not namespace-pair distributions; new offline paired packaging and HA/restore/upgrade qualification remain planned |
 
 ## Input and Output Channels
+
+The [value and use-case tables](../../business/value-and-use-cases.md) and
+[detailed walkthroughs](../../business/examples/index.md) use source → workflow → destination to explain
+target outcomes. They are planned use cases, not shipped HR/organisation/Finance/CI/Kubernetes investigation connectors.
+The supplier-renewal walkthrough likewise adds no supplier/contract/assurance connector, risk
+acceptance, contract approval or delivery implementation. Department example tables describe
+proposed outcomes rather than installed integrations.
+The ITSM service-impact example and additional MCP-based product-suite examples are likewise
+design illustrations. No ServiceNow/ITSM connector, dependency traversal, service-health correlation,
+impact calculation or ITSM update capability is added by these pages or their synthetic diagram.
+Existing channel APIs and grants retain their current semantics. Real-model business processing,
+governed native tools, recipient-specific delivery and production remediation remain unimplemented.
 
 The control-plane pilot owns policy and canonical grants; it does not authorize business execution.
 Identity providers own identities/membership. Governance owns framework roles, qualified mappings,
@@ -114,7 +126,7 @@ routers retain their owner schema/contract; native runtime routes are not redefi
 | Fabric package | Declared routes |
 |---|---|
 | `viewsense_certificates` | `GET /metrics`, `GET /v1/certificates`, `GET /v1/certificates/{namespace}/{name}`, `POST /v1/certificates/{namespace}/{name}:renew` |
-| `viewsense_console` | `GET /`, `GET /api/auth/channel-access`, `GET /api/auth/me`, `GET /api/auth/roles`, `GET /api/certificates`, `POST /api/certificates/{namespace}/{name}:renew`, `GET /api/components`, `GET /api/configuration`, `PUT /api/configuration`, `GET /api/console-roles`, `GET /api/history`, `POST /api/networking/plans`, `GET /api/networking/{operation}`, `GET /api/platform/catalog`, `GET /api/platform/status`, `POST /api/platform/suite-plans`, `GET /api/platform/suites`, `POST /api/playground/chat`, `GET /api/playground/options`, `POST /api/playground/policy-check`, `DELETE /api/session`, `GET /api/session`, `POST /api/session`, `POST /api/tests/decision`, `POST /api/tests/embedding`, `POST /api/tests/ingestion`, `POST /api/tests/memory`, `POST /api/tests/model`, `POST /api/tests/rag`, `POST /api/tests/reembed`, `POST /api/tests/search`, `GET /auth/callback`, `GET /auth/login/{provider_id}`, `GET /auth/providers` |
+| `viewsense_console` | `GET /`, `GET /api/auth/channel-access`, `GET /api/auth/me`, `GET /api/auth/roles`, `GET /api/certificates`, `POST /api/certificates/{namespace}/{name}:renew`, `GET /api/components`, `GET /api/console-roles`, `GET /api/history`, `GET /api/integrations/trueforge`, `POST /api/networking/plans`, `GET /api/networking/{operation}`, `GET /api/platform/catalog`, `GET /api/platform/status`, `POST /api/platform/suite-plans`, `GET /api/platform/suites`, `POST /api/playground/chat`, `GET /api/playground/options`, `POST /api/playground/policy-check`, `DELETE /api/session`, `GET /api/session`, `POST /api/session`, `POST /api/tests/ingestion`, `POST /api/tests/memory`, `POST /api/tests/reembed`, `POST /api/tests/search`, `GET /auth/callback`, `GET /auth/login/{provider_id}`, `GET /auth/providers` |
 | `viewsense_gateway` | `GET /v1/auth/channel-access`, `GET /v1/auth/me`, `GET /v1/auth/providers`, `GET /v1/auth/roles`, `POST /v1/authorization:decide`, `GET /v1/certificates/{namespace}/{name}`, `POST /v1/certificates/{namespace}/{name}:renew`, `GET /v1/models`, `POST /v1/networking/plans`, `GET /v1/networking/providers`, `GET /v1/networking/status`, `GET /v1/networking/topology`, `GET /v1/platform/catalog`, `GET /v1/platform/status`, `POST /v1/platform/suite-plans`, `GET /v1/platform/suites`, `POST /v1/playground/chat`, `GET /v1/playground/options`, `POST /v1/playground/policy-check`, `POST /v1/responses` |
 | `viewsense_governance` | `GET /v1/access-policy-draft`, `POST /v1/access-policy-draft:seed`, `POST /v1/access-policy-revisions`, `POST /v1/access-policy-revisions/{revision}:activate`, `POST /v1/access-policy-revisions/{revision}:review`, `POST /v1/access-policy-revisions:validate`, `GET /v1/authorization-providers`, `POST /v1/authorization:access`, `POST /v1/authorization:decide`, `POST /v1/authorization:sales-example`, `POST /v1/authorization:simulate`, `GET /v1/evidence-events`, `POST /v1/evidence-events`, `POST /v1/playground/options:resolve`, `POST /v1/playground/policy-check`, `GET /v1/provider-passports/{name}`, `PUT /v1/provider-passports/{name}`, `POST /v1/provider-passports/{name}/evaluations`, `POST /v1/provider-passports/{name}:admit` |
 | `viewsense_identity` | `GET /.well-known/openid-configuration`, `GET /jwks`, `POST /oauth2/token` |
@@ -138,7 +150,7 @@ caller prompts, roles, models or tenant overrides.
 
 ## Verification and cleanup
 
-Use [Open TrueForge](../../deploy/trueforge-access.md) for GUI access and the
+Use [Agent runtime access](../../deploy/trueforge-access.md) for GUI access and the
 [current test guide](../../tests/README.md) for supported checks. `make k8s-test` covers retained
 fabric smoke, one fixed hosted turn, JWT/mTLS and subject isolation, private database denials and
 an untrusted workload denied from previously reachable identity/runtime listeners. CNI probes
@@ -156,3 +168,15 @@ hosted/security regressions. The first live run exposed an empty worker policy c
 the owner-approved worker restart did the same-node denial pass. All 24 nonterminal worker pods
 were Ready after recovery. The cleanup record preserves this failure/recovery and the remaining
 per-node monitoring gap; this is development evidence, not production certification.
+
+## TrueForge management ownership
+
+The former AI/model editor and direct model/decision/embedding/RAG console routes are removed.
+Runtime configuration is owned by TrueForge; fabric reads names/types/model names through supported
+GET settings APIs with no credentials/manifests in browser responses. Local development enables
+only the fixed standalone preview connection. SSO/release profiles and production disable it.
+A visible-page refresh rereads upstream state; failures clear the displayed inventory. The hosted
+runtime is separately marked not observed. This adds one server-to-loopback development read edge,
+no workload grant to hosted settings, no new datastore and no upstream customization.
+See [console contract](10-overall/06-local-ai-console.md) and its negative/security tests in
+`tests/unit/test_trueforge_console.py`. Configuration discovery is not provider health/admission.

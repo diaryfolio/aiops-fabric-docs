@@ -3,7 +3,7 @@
 The current development profile connects `viewsense-dev` and `trueforge-dev` through fabric-owned
 namespace-qualified topology-v2 policies. The selected cluster keeps its existing enforcing CNI.
 No installer swaps the CNI, installs a mesh or changes unrelated system namespaces.
-For native GUI access use [Open TrueForge](../trueforge-access.md); opening the GUI does not deploy
+For native GUI access use [Agent runtime access](../trueforge-access.md); opening the GUI does not deploy
 networking or grant cluster access.
 
 ## Current deployment and verification
@@ -38,7 +38,7 @@ The optional console Networking page is a client of those APIs; a plan is not en
 Cilium and Istio ambient remain external, independently operated choices. The fabric chart retains
 single-namespace mesh configuration for separately qualified foundation profiles. Namespace-pair
 mesh-v2 identity, enrollment, recovery and live acceptance are planned; v1 rules cannot certify the
-TrueForge pair. Provider replacement needs exact namespace/workload/operation authority, live
+agent-runtime pair. Provider replacement needs exact namespace/workload/operation authority, live
 positive/negative tests, approved rollback and evidence matched to topology/configuration digests.
 Never expose arbitrary URL fetch or privileged installer execution through management APIs.
 

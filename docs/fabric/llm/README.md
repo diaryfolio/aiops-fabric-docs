@@ -1,7 +1,5 @@
 # LLM Gateway Module
 
-For native GUI access, run `make trueforge-ui` and open `http://localhost:8791`. This is a separate temporary standalone preview; see [Open TrueForge](../../deploy/trueforge-access.md) for lifecycle, certificate errors and hosted-runtime limits.
-
 The LLM gateway provides the stable OpenAI-compatible inference boundary. Callers never receive
 provider URLs or credentials. The deterministic mock and credential-isolated OpenAI adapter are
 executable. The Ollama adapter adds local decisions, real embeddings and optional text chat; vLLM
@@ -10,7 +8,7 @@ and other external providers still require planned adapters.
 - Runtime: `viewsense_llm_gateway`
 - Bundled test provider: `viewsense_mock_llm`
 - Bundled credential-isolation adapter: `viewsense_openai_adapter` (OpenAI API)
-- Local provider: `viewsense_ollama_adapter`; isolated browser console: `make console`
+- Local capability/egress adapter: `viewsense_ollama_adapter`; runtime models are configured through runtime administration. The fabric console observes safe configuration metadata, without a duplicate editor.
 - Helm selection: `products.llm`; opt-in embedding profile: `profiles/local-ai.yaml`
 - Planned external endpoints require a ViewSense AI®-compatible mTLS/JWT adapter, explicit HTTPS trust,
   audience grants, and fail-closed egress rules. A vanilla OpenAI-compatible endpoint is not enough.

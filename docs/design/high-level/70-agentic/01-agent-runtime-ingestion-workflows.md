@@ -24,7 +24,7 @@ The manual run state machine, checkpoint API/schema and agent database are retir
 owns native sessions/turns; fabric verifies only the fixed synthetic route today. Full business
 execution must use supported upstream interfaces, with policy/identity/credential adapters in
 fabric. No replacement loop or injected runtime extension is permitted. Native GUI access is in
-[Open TrueForge](../../../deploy/trueforge-access.md).
+[Agent runtime access](../../../deploy/trueforge-access.md).
 
 ## Target autonomous worker
 

@@ -1,4 +1,4 @@
-# ViewSense AI® Clean-State TrueForge Rebuild
+# Clean-State Fabric and Runtime Rebuild
 
 ## Authorization and disposition
 

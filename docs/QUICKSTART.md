@@ -1,10 +1,17 @@
 # ViewSense AI® Quick Start
 
-Run implementation commands from the `aiops-fabric` repository root. The current system retains
-fabric controls and integrates an unmodified official TrueForge release. The native GUI preview
-and secured Kubernetes runtime are separate; neither requires a `keepview_harness` project.
+Run commands from the `aiops-fabric` repository root. ViewSense management and the agent-runtime
+backend have separate administration surfaces. The local runtime preview and secured hosted
+runtime have independent configuration and session data.
 
-## Open TrueForge first
+## Open ViewSense management
+
+Start Docker Desktop, run `make console` and open **[ViewSense management](http://127.0.0.1:8787)**.
+Use the provisioned ViewSense Admin sign-in described in the
+[management guide](#local-ai-management-console). The console shows enterprise controls and
+runtime connection status; model/agent configuration uses the separate runtime interface below.
+
+## Open runtime administration
 
 Start Docker Desktop, then:
 
@@ -16,7 +23,7 @@ Open **[http://localhost:8791](http://localhost:8791)**. No certificate or login
 localhost-only standalone preview. A fresh preview opens **Settings → Models**; configure a model
 before chat can execute. Data and provider settings are temporary and disappear when stopped or
 restarted. No Kubernetes credentials or sessions are imported. See
-[Open TrueForge](deploy/trueforge-access.md) for the canonical access and troubleshooting guide.
+[Agent runtime access](deploy/trueforge-access.md) for the canonical access and troubleshooting guide.
 
 ```bash
 make trueforge-ui-status
@@ -27,12 +34,12 @@ make trueforge-ui-stop
 
 | Goal | Command / guide |
 |---|---|
-| Open native TrueForge GUI | `make trueforge-ui`, then `http://localhost:8791` |
+| Open runtime administration preview | `make trueforge-ui`, then `http://localhost:8791` |
 | Deploy the fabric/runtime namespace pair | `make k8s-deploy` |
 | Verify fixed hosted turn, retained APIs and security denials | `make k8s-test` |
 | Resume an existing stopped development cluster | `k3d cluster start cks` |
 | Inspect hosted workloads | `kubectl -n viewsense-dev get pods` and `kubectl -n trueforge-dev get pods` |
-| Open optional fabric management console | `make console`; distinct from TrueForge |
+| Open ViewSense management console | `make console`; separate from runtime administration |
 | Run fabric local APIs without the console | `make harness`; attach the console with `make gui` |
 | Expose retained fabric APIs to an authenticated local client | `make ports-start`; four mTLS forwards |
 | Stop those forwards | `make ports-stop`; workloads keep running |
@@ -62,7 +69,7 @@ make k8s-test
 
 The deployment selects the explicit `k3d-cks` context, installs namespace-qualified boundaries and
 fresh resources when absent, builds/imports fabric images and installs the independent official
-TrueForge chart. Fabric lives in `viewsense-dev`; hosted runtime/SQL/Redis live in `trueforge-dev`.
+backend chart. Fabric lives in `viewsense-dev`; hosted runtime/SQL/Redis live in `trueforge-dev`.
 Private generated material is ignored under `.viewsense/rebuild`. Routine deployment does not
 reset namespaces, delete data or migrate an old agent database. The earlier authorized no-backup
 reset is recorded separately in the [operation record](design/high-level/40-ops/03-clean-state-rebuild.md).
@@ -96,18 +103,20 @@ make ports-status
 
 These are mTLS API endpoints, not browser login pages. Use the deployment's matching trust and
 workload identity. `make ports` keeps forwards in the foreground; Ctrl+C closes only the forwards.
-Hosted TrueForge on 8790 also requires mTLS/OIDC. A normal browser gets `Client certificate required`;
+The hosted runtime on 8790 also requires mTLS/OIDC. A normal browser gets `Client certificate required`;
 use the native preview on 8791 until integrated browser identity is implemented. Do not disable
 hosted authentication to work around that response.
 
 ## Local AI management console
 
-The optional retained fabric console runs at `http://127.0.0.1:8787` with `make console`. It owns no
-agent execution loop. Its isolated Ollama/memory/ingestion/identity harness has separate prerequisites,
+The ViewSense console runs at `http://127.0.0.1:8787` with `make console`. Open the
+[runtime connection page](http://127.0.0.1:8787/?page=ai) as ViewSense Admin to read back configuration from the
+native preview. Configure runtime models/connectors in the administration preview. The fabric console owns no
+agent execution loop or duplicate runtime model editor. Its isolated Ollama/memory/ingestion/identity harness has separate prerequisites,
 credentials and persistent local memory; follow the
 [local console design](design/high-level/10-overall/06-local-ai-console.md) and
-[management/SSO guide](deploy/integrations/keycloak.md). These examples do not connect the TrueForge
-preview to fabric or establish a production SSO deployment.
+[management/SSO guide](deploy/integrations/keycloak.md). The preview inventory does not connect its agent execution to ViewSense capabilities or establish
+a production SSO deployment.
 
 ## Headless harness and detachable GUI
 

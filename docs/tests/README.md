@@ -18,9 +18,9 @@ make docs-build
 These validate source, canonical contracts/catalog paths, every fabric Helm profile and current
 documentation links/navigation. Render success does not prove live network or workload identity.
 Fabric chart profiles configure retained capabilities; they do not install the independent hosted
-TrueForge release or qualify production providers automatically.
+runtime release or qualify production providers automatically.
 
-## Native TrueForge GUI
+## Runtime administration preview
 
 ```bash
 make trueforge-ui
@@ -32,11 +32,26 @@ Open `http://localhost:8791` and verify the native Settings → Models screen. I
 Connectors/Skills/Sandbox/Web search screens without entering production credentials or customer
 content. No model is configured automatically. The preview must publish only `127.0.0.1:8791`;
 its image must match the pinned official digest and its container must remain non-root/read-only.
-See [Open TrueForge](../deploy/trueforge-access.md) for lifecycle and troubleshooting.
+See [Agent runtime access](../deploy/trueforge-access.md) for lifecycle and troubleshooting.
 
 Do not stop the preview merely to test cleanup after someone has started using it: its data is
 disposable and stopping/restarting discards it. When finished intentionally, `make trueforge-ui-stop`
 removes the owned preview resources. The hosted Kubernetes data and authentication remain separate.
+
+## ViewSense console / runtime observation
+
+Start `make console`, sign in as ViewSense Admin and open the
+[runtime connection page](http://127.0.0.1:8787/?page=ai).
+Verify the instance is the standalone preview, its version is observed and collection states match
+the runtime. Configure a synthetic item in the native GUI and refresh fabric; changes/removals must
+appear without saving a second fabric configuration. Provider health/admission remains untested by
+this read. Hosted settings must remain **not observed**.
+
+Repository tests cover metadata minimization (no keys/manifests/URLs/skill content), updates/removals,
+access denial, malformed/oversized responses, redirect rejection, outage clearing and disabled
+production observation. Anonymous and non-admin callers are denied before any upstream read.
+Retired `/api/configuration` and model/decision/embedding/RAG test facades return authenticated 404.
+Fabric capability tests retain ingestion/memory/search/backfill; they do not execute an agent through the runtime.
 
 ## Kubernetes deployment and integration
 
@@ -81,7 +96,7 @@ make api-test
 ```
 
 This checks the separate local decision/embedding/memory/ingestion APIs without a GUI. Optional
-`make gui` attaches the fabric management client; it is not the native TrueForge GUI. The existing
+`make gui` attaches ViewSense management, independently of runtime administration. The existing
 `test-local-api.py`, `test-local-console.py`, `test-console-roles.py`, `test-channel-console.py` and
 `test-playground.py` operate their documented local profiles. Use their supplied authenticated
 session/CSRF and mTLS helpers rather than copying credentials into command arguments or chat.
@@ -96,7 +111,7 @@ make compose-test
 ```
 
 Compose tests the retained fabric capability processes on private development networks. It does
-not install hosted TrueForge, prove Kubernetes policies or supply native governed MCP. Its PKI and
+not install the hosted agent backend, prove Kubernetes policies or supply native governed MCP. Its PKI and
 volumes are separate from the namespace pair and the temporary standalone GUI. Inspect the current
 Compose configuration before selecting optional profiles; do not copy its credentials into Kubernetes.
 

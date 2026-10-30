@@ -3,7 +3,7 @@
 Retain fabric policy, identity, capability/credential and data owners around an independently
 upgraded official TrueForge runtime. The legacy orchestrator/manual kernel is retired. All custom
 behavior belongs in fabric; no upstream source/chart/image changes are permitted. See
-[Open TrueForge](../../../deploy/trueforge-access.md) for native GUI access and the
+[Agent runtime access](../../../deploy/trueforge-access.md) for native GUI access and the
 [conformance map](../00-implementation-conformance.md) for exact current scope.
 
 ```mermaid

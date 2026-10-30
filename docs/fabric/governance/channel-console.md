@@ -9,7 +9,7 @@ This release implements the control plane. Business tool/CRM execution remains d
 
 | Console role | Visible workspaces | Authority |
 |---|---|---|
-| ViewSense Admin | Overview & suites, AI & models, Networking, Observability, Certificates, Identity & access, Input Channels, Output Channels, Model test lab, Test history | Existing administration scopes; independent review remains separately provisioned |
+| ViewSense Admin | Overview & suites, TrueForge integration, Networking, Observability, Certificates, Identity & access, Input Channels, Output Channels, Fabric capability tests, Test history | Existing administration scopes; independent review remains separately provisioned |
 | Operations | Overview & suites, Certificates, Identity & access, Input Channels, Output Channels | Read only; no renewal, deployment-plan generation, model tests or policy mutations |
 | Sales | Input Channels playground, Output Channels AI destinations | General chat through policy; no channel configuration access |
 | SIEM | Input Channels playground, Output Channels AI destinations | General chat through policy; no channel configuration access |

@@ -13,4 +13,4 @@ historical evidence never imply live health or authorization.
 
 See the [operator guide](../../deploy/integrations/networking.md),
 [networking design](../../design/high-level/20-deployment/02-modular-networking-mesh.md), and
-[Open TrueForge](../../deploy/trueforge-access.md) for the independent native GUI preview.
+[Agent runtime access](../../deploy/trueforge-access.md) for the independent native GUI preview.

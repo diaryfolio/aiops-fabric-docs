@@ -5,37 +5,37 @@ hide:
 
 # Business overview
 
-ViewSense AI® gives an organisation a common control layer for AI models and company knowledge.
-Business applications use stable interfaces while the platform team manages approved providers,
-access rules, and operational evidence. The aim is to preserve supplier choice and keep decisions
-about data and risk with the organisation.
+Connect in-house applications to AI-assisted workflows and deliver useful outcomes to the right
+people. ViewSense AI® coordinates approved agents, enterprise integrations and access controls.
+
+## The workflow at a glance
+
+1. **Connect your systems**
+
+    Bring together approved information from in-house applications, events and requests.
+
+2. **Process with ViewSense**
+
+    Use a configured agent and permitted tools, with fabric applying enterprise controls.
+
+3. **Deliver useful outcomes**
+
+    Return reviewed reports, recommendations or approved tasks to the relevant people.
+
 
 This section is for business sponsors, management, procurement, and risk teams. Start with
-[compatibility and product fit](business/compatibility.md), then
-[value and use cases](business/value-and-use-cases.md) and
+[pilot fit](business/compatibility.md), then
+[value and use-case tables](business/value-and-use-cases.md) and
 [adoption and governance](business/adoption-and-governance.md).
 
-## Where it fits
+The [example comparison tables](business/value-and-use-cases.md) group ideas by team, including
+security, HR, Finance, customer/product teams, Procurement, Operations, Engineering, manufacturing,
+facilities and research. Each group contains two to five examples, with MCP as the main product
+integration approach. Open [Detailed examples](business/examples/index.md) for ITSM service impact,
+supplier renewal, reorganisation-performance and deployment-investigation walkthroughs.
 
-The diagram shows the business relationship between applications, the control layer, and approved
-resources. Each selected integration must meet the readiness requirements below.
-
-```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontSize": "22px", "fontFamily": "Arial, sans-serif", "lineColor": "#0f9f96"}, "flowchart": {"nodeSpacing": 35, "rankSpacing": 50, "padding": 24, "wrappingWidth": 360, "useMaxWidth": false}}}%%
-flowchart TB
-    accTitle: Business platform overview
-    accDescr: People and business applications use ViewSense AI for common controls and access to approved AI models, company knowledge, and operational evidence.
-    A["People and business applications"] --> B["ViewSense AI®<br/>Common controls and access"]
-    B --> C["Approved<br/>AI models"]
-    B --> D["Company<br/>knowledge"]
-    B --> E["Operational<br/>evidence"]
-    classDef business fill:#082a3a,color:#ffffff,stroke:#0f9f96,stroke-width:2px;
-    classDef resource fill:#0f766e,color:#ffffff,stroke:#0f9f96,stroke-width:2px;
-    class A,B business;
-    class C,D,E resource;
-```
-
-On smaller screens, scroll the diagram horizontally to see all the boxes.
+These are target workflows with explicit acceptance gates, not shipped business connectors or
+autonomous production operations.
 
 ## The management decisions
 
@@ -49,10 +49,11 @@ On smaller screens, scroll the diagram horizontally to see all the boxes.
 
 ## What can be evaluated now
 
-The tested reference includes response orchestration, PostgreSQL/pgvector memory, basic document
-ingestion, provider admission checks, safe evidence APIs, and a bounded agent lifecycle with manual
-approval and cancellation. Development identity, static certificates, mock models, and mock tools
-are test components.
+The tested reference includes a fixed synthetic agent-execution check,
+PostgreSQL/pgvector memory, basic document ingestion, provider admission APIs and safe evidence
+APIs. The old response orchestration and manual agent kernel are retired. Development identity,
+static certificates, mock models and mock tools are test components. General business execution,
+including the HR example, remains gated.
 
 OpenAI, Ollama, Mem0, enterprise identity, and selected operational integrations have documented
 integration paths. They require configuration and acceptance in the organisation's environment.
@@ -60,14 +61,16 @@ The local Ollama decision and embedding retrieval path has development evidence;
 not certify an enterprise deployment.
 
 Autonomous business actions, native MCP transport, workflow-engine adapters, and several production
-operations capabilities remain planned. The [compatibility guide](business/compatibility.md)
+operations capabilities remain planned. The architecture guide to
+[integration compatibility](design/high-level/10-overall/11-integration-compatibility.md)
 separates these states, and the [implementation conformance map](design/high-level/00-implementation-conformance.md)
 records the technical evidence and outstanding gaps.
 
 ## A useful first commitment
 
-Choose one knowledge-assistance pilot with a named business owner, approved information, a limited
-user group, and human review of answers. Agree success measures and environment acceptance before
+Choose one read-only reporting or investigation pilot with a named owner, approved information,
+a limited user group and human review. Start with synthetic facts and one authorized result view.
+Agree success measures and environment acceptance before
 connecting sensitive data or expanding the service. The [adoption guide](business/adoption-and-governance.md)
 provides the decision gates and responsibilities.
 
