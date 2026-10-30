@@ -33,6 +33,7 @@ nav = [
     { "Architecture index" = "design/high-level/design_01.md" },
     { "Implementation conformance" = "design/high-level/00-implementation-conformance.md" },
     { "Project status and local AI plan" = "design/high-level/01-project-status-and-local-ai-plan.md" },
+    { "TrueForge and KeepView assessment" = "design/high-level/02-trueforge-keepview-assessment.md" },
     { "Objectives and principles" = "design/high-level/10-overall/01-objective-principles.md" },
     { "Runtime topology" = "design/high-level/10-overall/02-runtime-topology-flow.md" },
     { "API standards" = "design/high-level/10-overall/03-api-integration-standards.md" },

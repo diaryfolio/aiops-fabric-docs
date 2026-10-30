@@ -29,6 +29,8 @@ flowchart LR
 - [Networking and mesh design](20-deployment/02-modular-networking-mesh.md) — replaceable CNI,
   strict workload transport and headless networking management.
 - [Implementation conformance](00-implementation-conformance.md)
+- [TrueForge and KeepView assessment](02-trueforge-keepview-assessment.md) — source-based reuse,
+  enterprise-control gaps and a proposed customer customization layer; no runtime migration is implemented.
 - [Input and Output Channels](10-overall/07-input-output-channels.md) — planned business routing,
   Tool-Sense module integration, and the Sales → CRM-Logistics1 Oracle opportunity use case.
 - [Channel consoles and role mapping](10-overall/08-channel-consoles-role-mapping.md) — planned
